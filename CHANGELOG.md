@@ -17,8 +17,14 @@ Historique détaillé de toutes les actions de développement.
 - [CREATE] `docker-compose.yml` - Services backend/frontend/postgres/redis/ollama/celery
 - [CREATE] `.env.example` - Variables environnement complètes (Paddle/Airwallex)
 
+- [CREATE] Backend models : User, Regulation, RegulationHistory, Simulation, FeatureFlag, AuditLog
+- [CREATE] `backend/app/main.py` - FastAPI app avec health check
+- [CREATE] `backend/app/config.py` - Settings avec Paddle/Airwallex
+- [CREATE] `backend/app/database.py` - SQLAlchemy setup
+- [GIT] Commit initial "feat: initial project structure" (commit 914ba99)
+
 ### Prochaines Actions
-- Création backend (models, routers, services)
+- Création backend services et routers
 - Création frontend (Next.js 15)
 - Scripts (seed, install, backup)
 

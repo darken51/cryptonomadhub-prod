@@ -30,8 +30,9 @@ async def health_check():
     return {"status": "healthy"}
 
 
-# TODO: Import routers here
-# from app.routers import auth, simulations, paddle_webhook
-# app.include_router(auth.router)
-# app.include_router(simulations.router)
-# app.include_router(paddle_webhook.router)
+# Import routers
+from app.routers import auth, simulations, paddle_webhook
+
+app.include_router(auth.router)
+app.include_router(simulations.router)
+app.include_router(paddle_webhook.router)
