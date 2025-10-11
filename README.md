@@ -8,11 +8,11 @@ Assistant IA pour nomades digitaux et investisseurs crypto - Support 10+ pays av
 
 ## 🎯 Statut Projet
 
-- **Phase** : MVP en développement (Session 1/5)
+- **Phase** : ✅ MVP COMPLET (Session 1)
 - **Stack** : FastAPI + Next.js 15 + PostgreSQL + Ollama + Docker
 - **Structure** : IBC Seychelles + Airwallex
 - **Budget** : $2k-4k MVP
-- **Timeline** : 4 mois
+- **Commits** : 914ba99, 446f8a5, 7608d65, b7a2c73
 
 ---
 
@@ -93,15 +93,17 @@ FastAPI Backend (port 8000)
 
 ## 📦 Fonctionnalités MVP
 
-### v1.0 (En cours)
-- [x] Authentication (JWT + OAuth2 Google)
-- [x] Database models (User, Regulation, Simulation, FeatureFlags)
+### v1.0 (✅ COMPLET)
+- [x] Authentication (JWT + OAuth2)
+- [x] Database models (User, Regulation, Simulation, FeatureFlags, AuditLog)
 - [x] Regulations versioning (historique audit trail)
-- [ ] Simulateur résidence (10 pays : US, FR, PT, AE, AU, CA, DE, SG, GB, ES)
-- [ ] **Explain Decision** mode (transparence calculs)
-- [ ] Paddle payments integration
-- [ ] Disclaimers légaux renforcés
-- [ ] Feature flags (rollout graduel)
+- [x] Simulateur résidence (10 pays : US, FR, PT, AE, AU, CA, DE, SG, GB, ES)
+- [x] **Explain Decision** mode (transparence calculs)
+- [x] Paddle payments integration (webhooks)
+- [x] Disclaimers légaux renforcés (3 variants)
+- [x] Feature flags (rollout graduel + A/B testing)
+- [x] Frontend Next.js 15 complet (auth, dashboard, simulations)
+- [x] Scripts installation et backup automatisés
 
 ### v1.1 (Post-MVP)
 - [ ] Chat guidé conversationnel
@@ -144,20 +146,28 @@ COMPANY_NUMBER="Registration #"
 ```
 backend/
 ├── app/
-│   ├── main.py              # FastAPI app
-│   ├── config.py            # Settings (Paddle/Airwallex)
-│   ├── database.py          # SQLAlchemy setup
-│   ├── models/
+│   ├── main.py              # FastAPI app ✅
+│   ├── config.py            # Settings (Paddle/Airwallex) ✅
+│   ├── database.py          # SQLAlchemy setup ✅
+│   ├── models/              # ✅ COMPLET
 │   │   ├── user.py          # User model
 │   │   ├── regulation.py    # Regulation + RegulationHistory
 │   │   ├── simulation.py    # Simulation avec snapshots
 │   │   ├── feature_flag.py  # Feature flags
 │   │   └── audit_log.py     # Audit trail GDPR
-│   ├── routers/             # TODO
-│   ├── services/            # TODO
-│   └── tasks/               # TODO (Celery)
-├── requirements.txt
-└── Dockerfile
+│   ├── routers/             # ✅ COMPLET
+│   │   ├── auth.py          # Register, login, JWT
+│   │   ├── simulations.py   # POST /residency + history
+│   │   └── paddle_webhook.py # Paddle events
+│   ├── services/            # ✅ COMPLET
+│   │   ├── tax_simulator.py # TaxSimulator + Explain Decision
+│   │   ├── paddle_handler.py # Webhook verification
+│   │   └── feature_flags.py # A/B testing
+│   ├── utils/               # ✅
+│   │   └── security.py      # JWT + bcrypt
+│   └── tasks/               # TODO (Celery - post-MVP)
+├── requirements.txt         # ✅
+└── Dockerfile              # ✅
 ```
 
 ### Commandes Utiles
@@ -192,7 +202,10 @@ git show HEAD
 ```
 
 **Commits actuels** :
-- `914ba99` - feat: initial project structure (2025-01-11)
+- `914ba99` - feat: initial project structure
+- `446f8a5` - feat: backend core - models, services, routers
+- `7608d65` - feat: add installation and backup scripts
+- `b7a2c73` - feat: complete frontend Next.js 15 application
 
 ---
 
@@ -208,7 +221,7 @@ Lis ces fichiers pour contexte complet :
 2. /home/fred/cryptonomadhub/CHANGELOG.md
 
 Dernière action : [voir CHANGELOG.md]
-Dernier commit git : 914ba99
+Dernier commit git : b7a2c73 (MVP complet)
 
 Continue le développement.
 ```
@@ -256,4 +269,4 @@ Propriétaire - IBC Seychelles
 
 ---
 
-**Dernière mise à jour** : 2025-01-11 (Session 1 - Structure initiale)
+**Dernière mise à jour** : 2025-10-11 (Session 1 - MVP complet ✅)

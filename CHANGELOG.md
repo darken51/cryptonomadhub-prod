@@ -42,10 +42,37 @@ Historique détaillé de toutes les actions de développement.
 - [CREATE] `scripts/backup.sh` - Backup PostgreSQL avec compression (rétention 30 jours)
 - [GIT] Commit "feat: add installation and backup scripts" (7608d65)
 
-### Prochaines Actions
-- Création frontend (Next.js 15)
-- Tests d'intégration backend
-- Migrations Alembic
+### Frontend Complete
+- [CREATE] `frontend/app/layout.tsx` - Root layout avec AuthProvider et ToastProvider
+- [CREATE] `frontend/app/globals.css` - TailwindCSS avec animations custom
+- [CREATE] `frontend/app/page.tsx` - Landing page avec hero et features
+- [CREATE] `frontend/app/auth/login/page.tsx` - Page de connexion
+- [CREATE] `frontend/app/auth/register/page.tsx` - Inscription avec disclaimer modal obligatoire
+- [CREATE] `frontend/app/dashboard/page.tsx` - Dashboard utilisateur avec stats
+- [CREATE] `frontend/app/simulations/new/page.tsx` - Formulaire simulation + résultats
+- [CREATE] `frontend/components/LegalDisclaimer.tsx` - 3 variants (compact, prominent, modal)
+- [CREATE] `frontend/components/SimulationExplainer.tsx` - Explain Decision UI expandable
+- [CREATE] `frontend/components/providers/AuthProvider.tsx` - Context Auth JWT
+- [CREATE] `frontend/components/providers/ToastProvider.tsx` - Notifications toast
+- [CREATE] `frontend/tailwind.config.ts` - Config TailwindCSS
+- [CREATE] `frontend/tsconfig.json` - TypeScript config
+- [CREATE] `frontend/next.config.js` - Next.js config
+- [CREATE] `frontend/.env.example` - API URL
+- [GIT] Commit "feat: complete frontend Next.js 15 application" (b7a2c73)
+
+### MVP Complet ✅
+**Backend**: Models, Services (TaxSimulator, PaddleHandler, FeatureFlags), Routers (Auth, Simulations, Paddle webhook)
+**Frontend**: Next.js 15 App Router, Auth pages, Dashboard, Simulation UI, Explain Decision
+**Scripts**: seed-regulations.py (10 pays), install.sh, backup.sh
+**Compliance**: Legal disclaimers partout, Regulation History versioning, Audit logs
+
+### Prochaines Actions (Post-MVP)
+- Migrations Alembic (backend/alembic/)
+- Tests d'intégration (pytest backend, Playwright frontend)
+- Déploiement production (Fly.io/Railway/Render)
+- Paddle webhooks testing
+- Ollama integration pour AI suggestions
+- API DeFi audit (Etherscan, BSCScan)
 
 ---
 
