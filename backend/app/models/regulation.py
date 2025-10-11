@@ -1,0 +1,101 @@
+from sqlalchemy import Column, Integer, String, Numeric, Text, DateTime, Date, ARRAY, Index
+from sqlalchemy.sql import func
+from app.database import Base
+from datetime import datetime, date
+
+
+class Regulation(Base):
+    """Current active regulations per country"""
+    __tablename__ = "regulations"
+
+    id = Column(Integer, primary_key=True, index=True)
+    country_code = Column(String(2), unique=True, index=True, nullable=False)
+    country_name = Column(String(100), nullable=False)
+
+    # Tax Rates (decimal 0-1, ex: 0.20 = 20%)
+    cgt_short_rate = Column(Numeric(5, 4), nullable=False)  # Short-term capital gains
+    cgt_long_rate = Column(Numeric(5, 4), nullable=False)   # Long-term capital gains
+    staking_rate = Column(Numeric(5, 4))                     # Staking rewards
+    mining_rate = Column(Numeric(5, 4))                      # Mining income
+
+    # Rules
+    nft_treatment = Column(String(50))  # "collectible", "capital_gain", etc
+    residency_rule = Column(Text)        # Ex: "183 days or domicile test"
+    treaty_countries = Column(ARRAY(String(2)))  # Countries with tax treaty
+    defi_reporting = Column(Text)        # DeFi reporting requirements
+    penalties_max = Column(String(200))   # Max penalties
+    notes = Column(Text)
+
+    # Metadata
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    source_url = Column(Text)
+
+    def to_dict(self):
+        return {
+            "country_code": self.country_code,
+            "country_name": self.country_name,
+            "cgt_short_rate": float(self.cgt_short_rate) if self.cgt_short_rate else None,
+            "cgt_long_rate": float(self.cgt_long_rate) if self.cgt_long_rate else None,
+            "staking_rate": float(self.staking_rate) if self.staking_rate else None,
+            "mining_rate": float(self.mining_rate) if self.mining_rate else None,
+            "residency_rule": self.residency_rule,
+            "treaty_countries": self.treaty_countries,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+            "notes": self.notes
+        }
+
+    @property
+    def is_stale(self) -> bool:
+        """Data older than 90 days"""
+        if not self.updated_at:
+            return True
+        return (datetime.now(self.updated_at.tzinfo) - self.updated_at).days > 90
+
+
+class RegulationHistory(Base):
+    """Historical versions of regulations for audit trail"""
+    __tablename__ = "regulations_history"
+
+    id = Column(Integer, primary_key=True, index=True)
+    country_code = Column(String(2), index=True, nullable=False)
+
+    # Tax Rates (snapshot)
+    cgt_short_rate = Column(Numeric(5, 4), nullable=False)
+    cgt_long_rate = Column(Numeric(5, 4), nullable=False)
+    staking_rate = Column(Numeric(5, 4))
+    mining_rate = Column(Numeric(5, 4))
+    nft_treatment = Column(String(50))
+    residency_rule = Column(Text)
+    treaty_countries = Column(ARRAY(String(2)))
+    defi_reporting = Column(Text)
+    penalties_max = Column(String(200))
+    notes = Column(Text)
+
+    # Validity Period
+    valid_from = Column(Date, nullable=False)  # Inclusive
+    valid_to = Column(Date, nullable=True)      # Exclusive (NULL = current)
+
+    # Metadata
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    source_url = Column(Text)
+    verified_by = Column(Integer, nullable=True)  # User ID who verified
+    change_notes = Column(Text)  # Why changed
+
+    __table_args__ = (
+        Index('idx_country_valid_period', 'country_code', 'valid_from', 'valid_to'),
+    )
+
+    @staticmethod
+    def get_at_date(db, country_code: str, target_date: date):
+        """Get regulation version valid at specific date"""
+        from sqlalchemy import or_, and_
+        return db.query(RegulationHistory).filter(
+            and_(
+                RegulationHistory.country_code == country_code,
+                RegulationHistory.valid_from <= target_date,
+                or_(
+                    RegulationHistory.valid_to > target_date,
+                    RegulationHistory.valid_to == None
+                )
+            )
+        ).first()

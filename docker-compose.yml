@@ -1,0 +1,101 @@
+version: '3.9'
+
+services:
+  backend:
+    build: ./backend
+    container_name: nomadcrypto-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://nomad:password@postgres:5432/nomadcrypto
+      - REDIS_URL=redis://redis:6379
+      - OLLAMA_HOST=http://ollama:11434
+      - SECRET_KEY=${SECRET_KEY}
+      - PADDLE_VENDOR_ID=${PADDLE_VENDOR_ID}
+      - PADDLE_AUTH_CODE=${PADDLE_AUTH_CODE}
+      - PADDLE_WEBHOOK_SECRET=${PADDLE_WEBHOOK_SECRET}
+    depends_on:
+      - postgres
+      - redis
+      - ollama
+    volumes:
+      - ./backend:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    restart: unless-stopped
+
+  celery-worker:
+    build: ./backend
+    container_name: nomadcrypto-celery
+    environment:
+      - DATABASE_URL=postgresql://nomad:password@postgres:5432/nomadcrypto
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+      - postgres
+    volumes:
+      - ./backend:/app
+    command: celery -A app.tasks.celery_app worker --loglevel=info
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: nomadcrypto-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_PADDLE_VENDOR_ID=${PADDLE_VENDOR_ID}
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    command: npm run dev
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: nomadcrypto-postgres
+    environment:
+      - POSTGRES_USER=nomad
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=nomadcrypto
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: nomadcrypto-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: nomadcrypto-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    restart: unless-stopped
+    # Uncomment for GPU support
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+volumes:
+  postgres_data:
+  redis_data:
+  ollama_data:
