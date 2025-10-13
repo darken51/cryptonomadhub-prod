@@ -1,0 +1,322 @@
+{
+  "common": {
+    "appName": "NomadCrypto Hub",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "close": "Close",
+    "logout": "Logout",
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "submit": "Submit",
+    "saving": "Saving...",
+    "deleting": "Deleting...",
+    "currency": "Currency",
+    "language": "Language",
+    "theme": "Theme",
+    "new": "NEW",
+    "beta": "Beta"
+  },
+  "auth": {
+    "login": {
+      "title": "Sign In",
+      "subtitle": "Welcome back to NomadCrypto Hub",
+      "emailPlaceholder": "your@email.com",
+      "passwordPlaceholder": "Your password",
+      "submitButton": "Sign In",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up",
+      "loggingIn": "Signing in...",
+      "error": "Invalid email or password"
+    },
+    "register": {
+      "title": "Create Account",
+      "subtitle": "Start optimizing your crypto taxes today",
+      "emailPlaceholder": "your@email.com",
+      "passwordPlaceholder": "Choose a strong password",
+      "confirmPasswordPlaceholder": "Confirm your password",
+      "submitButton": "Create Account",
+      "creating": "Creating account...",
+      "hasAccount": "Already have an account?",
+      "signIn": "Sign in",
+      "passwordMismatch": "Passwords do not match",
+      "weakPassword": "Password must be at least 8 characters"
+    },
+    "forgotPassword": {
+      "title": "Reset Password",
+      "subtitle": "Enter your email to receive a reset link",
+      "submitButton": "Send Reset Link",
+      "backToLogin": "Back to login",
+      "success": "Reset link sent! Check your email."
+    },
+    "resetPassword": {
+      "title": "New Password",
+      "subtitle": "Choose a new password for your account",
+      "newPassword": "New Password",
+      "submitButton": "Reset Password",
+      "success": "Password reset successful! You can now login."
+    }
+  },
+  "dashboard": {
+    "title": "Welcome to Your Dashboard",
+    "subtitle": "Start by simulating a residency change to see potential tax savings",
+    "cards": {
+      "aiChat": {
+        "title": "AI Chat Assistant",
+        "description": "Ask questions about crypto taxes in any country"
+      },
+      "newSimulation": {
+        "title": "New Simulation",
+        "description": "Compare tax impact of moving to a new country"
+      },
+      "compareCountries": {
+        "title": "Compare Countries",
+        "description": "Side-by-side comparison of up to 5 countries"
+      },
+      "defiAudit": {
+        "title": "DeFi Audit",
+        "description": "Analyze your DeFi activity and calculate taxes"
+      },
+      "countries": {
+        "title": "Countries",
+        "description": "Browse tax regulations for 98 countries"
+      },
+      "history": {
+        "title": "History",
+        "description": "View your past simulations"
+      },
+      "settings": {
+        "title": "Settings",
+        "description": "Manage your account preferences"
+      }
+    },
+    "quickStats": {
+      "title": "Quick Stats",
+      "simulations": "Simulations",
+      "countriesCompared": "Countries Compared",
+      "totalSavings": "Total Potential Savings",
+      "subscription": "Subscription",
+      "freeTier": "Free Tier"
+    },
+    "recentSimulations": {
+      "title": "Recent Simulations",
+      "viewAll": "View All",
+      "saved": "saved"
+    },
+    "disclaimer": "Reminder: This tool provides general information only and is NOT financial or legal advice. Always consult licensed professionals before making decisions."
+  },
+  "settings": {
+    "title": "Account Settings",
+    "profile": {
+      "title": "Profile",
+      "description": "Update your personal information",
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "John Doe",
+      "email": "Email",
+      "emailPlaceholder": "john@example.com",
+      "saveButton": "Save Changes",
+      "saving": "Saving...",
+      "success": "Profile updated successfully",
+      "error": "Failed to update profile"
+    },
+    "password": {
+      "title": "Change Password",
+      "description": "Update your password",
+      "currentPassword": "Current Password",
+      "currentPasswordPlaceholder": "Enter current password",
+      "newPassword": "New Password",
+      "newPasswordPlaceholder": "Enter new password (min 8 characters)",
+      "confirmPassword": "Confirm New Password",
+      "confirmPasswordPlaceholder": "Confirm new password",
+      "changeButton": "Change Password",
+      "changing": "Changing...",
+      "success": "Password changed successfully",
+      "error": "Current password is incorrect",
+      "mismatch": "New passwords do not match",
+      "tooShort": "Password must be at least 8 characters"
+    },
+    "preferences": {
+      "title": "Preferences",
+      "description": "Customize your experience",
+      "defaultCurrency": "Default Currency",
+      "currencies": {
+        "USD": "USD - US Dollar",
+        "EUR": "EUR - Euro",
+        "GBP": "GBP - British Pound",
+        "JPY": "JPY - Japanese Yen",
+        "CHF": "CHF - Swiss Franc",
+        "CAD": "CAD - Canadian Dollar",
+        "AUD": "AUD - Australian Dollar",
+        "BTC": "BTC - Bitcoin"
+      },
+      "language": "Language",
+      "languages": {
+        "en": "English",
+        "fr": "Français",
+        "es": "Español",
+        "de": "Deutsch",
+        "pt": "Português",
+        "ja": "日本語",
+        "zh": "中文"
+      },
+      "theme": "Theme",
+      "themes": {
+        "system": "System Default",
+        "light": "Light",
+        "dark": "Dark"
+      },
+      "saveButton": "Save Preferences",
+      "saving": "Saving...",
+      "success": "Preferences saved successfully"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Manage your notification preferences",
+      "emailNotifications": "Email Notifications",
+      "emailNotificationsDesc": "Receive important updates via email",
+      "productUpdates": "Product Updates",
+      "productUpdatesDesc": "Get notified about new features",
+      "marketingEmails": "Marketing Emails",
+      "marketingEmailsDesc": "Receive promotional content and tips",
+      "saveButton": "Save Notification Settings",
+      "saving": "Saving...",
+      "success": "Notification preferences saved"
+    },
+    "subscription": {
+      "title": "Subscription",
+      "description": "Manage your subscription plan",
+      "currentPlan": "Current Plan",
+      "freeTier": "Free Tier",
+      "freeTierDesc": "You are currently on the free tier with limited features.",
+      "upgradeButton": "Upgrade Plan"
+    },
+    "dangerZone": {
+      "title": "Danger Zone",
+      "description": "Irreversible actions",
+      "deleteAccount": "Delete Account",
+      "deleteWarning": "Once you delete your account, there is no going back. All your data, simulations, and settings will be permanently deleted.",
+      "confirmPlaceholder": "Type DELETE to confirm",
+      "deleteButton": "Delete Account Permanently",
+      "deleting": "Deleting..."
+    }
+  },
+  "defiAudit": {
+    "title": "DeFi Transaction Audit",
+    "subtitle": "Analyze your DeFi transactions across 40+ blockchains",
+    "beta": "⚠️ BETA FEATURE: This feature is in beta. Results may be incomplete.",
+    "form": {
+      "walletAddress": "Wallet Address",
+      "walletPlaceholder": "0x... or Solana address",
+      "blockchains": "Select Blockchains * ({count} selected)",
+      "dateRange": "Date Range",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "createButton": "Create Audit",
+      "creating": "Creating audit..."
+    },
+    "categories": {
+      "majorNetworks": "Major Networks ({count} chains)",
+      "layer2s": "Layer 2s ({count} chains)",
+      "emergingChains": "Emerging Chains ({count} chains)",
+      "others": "Others ({count} chains)",
+      "testnets": "Testnets ({count} chains)"
+    },
+    "chains": {
+      "ethereum": "Ethereum",
+      "polygon": "Polygon",
+      "bsc": "Binance Smart Chain (BSC)",
+      "avalanche": "Avalanche",
+      "fantom": "Fantom",
+      "solana": "Solana",
+      "arbitrum": "Arbitrum",
+      "optimism": "Optimism",
+      "base": "Base"
+    },
+    "audits": {
+      "title": "Your Audits",
+      "empty": "No audits yet. Create your first audit above!",
+      "status": {
+        "pending": "Processing...",
+        "completed": "Completed",
+        "failed": "Failed"
+      },
+      "transactions": "transactions",
+      "viewReport": "View Report",
+      "downloadPDF": "Download PDF",
+      "delete": "Delete"
+    }
+  },
+  "simulations": {
+    "new": {
+      "title": "New Tax Simulation",
+      "subtitle": "Compare crypto tax implications between countries"
+    },
+    "compare": {
+      "title": "Compare Countries",
+      "subtitle": "Side-by-side comparison of up to 5 countries"
+    },
+    "history": {
+      "title": "Simulation History",
+      "empty": "No simulations yet"
+    }
+  },
+  "countries": {
+    "title": "Country Tax Information",
+    "subtitle": "Browse tax regulations for 98 countries",
+    "search": "Search countries..."
+  },
+  "chat": {
+    "title": "AI Tax Assistant",
+    "subtitle": "Ask questions about crypto taxes in any country",
+    "placeholder": "Ask me anything about crypto taxes...",
+    "send": "Send"
+  },
+  "pricing": {
+    "title": "Choose Your Plan",
+    "subtitle": "Start optimizing your crypto taxes today"
+  },
+  "home": {
+    "hero": {
+      "title": "NomadCrypto Hub",
+      "subtitle": "AI-Powered Crypto Tax Optimization for Digital Nomads",
+      "description": "Compare tax scenarios across 98 countries with AI-powered insights & DeFi audit"
+    },
+    "cta": {
+      "getStarted": "Get Started Free",
+      "login": "Login"
+    },
+    "features": {
+      "countries": {
+        "title": "🌍 98 Countries",
+        "description": "Compare tax rates across major jurisdictions with official 2025 data"
+      },
+      "aiChat": {
+        "title": "🤖 AI Chat",
+        "description": "Conversational AI assistant with Explain Decision transparency mode"
+      },
+      "defiAudit": {
+        "title": "🔥 DeFi Audit",
+        "description": "Analyze on-chain activity across 5 blockchains (Uniswap, Aave, Compound)"
+      },
+      "pdfReports": {
+        "title": "📄 PDF Reports",
+        "description": "Export professional tax reports with full calculations and disclaimers"
+      }
+    },
+    "pricing": {
+      "teaser": "Freemium pricing starts at $20/month • No credit card required for trial",
+      "viewPlans": "View Plans →"
+    }
+  }
+}

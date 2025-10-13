@@ -1,0 +1,187 @@
+version: '3.9'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: nomadcrypto-backend-prod
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql://nomad:${POSTGRES_PASSWORD}@postgres:5432/nomadcrypto
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
+      - OLLAMA_HOST=http://ollama:11434
+      - SECRET_KEY=${SECRET_KEY}
+      - PADDLE_VENDOR_ID=${PADDLE_VENDOR_ID}
+      - PADDLE_AUTH_CODE=${PADDLE_AUTH_CODE}
+      - PADDLE_PUBLIC_KEY=${PADDLE_PUBLIC_KEY}
+      - PADDLE_WEBHOOK_SECRET=${PADDLE_WEBHOOK_SECRET}
+      - PADDLE_PLAN_STARTER=${PADDLE_PLAN_STARTER}
+      - PADDLE_PLAN_PRO=${PADDLE_PLAN_PRO}
+      - PADDLE_PLAN_ENTERPRISE=${PADDLE_PLAN_ENTERPRISE}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SENTRY_DSN=${SENTRY_DSN}
+      - FRONTEND_URL=${FRONTEND_URL}
+      - ENVIRONMENT=production
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "127.0.0.1:8000:8000"  # Only localhost access
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    volumes:
+      - ./backend/logs:/app/logs
+    networks:
+      - backend_network
+
+  celery-worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: nomadcrypto-celery-prod
+    restart: always
+    command: celery -A app.tasks.celery_app worker --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql://nomad:${POSTGRES_PASSWORD}@postgres:5432/nomadcrypto
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
+      - SECRET_KEY=${SECRET_KEY}
+      - OLLAMA_HOST=http://ollama:11434
+      - SENTRY_DSN=${SENTRY_DSN}
+      - ENVIRONMENT=production
+    depends_on:
+      - redis
+      - postgres
+    volumes:
+      - ./backend/logs:/app/logs
+    networks:
+      - backend_network
+
+  celery-beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: nomadcrypto-beat-prod
+    restart: always
+    command: celery -A app.tasks.celery_app beat --loglevel=info
+    environment:
+      - DATABASE_URL=postgresql://nomad:${POSTGRES_PASSWORD}@postgres:5432/nomadcrypto
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
+      - SECRET_KEY=${SECRET_KEY}
+      - ENVIRONMENT=production
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - backend_network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: nomadcrypto-frontend-prod
+    restart: always
+    environment:
+      - NEXT_PUBLIC_API_URL=${BACKEND_URL}
+      - NEXT_PUBLIC_PADDLE_VENDOR_ID=${PADDLE_VENDOR_ID}
+      - NODE_ENV=production
+    ports:
+      - "127.0.0.1:3000:3000"  # Only localhost access
+    depends_on:
+      - backend
+    networks:
+      - backend_network
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: nomadcrypto-postgres-prod
+    restart: always
+    environment:
+      - POSTGRES_USER=nomad
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=nomadcrypto
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    # DO NOT expose port externally in production!
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nomad -d nomadcrypto"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: nomadcrypto-redis-prod
+    restart: always
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_data_prod:/data
+    # DO NOT expose port externally in production!
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend_network
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: nomadcrypto-ollama-prod
+    restart: always
+    volumes:
+      - ollama_data_prod:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    # DO NOT expose port externally in production!
+    networks:
+      - backend_network
+
+  backup:
+    image: postgres:16-alpine
+    container_name: nomadcrypto-backup
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - ./backups:/backups
+    command: >
+      sh -c '
+      while true; do
+        echo "[$(date)] Starting backup..."
+        PGPASSWORD=${POSTGRES_PASSWORD} pg_dump -h postgres -U nomad nomadcrypto > /backups/backup_$(date +%Y%m%d_%H%M%S).sql
+        echo "[$(date)] Backup completed"
+        
+        # Delete backups older than 7 days
+        find /backups -name "backup_*.sql" -mtime +7 -delete
+        echo "[$(date)] Old backups cleaned up"
+        
+        # Sleep for 24 hours
+        sleep 86400
+      done
+      '
+    depends_on:
+      - postgres
+    networks:
+      - backend_network
+
+volumes:
+  postgres_data_prod:
+    driver: local
+  redis_data_prod:
+    driver: local
+  ollama_data_prod:
+    driver: local
+
+networks:
+  backend_network:
+    driver: bridge

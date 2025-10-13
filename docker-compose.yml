@@ -5,19 +5,27 @@ services:
     build: ./backend
     container_name: nomadcrypto-backend
     ports:
-      - "8000:8000"
+      - "8001:8000"
     environment:
       - DATABASE_URL=postgresql://nomad:password@postgres:5432/nomadcrypto
       - REDIS_URL=redis://redis:6379
-      - OLLAMA_HOST=http://ollama:11434
+      - OLLAMA_HOST=http://host.docker.internal:11434
       - SECRET_KEY=${SECRET_KEY}
       - PADDLE_VENDOR_ID=${PADDLE_VENDOR_ID}
       - PADDLE_AUTH_CODE=${PADDLE_AUTH_CODE}
+      - PADDLE_PUBLIC_KEY=${PADDLE_PUBLIC_KEY}
       - PADDLE_WEBHOOK_SECRET=${PADDLE_WEBHOOK_SECRET}
+      - PADDLE_PLAN_STARTER=${PADDLE_PLAN_STARTER}
+      - PADDLE_PLAN_PRO=${PADDLE_PLAN_PRO}
+      - PADDLE_PLAN_ENTERPRISE=${PADDLE_PLAN_ENTERPRISE}
+      - FRONTEND_URL=http://localhost:3001
+      - CORS_ORIGINS=http://localhost:3001,http://localhost:3000
+      - ENVIRONMENT=development
     depends_on:
       - postgres
       - redis
-      - ollama
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./backend:/app
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
@@ -29,9 +37,13 @@ services:
     environment:
       - DATABASE_URL=postgresql://nomad:password@postgres:5432/nomadcrypto
       - REDIS_URL=redis://redis:6379
+      - SECRET_KEY=${SECRET_KEY}
+      - OLLAMA_HOST=http://host.docker.internal:11434
     depends_on:
       - redis
       - postgres
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./backend:/app
     command: celery -A app.tasks.celery_app worker --loglevel=info
@@ -41,9 +53,9 @@ services:
     build: ./frontend
     container_name: nomadcrypto-frontend
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
-      - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_API_URL=http://localhost:8001
       - NEXT_PUBLIC_PADDLE_VENDOR_ID=${PADDLE_VENDOR_ID}
     depends_on:
       - backend
@@ -80,7 +92,7 @@ services:
     image: ollama/ollama:latest
     container_name: nomadcrypto-ollama
     ports:
-      - "11434:11434"
+      - "11435:11434"
     volumes:
       - ollama_data:/root/.ollama
     environment:

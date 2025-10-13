@@ -3,6 +3,8 @@ from .regulation import Regulation, RegulationHistory
 from .simulation import Simulation
 from .feature_flag import FeatureFlag
 from .audit_log import AuditLog
+from .defi_protocol import DeFiProtocol, DeFiTransaction, DeFiAudit
+from .license import License, LicenseTier, SubscriptionStatus
 
 __all__ = [
     "User",
@@ -11,4 +13,10 @@ __all__ = [
     "Simulation",
     "FeatureFlag",
     "AuditLog",
+    "DeFiProtocol",
+    "DeFiTransaction",
+    "DeFiAudit",
+    "License",
+    "LicenseTier",
+    "SubscriptionStatus",
 ]

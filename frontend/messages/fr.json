@@ -1,0 +1,322 @@
+{
+  "common": {
+    "appName": "NomadCrypto Hub",
+    "loading": "Chargement...",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "close": "Fermer",
+    "logout": "Déconnexion",
+    "login": "Connexion",
+    "register": "S'inscrire",
+    "email": "Email",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "submit": "Soumettre",
+    "saving": "Enregistrement...",
+    "deleting": "Suppression...",
+    "currency": "Devise",
+    "language": "Langue",
+    "theme": "Thème",
+    "new": "NOUVEAU",
+    "beta": "Bêta"
+  },
+  "auth": {
+    "login": {
+      "title": "Connexion",
+      "subtitle": "Bienvenue sur NomadCrypto Hub",
+      "emailPlaceholder": "votre@email.com",
+      "passwordPlaceholder": "Votre mot de passe",
+      "submitButton": "Se connecter",
+      "forgotPassword": "Mot de passe oublié ?",
+      "noAccount": "Pas encore de compte ?",
+      "signUp": "S'inscrire",
+      "loggingIn": "Connexion...",
+      "error": "Email ou mot de passe invalide"
+    },
+    "register": {
+      "title": "Créer un compte",
+      "subtitle": "Commencez à optimiser vos impôts crypto aujourd'hui",
+      "emailPlaceholder": "votre@email.com",
+      "passwordPlaceholder": "Choisissez un mot de passe fort",
+      "confirmPasswordPlaceholder": "Confirmez votre mot de passe",
+      "submitButton": "Créer un compte",
+      "creating": "Création du compte...",
+      "hasAccount": "Vous avez déjà un compte ?",
+      "signIn": "Se connecter",
+      "passwordMismatch": "Les mots de passe ne correspondent pas",
+      "weakPassword": "Le mot de passe doit contenir au moins 8 caractères"
+    },
+    "forgotPassword": {
+      "title": "Réinitialiser le mot de passe",
+      "subtitle": "Entrez votre email pour recevoir un lien de réinitialisation",
+      "submitButton": "Envoyer le lien",
+      "backToLogin": "Retour à la connexion",
+      "success": "Lien envoyé ! Vérifiez vos emails."
+    },
+    "resetPassword": {
+      "title": "Nouveau mot de passe",
+      "subtitle": "Choisissez un nouveau mot de passe pour votre compte",
+      "newPassword": "Nouveau mot de passe",
+      "submitButton": "Réinitialiser",
+      "success": "Mot de passe réinitialisé ! Vous pouvez maintenant vous connecter."
+    }
+  },
+  "dashboard": {
+    "title": "Bienvenue sur votre tableau de bord",
+    "subtitle": "Commencez par simuler un changement de résidence pour voir les économies potentielles",
+    "cards": {
+      "aiChat": {
+        "title": "Assistant IA",
+        "description": "Posez des questions sur les impôts crypto dans n'importe quel pays"
+      },
+      "newSimulation": {
+        "title": "Nouvelle simulation",
+        "description": "Comparez l'impact fiscal d'un déménagement vers un nouveau pays"
+      },
+      "compareCountries": {
+        "title": "Comparer les pays",
+        "description": "Comparaison côte à côte de jusqu'à 5 pays"
+      },
+      "defiAudit": {
+        "title": "Audit DeFi",
+        "description": "Analysez votre activité DeFi et calculez vos impôts"
+      },
+      "countries": {
+        "title": "Pays",
+        "description": "Parcourez les réglementations fiscales de 98 pays"
+      },
+      "history": {
+        "title": "Historique",
+        "description": "Consultez vos simulations passées"
+      },
+      "settings": {
+        "title": "Paramètres",
+        "description": "Gérez les préférences de votre compte"
+      }
+    },
+    "quickStats": {
+      "title": "Statistiques rapides",
+      "simulations": "Simulations",
+      "countriesCompared": "Pays comparés",
+      "totalSavings": "Économies potentielles totales",
+      "subscription": "Abonnement",
+      "freeTier": "Gratuit"
+    },
+    "recentSimulations": {
+      "title": "Simulations récentes",
+      "viewAll": "Voir tout",
+      "saved": "économisés"
+    },
+    "disclaimer": "Rappel : Cet outil fournit uniquement des informations générales et n'est PAS un conseil financier ou juridique. Consultez toujours des professionnels agréés avant de prendre des décisions."
+  },
+  "settings": {
+    "title": "Paramètres du compte",
+    "profile": {
+      "title": "Profil",
+      "description": "Mettez à jour vos informations personnelles",
+      "fullName": "Nom complet",
+      "fullNamePlaceholder": "Jean Dupont",
+      "email": "Email",
+      "emailPlaceholder": "jean@exemple.com",
+      "saveButton": "Enregistrer les modifications",
+      "saving": "Enregistrement...",
+      "success": "Profil mis à jour avec succès",
+      "error": "Échec de la mise à jour du profil"
+    },
+    "password": {
+      "title": "Changer le mot de passe",
+      "description": "Mettez à jour votre mot de passe",
+      "currentPassword": "Mot de passe actuel",
+      "currentPasswordPlaceholder": "Entrez le mot de passe actuel",
+      "newPassword": "Nouveau mot de passe",
+      "newPasswordPlaceholder": "Entrez le nouveau mot de passe (min 8 caractères)",
+      "confirmPassword": "Confirmer le nouveau mot de passe",
+      "confirmPasswordPlaceholder": "Confirmez le nouveau mot de passe",
+      "changeButton": "Changer le mot de passe",
+      "changing": "Modification...",
+      "success": "Mot de passe modifié avec succès",
+      "error": "Le mot de passe actuel est incorrect",
+      "mismatch": "Les nouveaux mots de passe ne correspondent pas",
+      "tooShort": "Le mot de passe doit contenir au moins 8 caractères"
+    },
+    "preferences": {
+      "title": "Préférences",
+      "description": "Personnalisez votre expérience",
+      "defaultCurrency": "Devise par défaut",
+      "currencies": {
+        "USD": "USD - Dollar américain",
+        "EUR": "EUR - Euro",
+        "GBP": "GBP - Livre sterling",
+        "JPY": "JPY - Yen japonais",
+        "CHF": "CHF - Franc suisse",
+        "CAD": "CAD - Dollar canadien",
+        "AUD": "AUD - Dollar australien",
+        "BTC": "BTC - Bitcoin"
+      },
+      "language": "Langue",
+      "languages": {
+        "en": "English",
+        "fr": "Français",
+        "es": "Español",
+        "de": "Deutsch",
+        "pt": "Português",
+        "ja": "日本語",
+        "zh": "中文"
+      },
+      "theme": "Thème",
+      "themes": {
+        "system": "Système par défaut",
+        "light": "Clair",
+        "dark": "Sombre"
+      },
+      "saveButton": "Enregistrer les préférences",
+      "saving": "Enregistrement...",
+      "success": "Préférences enregistrées avec succès"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "description": "Gérez vos préférences de notification",
+      "emailNotifications": "Notifications par email",
+      "emailNotificationsDesc": "Recevez les mises à jour importantes par email",
+      "productUpdates": "Mises à jour produit",
+      "productUpdatesDesc": "Soyez notifié des nouvelles fonctionnalités",
+      "marketingEmails": "Emails marketing",
+      "marketingEmailsDesc": "Recevez du contenu promotionnel et des conseils",
+      "saveButton": "Enregistrer les paramètres de notification",
+      "saving": "Enregistrement...",
+      "success": "Préférences de notification enregistrées"
+    },
+    "subscription": {
+      "title": "Abonnement",
+      "description": "Gérez votre plan d'abonnement",
+      "currentPlan": "Plan actuel",
+      "freeTier": "Gratuit",
+      "freeTierDesc": "Vous êtes actuellement sur le plan gratuit avec des fonctionnalités limitées.",
+      "upgradeButton": "Mettre à niveau"
+    },
+    "dangerZone": {
+      "title": "Zone dangereuse",
+      "description": "Actions irréversibles",
+      "deleteAccount": "Supprimer le compte",
+      "deleteWarning": "Une fois votre compte supprimé, il n'y a pas de retour en arrière possible. Toutes vos données, simulations et paramètres seront définitivement supprimés.",
+      "confirmPlaceholder": "Tapez DELETE pour confirmer",
+      "deleteButton": "Supprimer définitivement le compte",
+      "deleting": "Suppression..."
+    }
+  },
+  "defiAudit": {
+    "title": "Audit des transactions DeFi",
+    "subtitle": "Analysez vos transactions DeFi sur plus de 40 blockchains",
+    "beta": "⚠️ FONCTIONNALITÉ BÊTA : Cette fonctionnalité est en bêta. Les résultats peuvent être incomplets.",
+    "form": {
+      "walletAddress": "Adresse du portefeuille",
+      "walletPlaceholder": "0x... ou adresse Solana",
+      "blockchains": "Sélectionnez les blockchains * ({count} sélectionnées)",
+      "dateRange": "Période",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "createButton": "Créer l'audit",
+      "creating": "Création de l'audit..."
+    },
+    "categories": {
+      "majorNetworks": "Réseaux principaux ({count} chaînes)",
+      "layer2s": "Layer 2s ({count} chaînes)",
+      "emergingChains": "Chaînes émergentes ({count} chaînes)",
+      "others": "Autres ({count} chaînes)",
+      "testnets": "Testnets ({count} chaînes)"
+    },
+    "chains": {
+      "ethereum": "Ethereum",
+      "polygon": "Polygon",
+      "bsc": "Binance Smart Chain (BSC)",
+      "avalanche": "Avalanche",
+      "fantom": "Fantom",
+      "solana": "Solana",
+      "arbitrum": "Arbitrum",
+      "optimism": "Optimism",
+      "base": "Base"
+    },
+    "audits": {
+      "title": "Vos audits",
+      "empty": "Aucun audit pour le moment. Créez votre premier audit ci-dessus !",
+      "status": {
+        "pending": "En cours...",
+        "completed": "Terminé",
+        "failed": "Échec"
+      },
+      "transactions": "transactions",
+      "viewReport": "Voir le rapport",
+      "downloadPDF": "Télécharger PDF",
+      "delete": "Supprimer"
+    }
+  },
+  "simulations": {
+    "new": {
+      "title": "Nouvelle simulation fiscale",
+      "subtitle": "Comparez les implications fiscales crypto entre les pays"
+    },
+    "compare": {
+      "title": "Comparer les pays",
+      "subtitle": "Comparaison côte à côte de jusqu'à 5 pays"
+    },
+    "history": {
+      "title": "Historique des simulations",
+      "empty": "Aucune simulation pour le moment"
+    }
+  },
+  "countries": {
+    "title": "Informations fiscales par pays",
+    "subtitle": "Parcourez les réglementations fiscales de 98 pays",
+    "search": "Rechercher des pays..."
+  },
+  "chat": {
+    "title": "Assistant fiscal IA",
+    "subtitle": "Posez des questions sur les impôts crypto dans n'importe quel pays",
+    "placeholder": "Posez-moi n'importe quelle question sur les impôts crypto...",
+    "send": "Envoyer"
+  },
+  "pricing": {
+    "title": "Choisissez votre plan",
+    "subtitle": "Commencez à optimiser vos impôts crypto aujourd'hui"
+  },
+  "home": {
+    "hero": {
+      "title": "NomadCrypto Hub",
+      "subtitle": "Optimisation fiscale crypto par IA pour nomades numériques",
+      "description": "Comparez les scénarios fiscaux de 98 pays avec des insights IA et audit DeFi"
+    },
+    "cta": {
+      "getStarted": "Commencer gratuitement",
+      "login": "Connexion"
+    },
+    "features": {
+      "countries": {
+        "title": "🌍 98 Pays",
+        "description": "Comparez les taux d'imposition des principales juridictions avec les données officielles 2025"
+      },
+      "aiChat": {
+        "title": "🤖 Chat IA",
+        "description": "Assistant IA conversationnel avec mode transparence Explication des décisions"
+      },
+      "defiAudit": {
+        "title": "🔥 Audit DeFi",
+        "description": "Analysez l'activité on-chain sur 5 blockchains (Uniswap, Aave, Compound)"
+      },
+      "pdfReports": {
+        "title": "📄 Rapports PDF",
+        "description": "Exportez des rapports fiscaux professionnels avec calculs complets et mentions légales"
+      }
+    },
+    "pricing": {
+      "teaser": "Tarification freemium à partir de 20$/mois • Pas de carte bancaire requise pour l'essai",
+      "viewPlans": "Voir les plans →"
+    }
+  }
+}

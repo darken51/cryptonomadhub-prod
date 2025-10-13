@@ -133,9 +133,17 @@ export function LegalDisclaimer({ variant = 'compact', onAccept }: LegalDisclaim
             <li>Licensed Financial Advisor</li>
           </ul>
 
-          <p className="text-sm text-gray-600 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 pt-4">
-            By clicking "I Understand", you acknowledge that you have read and understood this disclaimer, and agree that NomadCrypto Hub and its creators bear no liability for any tax penalties, audits, legal consequences, or financial losses resulting from use of this tool.
-          </p>
+          <div className="text-sm text-gray-600 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 pt-4 space-y-2">
+            <p className="font-semibold">By clicking "I Accept", you acknowledge and agree that:</p>
+            <ul className="list-disc list-inside space-y-1 ml-4">
+              <li>You have read and understood this disclaimer</li>
+              <li>You have read and agree to our <a href="/terms" target="_blank" className="text-blue-600 hover:underline">Terms of Service</a></li>
+              <li>You have read and agree to our <a href="/privacy" target="_blank" className="text-blue-600 hover:underline">Privacy Policy</a></li>
+              <li>You understand this is NOT financial, tax, or legal advice</li>
+              <li>You are solely responsible for your tax compliance</li>
+              <li>NomadCrypto Hub bears no liability for any tax penalties, audits, legal consequences, or financial losses</li>
+            </ul>
+          </div>
         </div>
 
         <div className="flex gap-4">
@@ -143,7 +151,7 @@ export function LegalDisclaimer({ variant = 'compact', onAccept }: LegalDisclaim
             onClick={handleAccept}
             className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
           >
-            I Understand and Accept
+            I Accept All Terms
           </button>
         </div>
       </div>

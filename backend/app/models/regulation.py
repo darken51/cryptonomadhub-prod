@@ -13,8 +13,14 @@ class Regulation(Base):
     country_name = Column(String(100), nullable=False)
 
     # Tax Rates (decimal 0-1, ex: 0.20 = 20%)
-    cgt_short_rate = Column(Numeric(5, 4), nullable=False)  # Short-term capital gains
-    cgt_long_rate = Column(Numeric(5, 4), nullable=False)   # Long-term capital gains
+    cgt_short_rate = Column(Numeric(5, 4), nullable=False)  # Short-term capital gains (general)
+    cgt_long_rate = Column(Numeric(5, 4), nullable=False)   # Long-term capital gains (general)
+
+    # Crypto-specific tax rates (may differ from general CGT)
+    crypto_short_rate = Column(Numeric(5, 4))  # Short-term crypto gains (<1 year)
+    crypto_long_rate = Column(Numeric(5, 4))   # Long-term crypto gains (>1 year)
+    crypto_notes = Column(Text)                 # Crypto-specific rules and conditions
+
     staking_rate = Column(Numeric(5, 4))                     # Staking rewards
     mining_rate = Column(Numeric(5, 4))                      # Mining income
 
@@ -36,6 +42,9 @@ class Regulation(Base):
             "country_name": self.country_name,
             "cgt_short_rate": float(self.cgt_short_rate) if self.cgt_short_rate else None,
             "cgt_long_rate": float(self.cgt_long_rate) if self.cgt_long_rate else None,
+            "crypto_short_rate": float(self.crypto_short_rate) if self.crypto_short_rate else None,
+            "crypto_long_rate": float(self.crypto_long_rate) if self.crypto_long_rate else None,
+            "crypto_notes": self.crypto_notes,
             "staking_rate": float(self.staking_rate) if self.staking_rate else None,
             "mining_rate": float(self.mining_rate) if self.mining_rate else None,
             "residency_rule": self.residency_rule,

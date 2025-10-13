@@ -2,10 +2,14 @@ from fastapi import APIRouter, Request, HTTPException, Depends
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.services.paddle_handler import PaddleHandler
+from app.services.license_service import LicenseService
 from app.models.user import User
 from app.models.audit_log import AuditLog
+from app.models.license import SubscriptionStatus
 import json
+import logging
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/paddle", tags=["Paddle Webhooks"])
 
 
@@ -43,18 +47,37 @@ async def paddle_webhook(request: Request, db: Session = Depends(get_db)):
     passthrough = json.loads(data.get("passthrough", "{}"))
     user_id = passthrough.get("user_id")
 
+    # Initialize services
+    license_service = LicenseService(db)
+
     if event_type == "subscription_created":
         # New subscription
         subscription_id = data.get("subscription_id")
         plan_id = data.get("subscription_plan_id")
+        email = data.get("email")
+        amount = float(data.get("sale_gross", 0))
+        currency = data.get("currency", "USD")
+        billing_period = "yearly" if data.get("subscription_payment_frequency") == "yearly" else "monthly"
 
         # Get tier from plan ID
-        tier = paddle.get_plan_tier_from_id(plan_id)
+        tier = license_service.get_tier_from_paddle_plan_id(plan_id)
 
-        # TODO: Update user license in database
-        # license = License(user_id=user_id, tier=tier, paddle_subscription_id=subscription_id)
-        # db.add(license)
-        # db.commit()
+        # Upgrade user license
+        try:
+            license = license_service.upgrade_license(
+                user_id=user_id,
+                tier=tier,
+                paddle_subscription_id=subscription_id,
+                paddle_plan_id=plan_id,
+                paddle_email=email,
+                amount=amount,
+                currency=currency,
+                billing_period=billing_period
+            )
+            logger.info(f"Created subscription {subscription_id} for user {user_id} - Tier: {tier.value}")
+        except Exception as e:
+            logger.error(f"Failed to create subscription: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
 
         # Log
         audit = AuditLog(
@@ -63,43 +86,64 @@ async def paddle_webhook(request: Request, db: Session = Depends(get_db)):
             details={
                 "subscription_id": subscription_id,
                 "plan_id": plan_id,
-                "tier": tier
+                "tier": tier.value,
+                "amount": amount,
+                "currency": currency
             }
         )
         db.add(audit)
         db.commit()
 
     elif event_type == "subscription_updated":
-        # Plan change
+        # Plan change (upgrade/downgrade)
         subscription_id = data.get("subscription_id")
         plan_id = data.get("subscription_plan_id")
-        tier = paddle.get_plan_tier_from_id(plan_id)
+        email = data.get("email")
+        amount = float(data.get("sale_gross", 0))
+        currency = data.get("currency", "USD")
 
-        # TODO: Update license tier
-        # license = db.query(License).filter_by(paddle_subscription_id=subscription_id).first()
-        # if license:
-        #     license.tier = tier
-        #     db.commit()
+        # Get new tier
+        tier = license_service.get_tier_from_paddle_plan_id(plan_id)
+
+        # Update license
+        try:
+            license = license_service.upgrade_license(
+                user_id=user_id,
+                tier=tier,
+                paddle_subscription_id=subscription_id,
+                paddle_plan_id=plan_id,
+                paddle_email=email,
+                amount=amount,
+                currency=currency
+            )
+            logger.info(f"Updated subscription {subscription_id} to tier {tier.value}")
+        except Exception as e:
+            logger.error(f"Failed to update subscription: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
 
         audit = AuditLog(
             user_id=user_id,
             action="subscription_updated",
-            details={"subscription_id": subscription_id, "new_tier": tier}
+            details={"subscription_id": subscription_id, "new_tier": tier.value}
         )
         db.add(audit)
         db.commit()
 
     elif event_type == "subscription_cancelled":
-        # Cancellation
+        # Cancellation - downgrade to FREE at end of billing period
         subscription_id = data.get("subscription_id")
         cancellation_date = data.get("cancellation_effective_date")
 
-        # TODO: Mark license as cancelled
-        # license = db.query(License).filter_by(paddle_subscription_id=subscription_id).first()
-        # if license:
-        #     license.status = "cancelled"
-        #     license.cancels_at = cancellation_date
-        #     db.commit()
+        # Update subscription status
+        try:
+            license = license_service.update_subscription_status(
+                paddle_subscription_id=subscription_id,
+                status=SubscriptionStatus.CANCELLED
+            )
+            logger.info(f"Cancelled subscription {subscription_id} - Effective: {cancellation_date}")
+        except Exception as e:
+            logger.error(f"Failed to cancel subscription: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
 
         audit = AuditLog(
             user_id=user_id,
@@ -128,10 +172,22 @@ async def paddle_webhook(request: Request, db: Session = Depends(get_db)):
 
     elif event_type == "subscription_payment_failed":
         # Failed payment - Paddle handles dunning automatically
+        subscription_id = data.get("subscription_id")
+
+        # Mark subscription as past_due
+        try:
+            license = license_service.update_subscription_status(
+                paddle_subscription_id=subscription_id,
+                status=SubscriptionStatus.PAST_DUE
+            )
+            logger.warning(f"Payment failed for subscription {subscription_id}")
+        except Exception as e:
+            logger.error(f"Failed to update payment failed status: {e}")
+
         audit = AuditLog(
             user_id=user_id,
             action="payment_failed",
-            details={"subscription_id": data.get("subscription_id")}
+            details={"subscription_id": subscription_id, "amount": data.get("sale_gross")}
         )
         db.add(audit)
         db.commit()

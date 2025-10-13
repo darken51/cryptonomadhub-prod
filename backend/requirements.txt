@@ -10,28 +10,50 @@ asyncpg==0.29.0
 psycopg2-binary==2.9.9
 
 # Pydantic
-pydantic==2.5.0
+pydantic[email]==2.5.0
 pydantic-settings==2.1.0
+email-validator==2.1.0
 
 # Authentication
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
 python-multipart==0.0.6
 
 # Redis & Celery
 redis==5.0.1
 celery==5.3.4
 
+# Rate Limiting
+slowapi==0.1.9
+
 # Paddle (Payments - PAS Stripe)
 requests==2.31.0
 httpx==0.25.2
 
 # Crypto Exchange APIs
-ccxt==4.1.0
+ccxt==4.5.10
+
+# Blockchain & Web3
+web3==6.15.1
+eth-abi==4.2.1
 
 # Utilities
 python-dateutil==2.8.2
 python-dotenv==1.0.0
+
+# Web Scraping & Data Fetching
+beautifulsoup4==4.12.2
+lxml==5.1.0
+pdfplumber==0.10.3
+PyPDF2==3.0.1
+
+# PDF Generation
+weasyprint==60.2
+pydyf==0.10.0
+
+# Monitoring & Error Tracking
+sentry-sdk[fastapi]==1.40.0
 
 # Testing
 pytest==7.4.3

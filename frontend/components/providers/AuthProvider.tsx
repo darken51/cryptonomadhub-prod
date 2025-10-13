@@ -37,7 +37,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchUser = async (accessToken: string) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
+      const apiUrl = typeof window !== 'undefined' ? process.env.NEXT_PUBLIC_API_URL : 'http://backend:8000';
+    const response = await fetch(`${apiUrl}/auth/me`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },

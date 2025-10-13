@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, Enum
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, Enum, JSON
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
 import enum
@@ -19,8 +20,13 @@ class User(Base):
     role = Column(Enum(UserRole), default=UserRole.USER, nullable=False)
 
     # Profile
+    full_name = Column(String, nullable=True)
     current_country = Column(String(2))  # ISO country code
     beta_tester = Column(Boolean, default=False)
+
+    # User Preferences (JSON)
+    preferences = Column(JSON, nullable=True)  # {default_currency, language, theme}
+    notifications = Column(JSON, nullable=True)  # {email_notifications, marketing_emails, product_updates}
 
     # Timestamps
     created_at = Column(DateTime(timezone=True), server_default=func.now())
@@ -30,6 +36,18 @@ class User(Base):
     # OAuth
     google_id = Column(String, nullable=True)
     linkedin_id = Column(String, nullable=True)
+
+    # Password reset
+    reset_token = Column(String, nullable=True)
+    reset_token_expires = Column(DateTime(timezone=True), nullable=True)
+
+    # Email verification
+    email_verified = Column(Boolean, default=False)
+    verification_token = Column(String, nullable=True)
+    verification_token_expires = Column(DateTime(timezone=True), nullable=True)
+
+    # Relationships
+    license = relationship("License", back_populates="user", uselist=False, cascade="all, delete-orphan")
 
     def to_dict(self):
         return {

@@ -3,11 +3,14 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { useToast } from '@/components/providers/ToastProvider'
 import { LegalDisclaimer } from '@/components/LegalDisclaimer'
 
 export default function RegisterPage() {
+  const t = useTranslations('auth.register')
+  const tCommon = useTranslations('common')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -22,12 +25,12 @@ export default function RegisterPage() {
     e.preventDefault()
 
     if (password !== confirmPassword) {
-      showToast('Passwords do not match', 'error')
+      showToast(t('passwordMismatch'), 'error')
       return
     }
 
     if (password.length < 8) {
-      showToast('Password must be at least 8 characters', 'error')
+      showToast(t('weakPassword'), 'error')
       return
     }
 
@@ -64,9 +67,9 @@ export default function RegisterPage() {
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Create Account</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
           <p className="mt-2 text-gray-600 dark:text-gray-400">
-            Start optimizing your crypto taxes
+            {t('subtitle')}
           </p>
         </div>
 
@@ -75,7 +78,7 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Email Address
+                {tCommon('email')}
               </label>
               <input
                 id="email"
@@ -84,13 +87,13 @@ export default function RegisterPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
-                placeholder="you@example.com"
+                placeholder={t('emailPlaceholder')}
               />
             </div>
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Password
+                {tCommon('password')}
               </label>
               <input
                 id="password"
@@ -99,16 +102,16 @@ export default function RegisterPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
-                placeholder="••••••••"
+                placeholder={t('passwordPlaceholder')}
               />
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Minimum 8 characters
+                {t('weakPassword')}
               </p>
             </div>
 
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Confirm Password
+                {tCommon('confirmPassword')}
               </label>
               <input
                 id="confirmPassword"
@@ -117,28 +120,38 @@ export default function RegisterPage() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
-                placeholder="••••••••"
+                placeholder={t('confirmPasswordPlaceholder')}
               />
             </div>
 
-            <div className="flex items-start gap-3">
-              <input
-                id="terms"
-                type="checkbox"
-                checked={acceptedTerms}
-                onChange={(e) => setAcceptedTerms(e.target.checked)}
-                className="mt-1"
-              />
-              <label htmlFor="terms" className="text-sm text-gray-700 dark:text-gray-300">
-                I understand that this tool is NOT financial or legal advice, and I agree to the{' '}
-                <button
-                  type="button"
-                  onClick={() => setShowDisclaimer(true)}
-                  className="text-blue-600 hover:underline"
-                >
-                  Terms of Service
-                </button>
-              </label>
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <input
+                  id="terms"
+                  type="checkbox"
+                  checked={acceptedTerms}
+                  onChange={(e) => setAcceptedTerms(e.target.checked)}
+                  className="mt-1"
+                />
+                <label htmlFor="terms" className="text-sm text-gray-700 dark:text-gray-300">
+                  I understand that this tool is <strong>NOT financial, tax, or legal advice</strong>, and I agree to the{' '}
+                  <Link href="/terms" target="_blank" className="text-blue-600 hover:underline">
+                    Terms of Service
+                  </Link>
+                  {' '}and{' '}
+                  <Link href="/privacy" target="_blank" className="text-blue-600 hover:underline">
+                    Privacy Policy
+                  </Link>
+                </label>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowDisclaimer(true)}
+                className="text-xs text-blue-600 hover:underline ml-6"
+              >
+                → Read full legal disclaimer
+              </button>
             </div>
 
             <button
@@ -146,15 +159,15 @@ export default function RegisterPage() {
               disabled={isLoading}
               className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? 'Creating account...' : 'Create Account'}
+              {isLoading ? t('creating') : t('submitButton')}
             </button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Already have an account?{' '}
+              {t('hasAccount')}{' '}
               <Link href="/auth/login" className="text-blue-600 hover:underline font-semibold">
-                Sign in
+                {t('signIn')}
               </Link>
             </p>
           </div>
@@ -163,7 +176,7 @@ export default function RegisterPage() {
         {/* Back to home */}
         <div className="text-center">
           <Link href="/" className="text-sm text-gray-600 dark:text-gray-400 hover:underline">
-            ← Back to home
+            ← {tCommon('back')}
           </Link>
         </div>
       </div>

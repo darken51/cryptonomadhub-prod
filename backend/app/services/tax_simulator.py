@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from app.models.regulation import Regulation, RegulationHistory
 from app.models.simulation import Simulation
+from app.services.regulation_history import RegulationHistoryService
 from dataclasses import dataclass
 from typing import List, Dict
 from datetime import datetime, date
@@ -61,13 +62,21 @@ class TaxSimulator:
         if not reg_current or not reg_target:
             raise ValueError(f"Regulations not found for {current_country} or {target_country}")
 
-        # Calculate taxes
-        current_tax_short = short_term_gains * float(reg_current.cgt_short_rate)
-        current_tax_long = long_term_gains * float(reg_current.cgt_long_rate)
+        # Calculate taxes using crypto-specific rates if available, otherwise fallback to general CGT
+        # Current country
+        current_short_rate = float(reg_current.crypto_short_rate) if reg_current.crypto_short_rate is not None else float(reg_current.cgt_short_rate)
+        current_long_rate = float(reg_current.crypto_long_rate) if reg_current.crypto_long_rate is not None else float(reg_current.cgt_long_rate)
+
+        current_tax_short = short_term_gains * current_short_rate
+        current_tax_long = long_term_gains * current_long_rate
         current_tax = current_tax_short + current_tax_long
 
-        target_tax_short = short_term_gains * float(reg_target.cgt_short_rate)
-        target_tax_long = long_term_gains * float(reg_target.cgt_long_rate)
+        # Target country
+        target_short_rate = float(reg_target.crypto_short_rate) if reg_target.crypto_short_rate is not None else float(reg_target.cgt_short_rate)
+        target_long_rate = float(reg_target.crypto_long_rate) if reg_target.crypto_long_rate is not None else float(reg_target.cgt_long_rate)
+
+        target_tax_short = short_term_gains * target_short_rate
+        target_tax_long = long_term_gains * target_long_rate
         target_tax = target_tax_short + target_tax_long
 
         savings = current_tax - target_tax
@@ -119,28 +128,42 @@ class TaxSimulator:
     ) -> SimulationExplanation:
         """Generate step-by-step explanation (Explain Decision)"""
 
+        # Get actual rates used (crypto-specific if available, otherwise general CGT)
+        current_short_rate = float(reg_current.crypto_short_rate) if reg_current.crypto_short_rate is not None else float(reg_current.cgt_short_rate)
+        current_long_rate = float(reg_current.crypto_long_rate) if reg_current.crypto_long_rate is not None else float(reg_current.cgt_long_rate)
+        target_short_rate = float(reg_target.crypto_short_rate) if reg_target.crypto_short_rate is not None else float(reg_target.cgt_short_rate)
+        target_long_rate = float(reg_target.crypto_long_rate) if reg_target.crypto_long_rate is not None else float(reg_target.cgt_long_rate)
+
+        current_uses_crypto = reg_current.crypto_short_rate is not None
+        target_uses_crypto = reg_target.crypto_short_rate is not None
+
+        current_label = "crypto tax" if current_uses_crypto else "CGT"
+        target_label = "crypto tax" if target_uses_crypto else "CGT"
+
         reasoning = [
-            f"1. Current residency {reg_current.country_code}: {float(reg_current.cgt_short_rate)*100:.1f}% short-term, {float(reg_current.cgt_long_rate)*100:.1f}% long-term CGT",
-            f"2. Target residency {reg_target.country_code}: {float(reg_target.cgt_short_rate)*100:.1f}% short-term, {float(reg_target.cgt_long_rate)*100:.1f}% long-term CGT",
+            f"1. Current residency {reg_current.country_code}: {current_short_rate*100:.1f}% short-term, {current_long_rate*100:.1f}% long-term {current_label}",
+            f"2. Target residency {reg_target.country_code}: {target_short_rate*100:.1f}% short-term, {target_long_rate*100:.1f}% long-term {target_label}",
             f"3. Your projected gains: ${short_term:,.0f} short-term + ${long_term:,.0f} long-term",
-            f"4. Current tax calculation: ${current_tax:,.0f} (${short_term * float(reg_current.cgt_short_rate):,.0f} short + ${long_term * float(reg_current.cgt_long_rate):,.0f} long)",
-            f"5. Target tax calculation: ${target_tax:,.0f} (${short_term * float(reg_target.cgt_short_rate):,.0f} short + ${long_term * float(reg_target.cgt_long_rate):,.0f} long)",
+            f"4. Current tax calculation: ${current_tax:,.0f} (${short_term * current_short_rate:,.0f} short + ${long_term * current_long_rate:,.0f} long)",
+            f"5. Target tax calculation: ${target_tax:,.0f} (${short_term * target_short_rate:,.0f} short + ${long_term * target_long_rate:,.0f} long)",
             f"6. Net savings: ${savings:,.0f} ({(savings/current_tax*100 if current_tax > 0 else 0):.1f}% reduction)"
         ]
 
         rules_applied = [
             {
                 "country": reg_current.country_code,
-                "rule": "Capital Gains Tax",
-                "rate_short": float(reg_current.cgt_short_rate),
-                "rate_long": float(reg_current.cgt_long_rate),
+                "rule": "Crypto Tax" if current_uses_crypto else "Capital Gains Tax",
+                "rate_short": current_short_rate,
+                "rate_long": current_long_rate,
+                "crypto_specific": current_uses_crypto,
                 "source": reg_current.source_url or f"Tax authority {reg_current.country_code}"
             },
             {
                 "country": reg_target.country_code,
-                "rule": "Capital Gains Tax",
-                "rate_short": float(reg_target.cgt_short_rate),
-                "rate_long": float(reg_target.cgt_long_rate),
+                "rule": "Crypto Tax" if target_uses_crypto else "Capital Gains Tax",
+                "rate_short": target_short_rate,
+                "rate_long": target_long_rate,
+                "crypto_specific": target_uses_crypto,
                 "source": reg_target.source_url or f"Tax authority {reg_target.country_code}"
             }
         ]
@@ -231,7 +254,13 @@ class TaxSimulator:
         reg_target: Regulation,
         capital_gains: float
     ):
-        """Save simulation with regulation snapshots"""
+        """Save simulation with COMPLETE regulation snapshots for legal compliance"""
+
+        # Create complete snapshots using the history service
+        # This ensures we have full audit trail
+        current_snapshot = RegulationHistoryService.create_regulation_snapshot_dict(reg_current)
+        target_snapshot = RegulationHistoryService.create_regulation_snapshot_dict(reg_target)
+
         simulation = Simulation(
             user_id=user_id,
             current_country=result.current_country,
@@ -247,20 +276,9 @@ class TaxSimulator:
                 'timeline': result.timeline
             },
             regulation_snapshot={
-                'current': {
-                    'country': reg_current.country_code,
-                    'cgt_short_rate': float(reg_current.cgt_short_rate),
-                    'cgt_long_rate': float(reg_current.cgt_long_rate),
-                    'updated_at': reg_current.updated_at.isoformat() if reg_current.updated_at else None,
-                    'notes': reg_current.notes
-                },
-                'target': {
-                    'country': reg_target.country_code,
-                    'cgt_short_rate': float(reg_target.cgt_short_rate),
-                    'cgt_long_rate': float(reg_target.cgt_long_rate),
-                    'updated_at': reg_target.updated_at.isoformat() if reg_target.updated_at else None,
-                    'notes': reg_target.notes
-                }
+                'current': current_snapshot,
+                'target': target_snapshot,
+                'calculated_at': datetime.utcnow().isoformat()
             }
         )
 

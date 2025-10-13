@@ -3,10 +3,13 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { useToast } from '@/components/providers/ToastProvider'
 
 export default function LoginPage() {
+  const t = useTranslations('auth.login')
+  const tCommon = useTranslations('common')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -34,9 +37,9 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Welcome Back</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{t('title')}</h1>
           <p className="mt-2 text-gray-600 dark:text-gray-400">
-            Sign in to your NomadCrypto account
+            {t('subtitle')}
           </p>
         </div>
 
@@ -45,7 +48,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Email Address
+                {tCommon('email')}
               </label>
               <input
                 id="email"
@@ -54,14 +57,19 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
-                placeholder="you@example.com"
+                placeholder={t('emailPlaceholder')}
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Password
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {tCommon('password')}
+                </label>
+                <Link href="/auth/forgot-password" className="text-sm text-blue-600 hover:underline">
+                  {t('forgotPassword')}
+                </Link>
+              </div>
               <input
                 id="password"
                 type="password"
@@ -69,7 +77,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:text-white"
-                placeholder="••••••••"
+                placeholder={t('passwordPlaceholder')}
               />
             </div>
 
@@ -78,15 +86,15 @@ export default function LoginPage() {
               disabled={isLoading}
               className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? 'Signing in...' : 'Sign In'}
+              {isLoading ? t('loggingIn') : t('submitButton')}
             </button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Don't have an account?{' '}
+              {t('noAccount')}{' '}
               <Link href="/auth/register" className="text-blue-600 hover:underline font-semibold">
-                Sign up
+                {t('signUp')}
               </Link>
             </p>
           </div>
@@ -95,7 +103,7 @@ export default function LoginPage() {
         {/* Back to home */}
         <div className="text-center">
           <Link href="/" className="text-sm text-gray-600 dark:text-gray-400 hover:underline">
-            ← Back to home
+            ← {tCommon('back')}
           </Link>
         </div>
       </div>
