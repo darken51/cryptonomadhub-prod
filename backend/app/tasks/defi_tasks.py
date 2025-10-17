@@ -12,7 +12,9 @@ from app.services.defi_audit_service import DeFiAuditService
 from app.services.cost_basis_calculator import CostBasisCalculator
 from app.services.notification_service import NotificationService
 from sqlalchemy.orm import Session
+from datetime import datetime
 import logging
+import asyncio
 
 logger = logging.getLogger(__name__)
 
@@ -44,36 +46,12 @@ def process_defi_audit_task(self, audit_id: int, wallet_address: str):
     - 90-95%: Calculating taxes
     - 95-100%: Finalizing
     """
-    try:
-        # Get audit
-        audit = self.db.query(DeFiAudit).filter(DeFiAudit.id == audit_id).first()
-        if not audit:
-            raise ValueError(f"Audit {audit_id} not found")
 
-        # Update status
-        audit.status = "processing"
-        self.db.commit()
-
-        # Initialize services
-        defi_service = DeFiAuditService(self.db)
-        cost_basis_calc = CostBasisCalculator(self.db, audit.user_id)
-
-        # Progress tracking
-        total_chains = len(audit.chains)
-        progress_per_chain = 70 // total_chains if total_chains > 0 else 70
-
-        self.update_state(
-            state="PROGRESS",
-            meta={
-                "current": 0,
-                "total": 100,
-                "status": "Starting audit...",
-                "audit_id": audit_id
-            }
-        )
+    async def _run_audit_async():
+        """Inner async function to handle async operations"""
+        nonlocal audit, defi_service, all_transactions
 
         # Scan each blockchain
-        all_transactions = []
         for idx, chain in enumerate(audit.chains):
             logger.info(f"Scanning chain {chain} ({idx+1}/{total_chains})")
 
@@ -133,6 +111,54 @@ def process_defi_audit_task(self, audit_id: int, wallet_address: str):
                 except Exception as e:
                     logger.error(f"Failed to calculate cost basis for tx {tx.tx_hash}: {e}")
 
+        # Send notification
+        self.update_state(
+            state="PROGRESS",
+            meta={
+                "current": 95,
+                "total": 100,
+                "status": "Sending notification..."
+            }
+        )
+
+        notification_service = NotificationService(self.db)
+        try:
+            await notification_service.notify_audit_complete(audit.user_id, audit.id)
+        except Exception as e:
+            logger.warning(f"Failed to send notification: {e}")
+
+    try:
+        # Get audit
+        audit = self.db.query(DeFiAudit).filter(DeFiAudit.id == audit_id).first()
+        if not audit:
+            raise ValueError(f"Audit {audit_id} not found")
+
+        # Update status
+        audit.status = "processing"
+        self.db.commit()
+
+        # Initialize services
+        defi_service = DeFiAuditService(self.db)
+        cost_basis_calc = CostBasisCalculator(self.db, audit.user_id)
+
+        # Progress tracking
+        total_chains = len(audit.chains)
+        progress_per_chain = 70 // total_chains if total_chains > 0 else 70
+
+        self.update_state(
+            state="PROGRESS",
+            meta={
+                "current": 0,
+                "total": 100,
+                "status": "Starting audit...",
+                "audit_id": audit_id
+            }
+        )
+
+        # Run async operations
+        all_transactions = []
+        asyncio.run(_run_audit_async())
+
         # Calculate summary statistics
         self.update_state(
             state="PROGRESS",
@@ -160,19 +186,6 @@ def process_defi_audit_task(self, audit_id: int, wallet_address: str):
         audit.completed_at = datetime.utcnow()
 
         self.db.commit()
-
-        # Send notification
-        self.update_state(
-            state="PROGRESS",
-            meta={
-                "current": 95,
-                "total": 100,
-                "status": "Sending notification..."
-            }
-        )
-
-        notification_service = NotificationService(self.db)
-        await notification_service.notify_audit_complete(audit.user_id, audit.id)
 
         logger.info(f"Audit {audit_id} completed successfully")
 
@@ -211,14 +224,8 @@ def sync_cost_basis_from_exchange_task(user_id: int, exchange: str, api_key: str
     """
     from app.services.exchange_connectors import ExchangeConnectorFactory
 
-    try:
-        db = next(get_db())
-        connector = ExchangeConnectorFactory.get_connector(exchange)
-
-        trades = connector.fetch_trades(api_key, api_secret)
-
-        cost_basis_calc = CostBasisCalculator(db, user_id)
-
+    async def _import_trades_async():
+        """Inner async function"""
         for trade in trades:
             if trade["side"] == "buy":
                 await cost_basis_calc.add_lot(
@@ -230,6 +237,17 @@ def sync_cost_basis_from_exchange_task(user_id: int, exchange: str, api_key: str
                     acquisition_method="purchase",
                     notes=f"Imported from {exchange}"
                 )
+
+    try:
+        db = next(get_db())
+        connector = ExchangeConnectorFactory.get_connector(exchange)
+
+        trades = connector.fetch_trades(api_key, api_secret)
+
+        cost_basis_calc = CostBasisCalculator(db, user_id)
+
+        # Run async imports
+        asyncio.run(_import_trades_async())
 
         logger.info(f"Imported {len(trades)} trades from {exchange} for user {user_id}")
 
@@ -253,11 +271,16 @@ def calculate_tax_optimization_task(user_id: int):
     """
     from app.services.tax_optimizer import TaxOptimizer
 
+    async def _analyze_async():
+        """Inner async function"""
+        return await optimizer.analyze_portfolio()
+
     try:
         db = next(get_db())
         optimizer = TaxOptimizer(db, user_id)
 
-        suggestions = await optimizer.analyze_portfolio()
+        # Run async analysis
+        suggestions = asyncio.run(_analyze_async())
 
         logger.info(f"Generated {len(suggestions['trades_suggested'])} tax optimization suggestions for user {user_id}")
 

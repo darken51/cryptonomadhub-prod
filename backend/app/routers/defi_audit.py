@@ -139,6 +139,32 @@ async def create_defi_audit(
             detail=f"Unsupported chains: {invalid_chains}. Supported: {supported_chains}"
         )
 
+    # Validate address compatibility with chains
+    wallet_address = audit_request.wallet_address.strip()
+    is_evm_address = re.match(r'^0x[a-fA-F0-9]{40}$', wallet_address)
+    is_solana_address = re.match(r'^[1-9A-HJ-NP-Za-km-z]{32,44}$', wallet_address)
+
+    evm_chains = [c for c in audit_request.chains if c.lower() != 'solana']
+    solana_chains = [c for c in audit_request.chains if c.lower() == 'solana']
+
+    if is_evm_address and solana_chains:
+        raise HTTPException(
+            status_code=400,
+            detail=f"EVM address (0x...) cannot be used on Solana blockchain. Please remove 'solana' from chains or use a Solana address."
+        )
+
+    if is_solana_address and evm_chains:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Solana address cannot be used on EVM blockchains: {evm_chains}. Please remove EVM chains or use an EVM address (0x...)."
+        )
+
+    if not is_evm_address and not is_solana_address:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid wallet address format. Must be EVM (0x...) or Solana (base58) address."
+        )
+
     # Parse dates
     start_date = None
     end_date = None
@@ -236,15 +262,28 @@ async def get_audit_report(
     request: Request,
     response: FastAPIResponse,
     audit_id: int,
+    limit: int = 100,
+    offset: int = 0,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
-    Get complete audit report with all transactions
+    Get complete audit report with paginated transactions
+
+    Args:
+        audit_id: Audit ID
+        limit: Max transactions to return (default 100, max 1000)
+        offset: Offset for pagination (default 0)
 
     Returns detailed breakdown of all DeFi activity, tax implications,
     and optimization recommendations.
     """
+
+    # Validate pagination parameters
+    if limit < 1 or limit > 1000:
+        raise HTTPException(status_code=400, detail="Limit must be between 1 and 1000")
+    if offset < 0:
+        raise HTTPException(status_code=400, detail="Offset must be >= 0")
 
     # Verify ownership
     audit = db.query(DeFiAudit).filter(
@@ -255,11 +294,114 @@ async def get_audit_report(
     if not audit:
         raise HTTPException(status_code=404, detail="Audit not found")
 
-    # Get full report
+    # Get full report with pagination
     service = DeFiAuditService(db)
-    report = await service.get_audit_report(audit_id)
+    report = await service.get_audit_report(audit_id, limit=limit, offset=offset)
 
     return report
+
+
+@router.get("/audit/{audit_id}/export/csv")
+async def export_audit_csv(
+    audit_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Export DeFi audit transactions as CSV
+
+    Returns all transactions in CSV format for import into Excel, Google Sheets,
+    or tax software like TurboTax/TaxAct.
+    """
+    from fastapi.responses import Response as FastAPIResp
+    import csv
+    from io import StringIO
+
+    # Verify ownership
+    audit = db.query(DeFiAudit).filter(
+        DeFiAudit.id == audit_id,
+        DeFiAudit.user_id == current_user.id
+    ).first()
+
+    if not audit:
+        raise HTTPException(status_code=404, detail="Audit not found")
+
+    if audit.status != 'completed':
+        raise HTTPException(
+            status_code=400,
+            detail="Cannot export CSV for incomplete audit"
+        )
+
+    # Get all transactions (no pagination for export)
+    from app.models.defi_protocol import DeFiTransaction
+    transactions = db.query(DeFiTransaction).filter(
+        DeFiTransaction.audit_id == audit_id
+    ).order_by(DeFiTransaction.timestamp.asc()).all()
+
+    # Generate CSV
+    output = StringIO()
+    writer = csv.writer(output)
+
+    # Write header
+    writer.writerow([
+        'Date',
+        'Time (UTC)',
+        'Transaction Hash',
+        'Chain',
+        'Type',
+        'Protocol',
+        'Tax Category',
+        'Token In',
+        'Amount In',
+        'USD Value In',
+        'Token Out',
+        'Amount Out',
+        'USD Value Out',
+        'Gain/Loss (USD)',
+        'Holding Period (days)',
+        'Gas Fee (USD)',
+        'Protocol Fee (USD)',
+        'Total Fee (USD)',
+        'Notes'
+    ])
+
+    # Write transaction rows
+    for tx in transactions:
+        writer.writerow([
+            tx.timestamp.strftime('%Y-%m-%d'),
+            tx.timestamp.strftime('%H:%M:%S'),
+            tx.tx_hash,
+            tx.chain,
+            tx.transaction_type.value if tx.transaction_type else 'unknown',
+            tx.protocol.name if tx.protocol else 'Unknown',
+            tx.tax_category,
+            tx.token_in or '',
+            f"{tx.amount_in:.6f}" if tx.amount_in else '',
+            f"{tx.usd_value_in:.2f}" if tx.usd_value_in else '',
+            tx.token_out or '',
+            f"{tx.amount_out:.6f}" if tx.amount_out else '',
+            f"{tx.usd_value_out:.2f}" if tx.usd_value_out else '',
+            f"{tx.gain_loss_usd:.2f}" if tx.gain_loss_usd else '',
+            tx.holding_period_days or '',
+            f"{tx.gas_fee_usd:.2f}" if tx.gas_fee_usd else '',
+            f"{tx.protocol_fee_usd:.2f}" if tx.protocol_fee_usd else '',
+            f"{(tx.gas_fee_usd or 0) + (tx.protocol_fee_usd or 0):.2f}",
+            tx.notes or ''
+        ])
+
+    csv_content = output.getvalue()
+    output.close()
+
+    # Generate filename
+    filename = f"defi_audit_{audit_id}_{audit.start_date.strftime('%Y%m%d')}_{audit.end_date.strftime('%Y%m%d')}.csv"
+
+    return FastAPIResp(
+        content=csv_content,
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"'
+        }
+    )
 
 
 @router.get("/audit/{audit_id}/export/pdf")
@@ -449,3 +591,88 @@ async def list_supported_chains():
             }
         ]
     }
+
+
+@router.get("/audit/{audit_id}/status")
+@limiter.limit(get_rate_limit("read_only"))
+async def get_audit_status(
+    request: Request,
+    response: FastAPIResponse,
+    audit_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get real-time audit processing status
+
+    Returns current progress for audits in 'processing' state.
+    Useful for frontend progress bars and status updates.
+
+    Returns:
+        - status: processing, completed, failed
+        - progress: 0-100 percentage
+        - current_step: Description of current operation
+        - total_transactions: Transactions found so far
+        - estimated_time_remaining: Seconds (if available)
+    """
+
+    # Verify ownership
+    audit = db.query(DeFiAudit).filter(
+        DeFiAudit.id == audit_id,
+        DeFiAudit.user_id == current_user.id
+    ).first()
+
+    if not audit:
+        raise HTTPException(status_code=404, detail="Audit not found")
+
+    # Calculate progress based on status
+    if audit.status == "completed":
+        return {
+            "audit_id": audit.id,
+            "status": "completed",
+            "progress": 100,
+            "current_step": "Audit completed",
+            "total_transactions": audit.total_transactions,
+            "completed_at": audit.completed_at.isoformat() if audit.completed_at else None
+        }
+
+    elif audit.status == "failed":
+        return {
+            "audit_id": audit.id,
+            "status": "failed",
+            "progress": 0,
+            "current_step": "Audit failed",
+            "error_message": audit.error_message,
+            "total_transactions": 0
+        }
+
+    elif audit.status == "processing":
+        # Count transactions processed so far
+        transactions_processed = db.query(DeFiTransaction).filter(
+            DeFiTransaction.audit_id == audit_id
+        ).count()
+
+        # Estimate progress (rough estimate)
+        # Assume 10% for each chain scanned (if we knew which chain we're on)
+        # For now, just show 50% if processing
+        estimated_progress = min(50 + (transactions_processed // 10), 95)
+
+        return {
+            "audit_id": audit.id,
+            "status": "processing",
+            "progress": estimated_progress,
+            "current_step": f"Processing transactions... ({transactions_processed} found)",
+            "total_transactions": transactions_processed,
+            "chains": audit.chains,
+            "created_at": audit.created_at.isoformat()
+        }
+
+    else:
+        # Pending or unknown status
+        return {
+            "audit_id": audit.id,
+            "status": audit.status or "pending",
+            "progress": 0,
+            "current_step": "Queued for processing",
+            "total_transactions": 0
+        }

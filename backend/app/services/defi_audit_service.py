@@ -497,25 +497,32 @@ class DeFiAuditService:
             }
         }
 
-    async def get_audit_report(self, audit_id: int) -> Optional[Dict]:
+    async def get_audit_report(self, audit_id: int, limit: int = 100, offset: int = 0) -> Optional[Dict]:
         """
-        Get complete audit report
+        Get complete audit report with pagination
 
         Args:
             audit_id: Audit ID
+            limit: Max transactions to return
+            offset: Pagination offset
 
         Returns:
-            Complete audit report dict
+            Complete audit report dict with paginated transactions
         """
         audit = self.db.query(DeFiAudit).filter(DeFiAudit.id == audit_id).first()
 
         if not audit:
             return None
 
-        # Get all transactions
+        # Get total count first
+        total_transactions_count = self.db.query(DeFiTransaction).filter(
+            DeFiTransaction.audit_id == audit_id
+        ).count()
+
+        # Get paginated transactions
         transactions = self.db.query(DeFiTransaction).filter(
             DeFiTransaction.audit_id == audit_id
-        ).all()
+        ).order_by(DeFiTransaction.timestamp.desc()).limit(limit).offset(offset).all()
 
         return {
             "audit_id": audit.id,
@@ -537,6 +544,13 @@ class DeFiAuditService:
             },
             "protocols_used": audit.protocols_used,
             "transactions": [self._serialize_transaction(tx) for tx in transactions],
+            "pagination": {
+                "total": total_transactions_count,
+                "limit": limit,
+                "offset": offset,
+                "returned": len(transactions),
+                "has_more": (offset + len(transactions)) < total_transactions_count
+            },
             "recommendations": self._generate_recommendations(audit)
         }
 
