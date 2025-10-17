@@ -1,11 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.regulation import Regulation
+from app.models.country_analysis import CountryAnalysis
+from app.services.country_analysis_ai import CountryAnalysisAI
 from pydantic import BaseModel
 from typing import List, Optional
+import logging
 
 router = APIRouter(prefix="/regulations", tags=["Regulations"])
+logger = logging.getLogger(__name__)
 
 
 def extract_data_quality(regulation: Regulation) -> tuple[str, List[str]]:
@@ -58,6 +62,7 @@ class RegulationResponse(BaseModel):
     crypto_short_rate: Optional[float] = None
     crypto_long_rate: Optional[float] = None
     crypto_notes: Optional[str] = None
+    crypto_legal_status: Optional[str] = None  # 'legal', 'banned', 'restricted', 'unclear'
     staking_rate: Optional[float] = None
     mining_rate: Optional[float] = None
 
@@ -81,6 +86,9 @@ class RegulationResponse(BaseModel):
     data_quality: Optional[str] = None  # 'high', 'medium', 'low', 'unknown'
     data_sources: Optional[List[str]] = None  # ['PwC', 'Koinly', etc.]
 
+    # AI Analysis (optional, included when include_analysis=true)
+    ai_analysis: Optional[dict] = None
+
     class Config:
         from_attributes = True
 
@@ -89,7 +97,8 @@ class RegulationResponse(BaseModel):
 async def get_all_regulations(
     db: Session = Depends(get_db),
     crypto_only: bool = False,
-    reliable_only: bool = False
+    reliable_only: bool = False,
+    include_analysis: bool = False
 ):
     """
     Get all country tax regulations
@@ -97,19 +106,25 @@ async def get_all_regulations(
     Args:
         crypto_only: If True, only return countries with crypto-specific data
         reliable_only: If True, only return countries with verified CGT data from trusted sources
+        include_analysis: If True, include AI analysis scores (crypto_score, nomad_score, overall_score)
 
     Returns:
-        List of all regulations with crypto-specific rates when available
+        List of all regulations with optional AI analysis scores
     """
     query = db.query(Regulation)
 
     if crypto_only:
-        # Filter for countries that have crypto-specific data
         query = query.filter(Regulation.crypto_short_rate.isnot(None))
 
     regulations = query.all()
 
-    # Convert to response format and filter for reliable data if requested
+    # Get all analyses if requested
+    analyses_dict = {}
+    if include_analysis:
+        analyses = db.query(CountryAnalysis).all()
+        analyses_dict = {a.country_code: a for a in analyses}
+
+    # Convert to response format
     result = []
     for reg in regulations:
         quality, sources = extract_data_quality(reg)
@@ -118,36 +133,43 @@ async def get_all_regulations(
         if reliable_only and quality in ['low', 'unknown']:
             continue
 
-        result.append(RegulationResponse(
-            country_code=reg.country_code,
-            country_name=reg.country_name,
-            flag_emoji=reg.flag_emoji,
-            cgt_short_rate=float(reg.cgt_short_rate),
-            cgt_long_rate=float(reg.cgt_long_rate),
-            crypto_short_rate=float(reg.crypto_short_rate) if reg.crypto_short_rate else None,
-            crypto_long_rate=float(reg.crypto_long_rate) if reg.crypto_long_rate else None,
-            crypto_notes=reg.crypto_notes,
-            staking_rate=float(reg.staking_rate) if reg.staking_rate else None,
-            mining_rate=float(reg.mining_rate) if reg.mining_rate else None,
-            # Structured crypto tax metadata
-            holding_period_months=reg.holding_period_months,
-            is_flat_tax=bool(reg.is_flat_tax) if reg.is_flat_tax is not None else None,
-            is_progressive=bool(reg.is_progressive) if reg.is_progressive is not None else None,
-            is_territorial=bool(reg.is_territorial) if reg.is_territorial is not None else None,
-            crypto_specific=bool(reg.crypto_specific) if reg.crypto_specific is not None else None,
-            long_term_discount_pct=float(reg.long_term_discount_pct) if reg.long_term_discount_pct else None,
-            exemption_threshold=float(reg.exemption_threshold) if reg.exemption_threshold else None,
-            exemption_threshold_currency=reg.exemption_threshold_currency,
-            nft_treatment=reg.nft_treatment,
-            residency_rule=reg.residency_rule,
-            defi_reporting=reg.defi_reporting,
-            penalties_max=reg.penalties_max,
-            notes=reg.notes,
-            updated_at=str(reg.updated_at) if reg.updated_at else None,
-            source_url=reg.source_url,
-            data_quality=quality,
-            data_sources=sources if sources else None
-        ))
+        response_data = {
+            "country_code": reg.country_code,
+            "country_name": reg.country_name,
+            "flag_emoji": reg.flag_emoji,
+            "cgt_short_rate": float(reg.cgt_short_rate),
+            "cgt_long_rate": float(reg.cgt_long_rate),
+            "crypto_short_rate": float(reg.crypto_short_rate) if reg.crypto_short_rate else None,
+            "crypto_long_rate": float(reg.crypto_long_rate) if reg.crypto_long_rate else None,
+            "crypto_notes": reg.crypto_notes,
+            "crypto_legal_status": reg.crypto_legal_status,
+            "staking_rate": float(reg.staking_rate) if reg.staking_rate else None,
+            "mining_rate": float(reg.mining_rate) if reg.mining_rate else None,
+            "holding_period_months": reg.holding_period_months,
+            "is_flat_tax": bool(reg.is_flat_tax) if reg.is_flat_tax is not None else None,
+            "is_progressive": bool(reg.is_progressive) if reg.is_progressive is not None else None,
+            "is_territorial": bool(reg.is_territorial) if reg.is_territorial is not None else None,
+            "crypto_specific": bool(reg.crypto_specific) if reg.crypto_specific is not None else None,
+            "long_term_discount_pct": float(reg.long_term_discount_pct) if reg.long_term_discount_pct else None,
+            "exemption_threshold": float(reg.exemption_threshold) if reg.exemption_threshold else None,
+            "exemption_threshold_currency": reg.exemption_threshold_currency,
+            "nft_treatment": reg.nft_treatment,
+            "residency_rule": reg.residency_rule,
+            "defi_reporting": reg.defi_reporting,
+            "penalties_max": reg.penalties_max,
+            "notes": reg.notes,
+            "updated_at": str(reg.updated_at) if reg.updated_at else None,
+            "source_url": reg.source_url,
+            "data_quality": quality,
+            "data_sources": sources if sources else None
+        }
+
+        # Add AI analysis if requested
+        if include_analysis and reg.country_code in analyses_dict:
+            analysis = analyses_dict[reg.country_code]
+            response_data["ai_analysis"] = analysis.to_dict()
+
+        result.append(RegulationResponse(**response_data))
 
     return result
 
@@ -201,3 +223,126 @@ async def get_regulation(
         data_quality=quality,
         data_sources=sources if sources else None
     )
+
+
+# ============================================
+# COUNTRY AI ANALYSIS ENDPOINTS
+# ============================================
+
+class CountryAnalysisResponse(BaseModel):
+    """AI-generated country analysis"""
+    country_code: str
+    crypto_score: int
+    nomad_score: int
+    overall_score: int
+    crypto_analysis: str
+    nomad_analysis: str
+    key_advantages: List[str]
+    key_disadvantages: List[str]
+    best_for: List[str]
+    crypto_score_breakdown: dict
+    nomad_score_breakdown: dict
+    generated_at: str
+    expires_at: str
+    confidence: float
+    generation_duration_ms: Optional[int] = None
+
+    class Config:
+        from_attributes = True
+
+
+@router.get("/{country_code}/analysis", response_model=CountryAnalysisResponse)
+async def get_country_analysis(
+    country_code: str,
+    db: Session = Depends(get_db)
+):
+    """
+    Get AI-generated analysis for a country (crypto + nomad scores)
+
+    Returns cached analysis if available and not expired (30 days).
+    Auto-generates analysis if not found or expired.
+
+    No manual refresh button - analysis auto-updates when expired.
+    """
+    try:
+        country_code = country_code.upper()
+
+        # Check if country exists
+        regulation = db.query(Regulation).filter_by(country_code=country_code).first()
+        if not regulation:
+            raise HTTPException(status_code=404, detail=f"Country {country_code} not found")
+
+        # Check for existing analysis
+        analysis = db.query(CountryAnalysis).filter_by(country_code=country_code).first()
+
+        # Check if expired or doesn't exist
+        if not analysis or analysis.is_expired:
+            logger.info(f"Generating analysis for {country_code} (expired or missing)")
+
+            # Generate new analysis
+            ai_service = CountryAnalysisAI()
+            analysis_data = await ai_service.analyze_country(db, country_code, force_refresh=True)
+
+            return CountryAnalysisResponse(**analysis_data)
+
+        # Return cached analysis
+        logger.info(f"Returning cached analysis for {country_code} (expires in {analysis.days_until_expiry} days)")
+        return CountryAnalysisResponse(**analysis.to_dict())
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Error getting analysis for {country_code}: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to generate analysis: {str(e)}")
+
+
+async def _batch_analyze_background(country_codes: List[str], db: Session):
+    """Background task for batch analysis"""
+    ai_service = CountryAnalysisAI()
+    results = await ai_service.batch_analyze_countries(db, country_codes, force_refresh=True)
+    logger.info(f"Batch analysis complete: {len(results)} countries processed")
+    return results
+
+
+@router.post("/batch-analyze")
+async def batch_analyze_countries(
+    country_codes: List[str],
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db)
+):
+    """
+    Admin endpoint: Analyze multiple countries in batch
+
+    Runs in background to avoid timeout.
+    Use for initial population or bulk refresh.
+
+    Example:
+    ```json
+    {
+        "country_codes": ["US", "FR", "PT", "AE", "SG"]
+    }
+    ```
+    """
+    # Verify countries exist
+    existing_countries = db.query(Regulation.country_code).filter(
+        Regulation.country_code.in_([c.upper() for c in country_codes])
+    ).all()
+    existing_codes = [c[0] for c in existing_countries]
+
+    invalid_codes = [c for c in country_codes if c.upper() not in existing_codes]
+    if invalid_codes:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid country codes: {', '.join(invalid_codes)}"
+        )
+
+    # Start background task
+    background_tasks.add_task(_batch_analyze_background, [c.upper() for c in country_codes], db)
+
+    return {
+        "message": f"Started batch analysis for {len(country_codes)} countries",
+        "countries": [c.upper() for c in country_codes],
+        "status": "processing"
+    }
+
+

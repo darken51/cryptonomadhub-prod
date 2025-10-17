@@ -7,7 +7,7 @@ import { useAuth } from '@/components/providers/AuthProvider'
 import {
   Menu, X, LogOut, Settings, User, ChevronDown,
   LayoutDashboard, Globe, MessageCircle, Activity,
-  DollarSign, Wallet, BarChart3
+  DollarSign, Wallet, BarChart3, CreditCard
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -20,6 +20,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Countries', href: '/countries', icon: Globe },
+  { name: 'Tools', href: '/tools', icon: CreditCard },
   { name: 'Chat', href: '/chat', icon: MessageCircle },
   { name: 'DeFi Audit', href: '/defi-audit', icon: Activity },
   { name: 'Tax Optimizer', href: '/tax-optimizer', icon: DollarSign },

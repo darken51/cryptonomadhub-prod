@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   ComposableMap,
   Geographies,
@@ -19,6 +20,7 @@ interface Country {
   crypto_short_rate?: number
   crypto_long_rate?: number
   crypto_notes?: string
+  crypto_legal_status?: 'legal' | 'banned' | 'restricted' | 'unclear'
   data_quality?: 'high' | 'medium' | 'low' | 'unknown'
 
   // Structured crypto tax metadata
@@ -30,6 +32,15 @@ interface Country {
   long_term_discount_pct?: number
   exemption_threshold?: number
   exemption_threshold_currency?: string
+
+  // AI Analysis
+  ai_analysis?: {
+    crypto_score: number
+    nomad_score: number
+    overall_score: number
+    crypto_score_breakdown?: any
+    nomad_score_breakdown?: any
+  }
 }
 
 interface WorldTaxMapProps {
@@ -40,6 +51,7 @@ interface WorldTaxMapProps {
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json"
 
 export default function WorldTaxMap({ countries }: WorldTaxMapProps) {
+  const router = useRouter()
   const [tooltipContent, setTooltipContent] = useState<string>('')
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
   const [showTooltip, setShowTooltip] = useState(false)
@@ -56,6 +68,9 @@ export default function WorldTaxMap({ countries }: WorldTaxMapProps) {
   // Get color based on tax rate
   const getCountryColor = (country?: Country) => {
     if (!country) return '#E5E7EB' // Gray for no data
+
+    // Banned countries in black
+    if (country.crypto_legal_status === 'banned') return '#000000' // Black - Crypto banned
 
     const cryptoRate = country.crypto_long_rate ?? country.cgt_long_rate
 
@@ -134,6 +149,26 @@ export default function WorldTaxMap({ countries }: WorldTaxMapProps) {
                 <a href="${country.source_url}" target="_blank" class="text-xs text-blue-400 hover:underline">📎 Official Source</a>
               </div>
             ` : ''}
+            ${country.ai_analysis ? `
+              <div class="mt-3 pt-3 border-t border-gray-600">
+                <div class="font-semibold mb-2 text-purple-300 text-sm">🤖 AI Analysis</div>
+                <div class="space-y-1.5">
+                  <div class="flex justify-between gap-4">
+                    <span class="text-gray-300">🪙 Crypto Score:</span>
+                    <span class="font-bold text-violet-400">${country.ai_analysis.crypto_score}/100</span>
+                  </div>
+                  <div class="flex justify-between gap-4">
+                    <span class="text-gray-300">✈️ Nomad Score:</span>
+                    <span class="font-bold text-fuchsia-400">${country.ai_analysis.nomad_score}/100</span>
+                  </div>
+                  <div class="flex justify-between gap-4">
+                    <span class="text-gray-300">⭐ Overall:</span>
+                    <span class="font-bold text-amber-400">${country.ai_analysis.overall_score}/100</span>
+                  </div>
+                </div>
+                <div class="mt-2 text-xs text-gray-400 italic">Click to see full analysis</div>
+              </div>
+            ` : ''}
           </div>
         </div>
       `)
@@ -192,6 +227,10 @@ export default function WorldTaxMap({ countries }: WorldTaxMapProps) {
             <span className="text-gray-700 dark:text-gray-300">&gt;30%</span>
           </div>
           <div className="flex items-center gap-2">
+            <div className="w-6 h-4 rounded" style={{ backgroundColor: '#000000' }}></div>
+            <span className="text-gray-700 dark:text-gray-300">Crypto Banned</span>
+          </div>
+          <div className="flex items-center gap-2">
             <div className="w-6 h-4 rounded bg-gray-300 dark:bg-gray-600"></div>
             <span className="text-gray-700 dark:text-gray-300">No Data</span>
           </div>
@@ -224,6 +263,12 @@ export default function WorldTaxMap({ countries }: WorldTaxMapProps) {
                         onMouseEnter={(event) => handleMouseEnter(geo, event)}
                         onMouseMove={handleMouseMove}
                         onMouseLeave={handleMouseLeave}
+                        onClick={() => {
+                          if (country) {
+                            // Navigate to country detail page
+                            router.push(`/countries/${country.country_code.toLowerCase()}`)
+                          }
+                        }}
                         style={{
                           default: {
                             outline: 'none',

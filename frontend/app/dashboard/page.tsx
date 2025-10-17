@@ -8,7 +8,7 @@ import { AppHeader } from '@/components/AppHeader'
 import { Footer } from '@/components/Footer'
 import { useAuth } from '@/components/providers/AuthProvider'
 import {
-  LogOut, TrendingUp, Globe, FileText, MessageCircle, Activity,
+  TrendingUp, Globe, FileText, MessageCircle, Activity,
   Settings, CreditCard, Wallet, PieChart, BarChart3, DollarSign,
   Sparkles, ArrowRight, Zap, Shield, Target
 } from 'lucide-react'
@@ -144,11 +144,6 @@ export default function DashboardPage() {
     )
   }
 
-  const handleLogout = () => {
-    logout()
-    router.push('/')
-  }
-
   const COLORS = ['#7c3aed', '#d946ef', '#a855f7', '#e879f9', '#9333ea', '#f0abfc', '#6b21a8', '#f5d0fe']
 
   // Animation variants
@@ -183,30 +178,6 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-violet-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-violet-950/20">
       <AppHeader />
-
-      {/* User Info Bar */}
-      <div className="border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-violet-600 to-fuchsia-600 rounded-full flex items-center justify-center text-white font-bold">
-                {user.email.charAt(0).toUpperCase()}
-              </div>
-              <div>
-                <p className="text-sm font-medium text-slate-900 dark:text-white">{user.email}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Free Tier</p>
-              </div>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-            >
-              <LogOut className="w-4 h-4" />
-              Logout
-            </button>
-          </div>
-        </div>
-      </div>
 
       {/* Main content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { AppHeader } from '@/components/AppHeader'
 import { CreditCard, ArrowRight, ExternalLink, Check, Info, MapPin, Shield } from 'lucide-react'
 
 interface CryptoCard {
@@ -139,23 +140,24 @@ const residencyServices: ResidencyService[] = [
       '19,189+ digital residencies issued',
       'Available to citizens of 138 countries',
       'Built on Solana blockchain',
+      '⚠️ Important: Digital ID only - NOT tax residency or citizenship',
     ],
     benefits: [
-      '0% tax on digital income from Palau',
+      'Global KYC for crypto exchanges (Kraken, Crypto.com)',
+      'Enhanced identity verification worldwide',
+      'Physical government-issued ID card',
+      'Web3-native NFT identity on Solana',
       'Visa extensions up to +180 days per entry',
-      'Global KYC for crypto exchanges',
-      'Open bank accounts and neobanks',
-      'Identity verification for travel',
-      'Web3-native sovereign identity',
+      'Access to banking services and neobanks',
     ],
     pricing: '$248 one-time application fee',
     processingTime: '2-4 weeks',
     affiliateLink: 'https://rns.id/?rc_by=Oswa5kTT',
     affiliateBonus: 'You get: Official Palau ID | We earn: Referral commission',
     idealFor: [
-      'Digital nomads seeking tax optimization',
-      'Crypto traders needing reliable KYC',
-      'Web3 professionals',
+      'Digital nomads needing global identity verification',
+      'Crypto traders requiring KYC for exchanges',
+      'Web3 professionals seeking on-chain identity',
       'Remote workers traveling frequently',
     ],
   },
@@ -165,24 +167,22 @@ export default function ToolsPage() {
   const [selectedCard, setSelectedCard] = useState<CryptoCard | null>(null)
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center gap-3 mb-4">
-            <CreditCard className="w-8 h-8 text-blue-600" />
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Crypto Tools & Cards
-            </h1>
+    <>
+      <AppHeader />
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Page Title */}
+          <div className="mb-8">
+            <div className="flex items-center gap-3 mb-4">
+              <CreditCard className="w-8 h-8 text-blue-600" />
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                Crypto Tools & Cards
+              </h1>
+            </div>
+            <p className="text-lg text-gray-600 dark:text-gray-400">
+              After optimizing your crypto taxes, you'll need the right tools to spend and manage your crypto globally.
+            </p>
           </div>
-          <p className="text-lg text-gray-600 dark:text-gray-400">
-            After optimizing your crypto taxes, you'll need the right tools to spend and manage your crypto globally.
-          </p>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Affiliate Disclosure */}
         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-8">
           <div className="flex items-start gap-3">
@@ -676,5 +676,6 @@ export default function ToolsPage() {
         </div>
       )}
     </div>
+    </>
   )
 }

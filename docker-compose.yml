@@ -4,6 +4,8 @@ services:
     container_name: nomadcrypto-backend
     ports:
       - "8001:8000"
+    env_file:
+      - .env
     environment:
       - DATABASE_URL=postgresql://nomad:password@postgres:5432/nomadcrypto
       - REDIS_URL=redis://redis:6379
@@ -19,6 +21,8 @@ services:
       - ETHERSCAN_API_KEY=${ETHERSCAN_API_KEY}
       - SOLANA_API_KEY=${SOLANA_API_KEY}
       - SOLANA_RPC_URL=${SOLANA_RPC_URL}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - ANTHROPIC_MODEL=${ANTHROPIC_MODEL}
       - FRONTEND_URL=http://localhost:3001
       - CORS_ORIGINS=http://localhost:3001,http://localhost:3000
       - ENVIRONMENT=development

@@ -4,8 +4,38 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/components/providers/AuthProvider'
+import { AppHeader } from '@/components/AppHeader'
 import { ArrowLeft, Search, TrendingDown, Info } from 'lucide-react'
 import WorldTaxMap from '@/components/WorldTaxMap'
+import CountryScoreCard from '@/components/CountryScoreCard'
+import TopCountriesPodium from '@/components/TopCountriesPodium'
+
+interface AIAnalysis {
+  crypto_score: number
+  nomad_score: number
+  overall_score: number
+  crypto_analysis: string
+  nomad_analysis: string
+  key_advantages: string[]
+  key_disadvantages: string[]
+  best_for: string[]
+  crypto_score_breakdown: {
+    tax_favorability: number
+    legal_clarity: number
+    crypto_adoption: number
+    innovation_ecosystem: number
+  }
+  nomad_score_breakdown: {
+    cost_of_living: number
+    visa_accessibility: number
+    infrastructure: number
+    expat_community: number
+  }
+  generated_at: string
+  expires_at: string
+  confidence: number
+  is_expired: boolean
+}
 
 interface Country {
   country_code: string
@@ -32,6 +62,9 @@ interface Country {
   long_term_discount_pct?: number
   exemption_threshold?: number
   exemption_threshold_currency?: string
+
+  // AI Analysis
+  ai_analysis?: AIAnalysis
 }
 
 export default function CountriesPage() {
@@ -74,7 +107,7 @@ export default function CountriesPage() {
 
   const fetchCountries = async () => {
     try {
-      const url = `${process.env.NEXT_PUBLIC_API_URL}/regulations/?reliable_only=${reliableOnly}`
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/regulations/?reliable_only=${reliableOnly}&include_analysis=true`
       const response = await fetch(url)
       if (response.ok) {
         const data = await response.json()
@@ -191,29 +224,24 @@ export default function CountriesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 py-4 sm:py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <motion.div
-          className="mb-6 sm:mb-8"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 mb-3 sm:mb-4 transition-colors"
+    <>
+      <AppHeader />
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 py-4 sm:py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Page Title */}
+          <motion.div
+            className="mb-6 sm:mb-8"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
           >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Dashboard
-          </Link>
-          <h1 className="text-3xl sm:text-5xl font-bold bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent mb-4">
-            Country Tax Regulations
-          </h1>
-          <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl">
-            Browse crypto tax rates for {countries.length}+ countries with verified data and real-time updates
-          </p>
-        </motion.div>
+            <h1 className="text-3xl sm:text-5xl font-bold bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent mb-4">
+              Country Tax Regulations
+            </h1>
+            <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl">
+              Browse crypto tax rates for {countries.length}+ countries with verified data and real-time updates
+            </p>
+          </motion.div>
 
         {/* Filters */}
         <motion.div
@@ -309,6 +337,11 @@ export default function CountriesPage() {
           </div>
         )}
 
+        {/* Top Countries Podium */}
+        {!isLoading && countries.length > 0 && (
+          <TopCountriesPodium countries={countries} />
+        )}
+
         {/* Loading */}
         {isLoading && (
           <div className="space-y-4">
@@ -334,7 +367,8 @@ export default function CountriesPage() {
             {filteredCountries.map((country, index) => (
               <motion.div
                 key={country.country_code}
-                className="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-200 dark:border-slate-800 hover:shadow-xl hover:border-violet-300 dark:hover:border-violet-700 transition-all duration-300"
+                id={`country-${country.country_code}`}
+                className="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-200 dark:border-slate-800 hover:shadow-xl hover:border-violet-300 dark:hover:border-violet-700 transition-all duration-300 scroll-mt-24"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
@@ -551,6 +585,13 @@ export default function CountriesPage() {
                     </p>
                   </div>
                 )}
+
+                {/* AI Analysis Score Card */}
+                {country.ai_analysis && (
+                  <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
+                    <CountryScoreCard analysis={country.ai_analysis} />
+                  </div>
+                )}
               </motion.div>
             ))}
 
@@ -581,5 +622,6 @@ export default function CountriesPage() {
         </motion.div>
       </div>
     </div>
+    </>
   )
 }
