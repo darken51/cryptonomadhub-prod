@@ -294,8 +294,8 @@ export default function DashboardPage() {
               </div>
               <Sparkles className="w-5 h-5 text-fuchsia-200" />
             </div>
-            <p className="text-sm text-violet-100 mb-1">Portfolio Value</p>
-            <p className="text-3xl font-bold">
+            <p className="text-sm text-white/90 mb-1 font-medium">Portfolio Value</p>
+            <p className="text-3xl font-extrabold text-white drop-shadow-lg">
               ${defiStats.totalPortfolioValue.toLocaleString()}
             </p>
           </motion.div>
