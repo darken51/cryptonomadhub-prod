@@ -97,6 +97,10 @@ class DeFiTransaction(Base):
     usd_value_in = Column(Float, nullable=True)
     usd_value_out = Column(Float, nullable=True)
 
+    # Price estimation flags (for audit accuracy)
+    price_in_estimated = Column(Boolean, default=False, nullable=False)  # True if monthly average used
+    price_out_estimated = Column(Boolean, default=False, nullable=False)  # True if monthly average used
+
     # Fees
     gas_fee_usd = Column(Float, nullable=True)
     protocol_fee_usd = Column(Float, nullable=True)
@@ -167,3 +171,4 @@ class DeFiAudit(Base):
     # Relationships
     user = relationship("User")
     transactions = relationship("DeFiTransaction", back_populates="audit")
+    nft_transactions = relationship("NFTTransaction", back_populates="audit")

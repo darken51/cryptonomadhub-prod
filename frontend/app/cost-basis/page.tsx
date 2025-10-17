@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Plus, Upload, Download, Edit2, Trash2,
   Filter, TrendingUp, TrendingDown, DollarSign,
-  Calendar, Database, Info
+  Calendar, Database, Info, AlertTriangle, CheckCircle
 } from 'lucide-react'
 
 interface CostBasisLot {
@@ -366,6 +366,26 @@ export default function CostBasisPage() {
             >
               <Download className="w-5 h-5" />
               Export
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => router.push('/cost-basis/review')}
+              className="bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border border-orange-300 dark:border-orange-700 text-orange-700 dark:text-orange-300 px-6 py-3 rounded-xl font-semibold flex items-center gap-2 shadow-md hover:shadow-lg transition-all"
+            >
+              <CheckCircle className="w-5 h-5" />
+              Review Unverified
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => router.push('/cost-basis/wash-sales')}
+              className="bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 px-6 py-3 rounded-xl font-semibold flex items-center gap-2 shadow-md hover:shadow-lg transition-all"
+            >
+              <AlertTriangle className="w-5 h-5" />
+              Wash Sales
             </motion.button>
 
             <div className="ml-auto flex gap-3">

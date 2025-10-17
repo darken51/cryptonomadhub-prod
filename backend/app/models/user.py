@@ -48,6 +48,7 @@ class User(Base):
 
     # Relationships
     license = relationship("License", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    wallets = relationship("UserWallet", back_populates="user", cascade="all, delete-orphan")
 
     def to_dict(self):
         return {

@@ -62,8 +62,12 @@ class Settings(BaseSettings):
     # Single Etherscan API key works for 50+ EVM chains via v2 API
     ETHERSCAN_API_KEY: str = ""
 
-    # Solana API Key (Helius/Solscan)
-    SOLANA_API_KEY: str = ""
+    # Solana API Keys
+    SOLANA_API_KEY: str = ""  # Solscan (fallback)
+    HELIUS_API_KEY: str = ""  # Helius (primary, better for transactions)
+
+    # Price API Keys
+    COINMARKETCAP_API_KEY: str = ""  # CoinMarketCap (fallback for prices)
 
     class Config:
         env_file = ".env"

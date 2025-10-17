@@ -82,7 +82,7 @@ export default function DashboardPage() {
           headers: { Authorization: `Bearer ${token}` }
         }).then(r => r.json()).catch(() => null),
 
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/defi-audit/history`, {
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/defi/audits`, {
           headers: { Authorization: `Bearer ${token}` }
         }).then(r => r.json()).catch(() => null)
       ]).then(([portfolio, taxAnalysis, audits]) => {

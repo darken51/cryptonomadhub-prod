@@ -7,7 +7,8 @@ import { useAuth } from '@/components/providers/AuthProvider'
 import {
   Menu, X, LogOut, Settings, User, ChevronDown,
   LayoutDashboard, Globe, MessageCircle, Activity,
-  DollarSign, Wallet, BarChart3, CreditCard
+  DollarSign, Wallet, BarChart3, CreditCard, FileText,
+  Image, TrendingUp, AlertTriangle
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -23,8 +24,11 @@ const navItems: NavItem[] = [
   { name: 'Tools', href: '/tools', icon: CreditCard },
   { name: 'Chat', href: '/chat', icon: MessageCircle },
   { name: 'DeFi Audit', href: '/defi-audit', icon: Activity },
+  { name: 'Cost Basis', href: '/cost-basis', icon: FileText },
   { name: 'Tax Optimizer', href: '/tax-optimizer', icon: DollarSign },
   { name: 'Wallets', href: '/wallets', icon: Wallet },
+  { name: 'NFT', href: '/nft', icon: Image },
+  { name: 'Yield', href: '/yield', icon: TrendingUp },
   { name: 'Simulations', href: '/simulations/new', icon: BarChart3 },
 ]
 

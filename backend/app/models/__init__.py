@@ -27,6 +27,9 @@ from .tax_opportunity import (
     OpportunityType,
     OpportunityStatus
 )
+from .user_wallet import UserWallet
+from .nft_transaction import NFTTransaction
+from .yield_position import YieldPosition, YieldReward
 
 __all__ = [
     "User",
@@ -57,4 +60,8 @@ __all__ = [
     "TaxOptimizationSettings",
     "OpportunityType",
     "OpportunityStatus",
+    "UserWallet",
+    "NFTTransaction",
+    "YieldPosition",
+    "YieldReward",
 ]

@@ -53,11 +53,12 @@ class DeFiAuditService:
         self.db = db
         # Initialize blockchain parser with API keys
         # Single Etherscan API key works for 50+ EVM chains
-        # Solana uses separate Helius API key
+        # Solana uses Helius API (primary) or Solscan (fallback)
         from app.config import settings
         api_keys = {
             "etherscan": settings.ETHERSCAN_API_KEY,
-            "solana": settings.SOLANA_API_KEY
+            "solana": settings.SOLANA_API_KEY,
+            "helius": settings.HELIUS_API_KEY or settings.SOLANA_API_KEY
         }
         self.parser = BlockchainParser(api_keys=api_keys)
 
@@ -155,8 +156,22 @@ class DeFiAuditService:
                     print(f"Transaction skipped: {tx.get('tx_hash')}")
 
         print(f"Total transactions to save: {len(all_transactions)}")
+
+        # Count transactions with estimated prices
+        estimated_price_count = sum(
+            1 for tx in all_transactions
+            if getattr(tx, 'price_in_estimated', False) or getattr(tx, 'price_out_estimated', False)
+        )
+
         # Calculate summary statistics
         summary = self._calculate_summary(all_transactions)
+
+        # Add price estimation warning to summary if needed
+        if estimated_price_count > 0:
+            warning = f"⚠️  WARNING: {estimated_price_count} of {len(all_transactions)} transactions use ESTIMATED prices (monthly averages). For accurate tax reporting, consider upgrading to CoinGecko Pro API or manually verifying these prices."
+            summary["price_warning"] = warning
+            logger.warning(warning)
+            print(warning)
 
         # Update audit with results
         audit.total_transactions = len(all_transactions)
@@ -230,7 +245,11 @@ class DeFiAuditService:
             if cost_basis_result:
                 tax_info["gain_loss"] = cost_basis_result["gain_loss"]
                 tax_info["holding_period_days"] = cost_basis_result["holding_period_days"]
-                print(f"[COST BASIS] Calculated gain/loss: ${cost_basis_result['gain_loss']:.2f} using {cost_basis_result['method']} method")
+                gain_loss = cost_basis_result.get('gain_loss')
+                if gain_loss is not None:
+                    print(f"[COST BASIS] Calculated gain/loss: ${gain_loss:.2f} using {cost_basis_result['method']} method")
+                else:
+                    print(f"[COST BASIS] No gain/loss calculated (insufficient data) using {cost_basis_result['method']} method")
 
         # Create transaction record
         # Convert datetime objects to strings for JSON storage
@@ -267,6 +286,8 @@ class DeFiAuditService:
             amount_out=tx_data.get("amount_out"),
             usd_value_in=tx_data.get("usd_value_in"),
             usd_value_out=tx_data.get("usd_value_out"),
+            price_in_estimated=tx_data.get("price_in_estimated", False),
+            price_out_estimated=tx_data.get("price_out_estimated", False),
             gas_fee_usd=tx_data.get("gas_fee_usd"),
             protocol_fee_usd=tx_data.get("protocol_fee_usd"),
             gain_loss_usd=tax_info.get("gain_loss"),
@@ -278,6 +299,24 @@ class DeFiAuditService:
         self.db.add(defi_tx)
         self.db.commit()
 
+        # ✅ NOUVEAU: Créer automatiquement cost basis lot pour acquisitions
+        if tx_data.get("token_in") and tx_data.get("amount_in") and tx_data.get("usd_value_in"):
+            try:
+                await self._create_acquisition_lot(
+                    user_id=user_id,
+                    token=tx_data["token_in"],
+                    chain=tx_data["chain"],
+                    amount=tx_data["amount_in"],
+                    price_usd=tx_data["usd_value_in"] / tx_data["amount_in"] if tx_data["amount_in"] > 0 else 0,
+                    acquisition_date=tx_data["timestamp"],
+                    transaction_type=tx_data.get("transaction_type", "unknown"),
+                    tx_hash=tx_hash
+                )
+                print(f"[COST BASIS] Created lot for {tx_data['amount_in']} {tx_data['token_in']} acquired")
+            except Exception as e:
+                logger.warning(f"Failed to create cost basis lot: {e}")
+                # Don't fail the whole transaction if lot creation fails
+
         return defi_tx
 
     def _get_or_create_protocol(
@@ -287,6 +326,11 @@ class DeFiAuditService:
         chain: str
     ) -> Optional[DeFiProtocol]:
         """Get existing protocol or create new one"""
+
+        # ✅ FIX: Validate chain is not None
+        if not chain:
+            logger.warning(f"Cannot create protocol '{name}' with null chain, using 'unknown'")
+            chain = "unknown"
 
         # For "Unknown" protocols, make name unique per chain
         unique_name = f"{name} ({chain})" if name == "Unknown" else name
@@ -393,6 +437,20 @@ class DeFiAuditService:
                 "category": "income",
                 "taxable": True,
                 "notes": "Rewards are taxable as income"
+            }
+
+        elif "stake" in type_lower and "unstake" not in type_lower:
+            return {
+                "category": "non_taxable",
+                "taxable": False,
+                "notes": "Staking tokens is not taxable. Rewards earned later are taxable."
+            }
+
+        elif "unstake" in type_lower:
+            return {
+                "category": "non_taxable",
+                "taxable": False,
+                "notes": "Unstaking tokens is not taxable unless there are rewards included."
             }
 
         elif "lend" in type_lower or "deposit" in type_lower:
@@ -676,17 +734,32 @@ class DeFiAuditService:
             # Update remaining
             remaining_to_sell -= amount_from_lot
 
-            # Create disposal record
+            # Calculate disposal price safely (handle None values)
+            disposal_price = 0.0
+            proceeds = 0.0
+            if usd_value_out is not None and amount_out and amount_out > 0:
+                disposal_price = usd_value_out / amount_out
+                proceeds = amount_from_lot * disposal_price
+
+            # Calculate holding period
+            holding_days = (timestamp - lot.acquisition_date).days if timestamp and lot.acquisition_date else 0
+            is_short_term = holding_days < 365
+            is_long_term = holding_days >= 365
+
+            # Create disposal record (using correct model field names)
             disposal = CostBasisDisposal(
                 user_id=user_id,
                 lot_id=lot.id,
                 disposal_date=timestamp,
-                disposal_method="fifo",
                 amount_disposed=amount_from_lot,
-                disposal_price_usd=usd_value_out / amount_out if amount_out > 0 else 0,
-                proceeds_usd=amount_from_lot * (usd_value_out / amount_out) if amount_out > 0 else 0,
-                cost_basis_usd=cost_for_portion,
-                gain_loss_usd=(amount_from_lot * (usd_value_out / amount_out) if amount_out > 0 else 0) - cost_for_portion
+                disposal_price_usd=disposal_price,
+                cost_basis_per_unit=lot.acquisition_price_usd,
+                total_cost_basis=cost_for_portion,
+                total_proceeds=proceeds,
+                gain_loss=proceeds - cost_for_portion,
+                holding_period_days=holding_days,
+                is_short_term=is_short_term,
+                is_long_term=is_long_term
             )
             self.db.add(disposal)
 
@@ -696,8 +769,10 @@ class DeFiAuditService:
 
         self.db.commit()
 
-        # Calculate gain/loss
-        gain_loss = usd_value_out - total_cost_basis
+        # Calculate gain/loss (handle None values)
+        gain_loss = None
+        if usd_value_out is not None:
+            gain_loss = usd_value_out - total_cost_basis
 
         # Calculate holding period
         holding_period_days = 0
@@ -710,3 +785,78 @@ class DeFiAuditService:
             "holding_period_days": holding_period_days,
             "method": "fifo"
         }
+
+    async def _create_acquisition_lot(
+        self,
+        user_id: int,
+        token: str,
+        chain: str,
+        amount: float,
+        price_usd: float,
+        acquisition_date: datetime,
+        transaction_type: str,
+        tx_hash: str
+    ):
+        """
+        Créer automatiquement un lot de cost basis pour une acquisition
+
+        Args:
+            user_id: User ID
+            token: Token symbol (ex: ETH, USDC)
+            chain: Blockchain
+            amount: Quantité acquise
+            price_usd: Prix unitaire en USD
+            acquisition_date: Date d'acquisition
+            transaction_type: Type de transaction (swap, claim_rewards, etc.)
+            tx_hash: Hash de la transaction
+        """
+        from app.services.cost_basis_calculator import CostBasisCalculator
+
+        # Déterminer la méthode d'acquisition
+        acquisition_method = self._determine_acquisition_method(transaction_type)
+
+        # Créer le lot
+        calculator = CostBasisCalculator(self.db, user_id)
+
+        await calculator.add_lot(
+            token=token.upper(),
+            chain=chain,
+            amount=amount,
+            acquisition_price_usd=price_usd,
+            acquisition_date=acquisition_date,
+            acquisition_method=acquisition_method,
+            source_tx_hash=tx_hash,
+            notes=f"Auto-created from DeFi audit ({transaction_type})"
+        )
+
+        logger.info(
+            f"[COST BASIS] Created lot: {amount} {token} at ${price_usd:.4f} "
+            f"via {acquisition_method.value} on {acquisition_date.date()}"
+        )
+
+    def _determine_acquisition_method(self, transaction_type: str):
+        """
+        Déterminer la méthode d'acquisition pour cost basis
+
+        Args:
+            transaction_type: Type de transaction DeFi
+
+        Returns:
+            AcquisitionMethod enum
+        """
+        from app.models.cost_basis import AcquisitionMethod
+
+        type_lower = transaction_type.lower()
+
+        if "swap" in type_lower:
+            return AcquisitionMethod.SWAP
+        elif "reward" in type_lower or "claim" in type_lower:
+            return AcquisitionMethod.AIRDROP  # Rewards = similar to airdrops fiscalement
+        elif "stake" in type_lower or "staking" in type_lower or "mining" in type_lower or "mine" in type_lower:
+            return AcquisitionMethod.MINING  # Mining includes staking rewards
+        elif "fork" in type_lower:
+            return AcquisitionMethod.FORK
+        elif "exchange" in type_lower or "deposit" in type_lower:
+            return AcquisitionMethod.PURCHASE  # Exchange deposits are purchases
+        else:
+            return AcquisitionMethod.PURCHASE  # Default
