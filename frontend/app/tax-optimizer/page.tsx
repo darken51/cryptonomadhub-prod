@@ -25,7 +25,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { TrendingDown, TrendingUp, Calendar, DollarSign, AlertTriangle, CheckCircle, Info, ArrowRight } from "lucide-react"
-import { Header } from "@/components/Header"
+import { AppHeader } from "@/components/AppHeader"
 import { Footer } from "@/components/Footer"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
@@ -195,7 +195,7 @@ export default function TaxOptimizerPage() {
   if (loading && !portfolioAnalysis) {
     return (
       <>
-        <Header />
+        <AppHeader />
         <div className="container mx-auto p-6">
           <div className="flex items-center justify-center h-96">
             <div className="text-center">
@@ -211,7 +211,7 @@ export default function TaxOptimizerPage() {
 
   return (
     <>
-      <Header />
+      <AppHeader />
       <div className="min-h-screen bg-gradient-to-br from-violet-50 via-fuchsia-50 to-white dark:from-gray-900 dark:via-violet-950 dark:to-gray-900">
         {/* Hero Section */}
         <motion.div

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { useToast } from '@/components/providers/ToastProvider'
-import { Header } from '@/components/Header'
+import { AppHeader } from '@/components/AppHeader'
 import { Footer } from '@/components/Footer'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -228,7 +228,7 @@ export default function CostBasisPage() {
   if (isLoading || isLoadingLots) {
     return (
       <>
-        <Header />
+        <AppHeader />
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-violet-50 to-fuchsia-50 dark:from-slate-950 dark:via-violet-950/20 dark:to-fuchsia-950/20 flex items-center justify-center">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -246,7 +246,7 @@ export default function CostBasisPage() {
 
   return (
     <>
-      <Header />
+      <AppHeader />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-violet-50 to-fuchsia-50 dark:from-slate-950 dark:via-violet-950/20 dark:to-fuchsia-950/20">
         <div className="container mx-auto px-4 py-12 max-w-7xl">
           {/* Page Header */}

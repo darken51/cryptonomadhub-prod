@@ -35,7 +35,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Wallet, Plus, Trash2, Edit, CheckCircle, AlertTriangle, TrendingUp, DollarSign, Coins, RefreshCw, Layers } from "lucide-react"
-import { Header } from "@/components/Header"
+import { AppHeader } from "@/components/AppHeader"
 import { Footer } from "@/components/Footer"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
@@ -510,7 +510,7 @@ export default function WalletsPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-violet-50/30 to-fuchsia-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
-      <Header />
+      <AppHeader />
 
       <main className="flex-1">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">

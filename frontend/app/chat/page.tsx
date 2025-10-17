@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { useToast } from '@/components/providers/ToastProvider'
-import { Header } from '@/components/Header'
+import { AppHeader } from '@/components/AppHeader'
 import { Footer } from '@/components/Footer'
 import { Send, Bot, User as UserIcon, Sparkles } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -167,7 +167,7 @@ export default function ChatPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-violet-50/20 to-fuchsia-50/20 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex flex-col">
-      <Header />
+      <AppHeader />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col max-w-5xl mx-auto w-full px-4 py-8">

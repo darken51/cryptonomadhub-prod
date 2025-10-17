@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/components/providers/AuthProvider'
-import { Header } from '@/components/Header'
+import { AppHeader } from '@/components/AppHeader'
 import { Footer } from '@/components/Footer'
 import { ArrowLeft, Calendar, TrendingDown, TrendingUp, History } from 'lucide-react'
 
@@ -41,7 +41,7 @@ export default function SimulationHistoryPage() {
   if (isLoading || loading) {
     return (
       <>
-        <Header />
+        <AppHeader />
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-violet-50/30 to-fuchsia-50/30 dark:from-slate-950 dark:via-violet-950/20 dark:to-fuchsia-950/20">
           <motion.div
             animate={{ rotate: 360 }}
@@ -56,7 +56,7 @@ export default function SimulationHistoryPage() {
 
   return (
     <>
-      <Header />
+      <AppHeader />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-violet-50/30 to-fuchsia-50/30 dark:from-slate-950 dark:via-violet-950/20 dark:to-fuchsia-950/20 py-8">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}

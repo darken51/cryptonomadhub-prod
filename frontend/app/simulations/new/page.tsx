@@ -7,7 +7,7 @@ import { motion } from 'framer-motion'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { useToast } from '@/components/providers/ToastProvider'
 import { SimulationExplainer } from '@/components/SimulationExplainer'
-import { Header } from '@/components/Header'
+import { AppHeader } from '@/components/AppHeader'
 import { Footer } from '@/components/Footer'
 import { ArrowLeft, Calculator, Sparkles } from 'lucide-react'
 
@@ -250,7 +250,7 @@ export default function NewSimulationPage() {
 
   return (
     <>
-      <Header />
+      <AppHeader />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-violet-50/30 to-fuchsia-50/30 dark:from-slate-950 dark:via-violet-950/20 dark:to-fuchsia-950/20 py-4 sm:py-8">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}

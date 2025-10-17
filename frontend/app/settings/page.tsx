@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/components/providers/AuthProvider'
-import { Header } from '@/components/Header'
+import { AppHeader } from '@/components/AppHeader'
 import { Footer } from '@/components/Footer'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
 import {
@@ -255,7 +255,7 @@ export default function SettingsPage() {
   if (isLoading || !user) {
     return (
       <>
-        <Header />
+        <AppHeader />
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-violet-50/30 to-fuchsia-50/30 dark:from-slate-950 dark:via-violet-950/20 dark:to-fuchsia-950/20">
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -273,7 +273,7 @@ export default function SettingsPage() {
 
   return (
     <>
-      <Header />
+      <AppHeader />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-violet-50/30 to-fuchsia-50/30 dark:from-slate-950 dark:via-violet-950/20 dark:to-fuchsia-950/20">
         {/* Page Header */}
         <motion.div
