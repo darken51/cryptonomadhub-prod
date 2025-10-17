@@ -25,6 +25,11 @@ node_modules/
 .next/
 out/
 dist/
+*.tsbuildinfo
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
 
 # IDE
 .vscode/
