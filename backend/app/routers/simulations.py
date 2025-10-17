@@ -9,7 +9,7 @@ from app.services.tax_simulator import TaxSimulator
 from app.services.pdf_generator import PDFGenerator
 from app.middleware import limiter, get_rate_limit
 from pydantic import BaseModel, Field, field_validator
-from typing import List
+from typing import List, Optional
 import re
 
 router = APIRouter(prefix="/simulations", tags=["Simulations"])
