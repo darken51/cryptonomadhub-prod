@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { ArrowLeft, Search, TrendingDown, Info } from 'lucide-react'
 import WorldTaxMap from '@/components/WorldTaxMap'
@@ -160,54 +161,64 @@ export default function CountriesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-4 sm:py-8">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 py-4 sm:py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-6 sm:mb-8">
+        <motion.div
+          className="mb-6 sm:mb-8"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 mb-3 sm:mb-4"
+            className="inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 mb-3 sm:mb-4 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Dashboard
           </Link>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl sm:text-5xl font-bold bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent mb-4">
             Country Tax Regulations
           </h1>
-          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-2">
-            Browse crypto tax rates for {countries.length}+ countries
+          <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl">
+            Browse crypto tax rates for {countries.length}+ countries with verified data and real-time updates
           </p>
-        </div>
+        </motion.div>
 
         {/* Filters */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700 mb-6">
+        <motion.div
+          className="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-200 dark:border-slate-800 mb-6 shadow-sm"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Search */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Search Countries
               </label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search by name or code..."
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-900 dark:text-white"
+                  className="w-full pl-10 pr-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-900 dark:text-white transition-all"
                 />
               </div>
             </div>
 
             {/* Filter Type */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Filter by Type
               </label>
               <select
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value as any)}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-900 dark:text-white"
+                className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-900 dark:text-white transition-all"
               >
                 <option value="all">All Countries ({countries.length})</option>
                 <option value="crypto-friendly">Crypto-Friendly (&lt;10% tax)</option>
@@ -222,28 +233,33 @@ export default function CountriesPage() {
                 type="checkbox"
                 checked={reliableOnly}
                 onChange={(e) => setReliableOnly(e.target.checked)}
-                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="w-4 h-4 rounded border-slate-300 text-violet-600 focus:ring-violet-500"
               />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
                 Show only countries with verified data
               </span>
             </label>
-            <span className="text-sm text-gray-600 dark:text-gray-400">
+            <span className="text-sm text-slate-600 dark:text-slate-400">
               ({filteredCountries.length} countries)
             </span>
           </div>
-        </div>
+        </motion.div>
 
         {/* Info Banner */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+        <motion.div
+          className="bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800 rounded-lg p-4 mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
           <div className="flex gap-3">
-            <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-            <div className="text-sm text-blue-800 dark:text-blue-200">
+            <Info className="w-5 h-5 text-violet-600 dark:text-violet-400 flex-shrink-0 mt-0.5" />
+            <div className="text-sm text-violet-800 dark:text-violet-200">
               <p className="font-semibold mb-1">Crypto vs General Capital Gains</p>
               <p>Some countries have different tax rates for cryptocurrencies compared to general capital gains. Crypto-specific rates are shown when available.</p>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* World Map */}
         {!isLoading && countries.length > 0 && (
@@ -256,11 +272,17 @@ export default function CountriesPage() {
         {isLoading && (
           <div className="space-y-4">
             {[1, 2, 3, 4, 5].map(i => (
-              <div key={i} className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700 animate-pulse">
-                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-4"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
-                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-              </div>
+              <motion.div
+                key={i}
+                className="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-800 animate-pulse"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: i * 0.1 }}
+              >
+                <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded w-1/4 mb-4"></div>
+                <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-full mb-2"></div>
+                <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4"></div>
+              </motion.div>
             ))}
           </div>
         )}
@@ -268,10 +290,15 @@ export default function CountriesPage() {
         {/* Countries Grid */}
         {!isLoading && (
           <div className="space-y-4">
-            {filteredCountries.map(country => (
-              <div
+            {filteredCountries.map((country, index) => (
+              <motion.div
                 key={country.country_code}
-                className="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition"
+                className="bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 border border-slate-200 dark:border-slate-800 hover:shadow-xl hover:border-violet-300 dark:hover:border-violet-700 transition-all duration-300"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.4, delay: index * 0.05 }}
+                whileHover={{ scale: 1.01 }}
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
@@ -279,30 +306,30 @@ export default function CountriesPage() {
                       {country.flag_emoji && (
                         <span className="text-3xl">{country.flag_emoji}</span>
                       )}
-                      <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+                      <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">
                         {country.country_name}
                       </h3>
-                      <span className="text-sm text-gray-500 dark:text-gray-400 font-mono">
+                      <span className="text-sm text-slate-500 dark:text-slate-400 font-mono">
                         {country.country_code}
                       </span>
                       {getCryptoFriendlyBadge(country)}
                       {getDataQualityBadge(country.data_quality)}
                       {country.updated_at && isRecentlyUpdated(country.updated_at) && (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-fuchsia-100 dark:bg-fuchsia-900/30 text-fuchsia-700 dark:text-fuchsia-300">
                           🔄 Recently Updated
                         </span>
                       )}
                     </div>
                     {country.updated_at && (
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                      <div className="text-xs text-slate-500 dark:text-slate-400 mb-2">
                         Last updated: {formatDate(country.updated_at)}
                       </div>
                     )}
                     {country.data_sources && country.data_sources.length > 0 && (
-                      <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 mb-2">
+                      <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400 mb-2">
                         <span>Sources:</span>
                         {country.data_sources.map((source, idx) => (
-                          <span key={idx} className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded">
+                          <span key={idx} className="px-2 py-0.5 bg-slate-100 dark:bg-slate-700 rounded">
                             {source}
                           </span>
                         ))}
@@ -313,7 +340,7 @@ export default function CountriesPage() {
                         href={country.source_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                        className="inline-flex items-center gap-1 text-xs text-violet-600 dark:text-violet-400 hover:text-fuchsia-600 dark:hover:text-fuchsia-400 transition-colors"
                       >
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -327,20 +354,20 @@ export default function CountriesPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* General CGT */}
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                    <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3 flex items-center gap-2">
                       <TrendingDown className="w-4 h-4" />
                       General Capital Gains Tax
                     </h4>
                     <div className="space-y-2">
-                      <div className="flex justify-between items-center py-2 px-3 bg-gray-50 dark:bg-gray-700/50 rounded">
-                        <span className="text-sm text-gray-600 dark:text-gray-400">Short-term (&lt;1 year)</span>
-                        <span className="text-sm font-bold text-gray-900 dark:text-white">
+                      <div className="flex justify-between items-center py-2 px-3 bg-slate-50 dark:bg-slate-700/50 rounded">
+                        <span className="text-sm text-slate-600 dark:text-slate-400">Short-term (&lt;1 year)</span>
+                        <span className="text-sm font-bold text-slate-900 dark:text-white">
                           {(country.cgt_short_rate * 100).toFixed(1)}%
                         </span>
                       </div>
-                      <div className="flex justify-between items-center py-2 px-3 bg-gray-50 dark:bg-gray-700/50 rounded">
-                        <span className="text-sm text-gray-600 dark:text-gray-400">Long-term (&gt;1 year)</span>
-                        <span className="text-sm font-bold text-gray-900 dark:text-white">
+                      <div className="flex justify-between items-center py-2 px-3 bg-slate-50 dark:bg-slate-700/50 rounded">
+                        <span className="text-sm text-slate-600 dark:text-slate-400">Long-term (&gt;1 year)</span>
+                        <span className="text-sm font-bold text-slate-900 dark:text-white">
                           {(country.cgt_long_rate * 100).toFixed(1)}%
                         </span>
                       </div>
@@ -349,34 +376,34 @@ export default function CountriesPage() {
 
                   {/* Crypto-Specific */}
                   <div>
-                    <h4 className="text-sm font-semibold text-purple-700 dark:text-purple-300 mb-3 flex items-center gap-2">
+                    <h4 className="text-sm font-semibold text-violet-700 dark:text-violet-300 mb-3 flex items-center gap-2">
                       <span className="text-lg">🪙</span>
                       Crypto-Specific Tax
                     </h4>
                     {country.crypto_short_rate !== null && country.crypto_short_rate !== undefined ? (
                       <div className="space-y-2">
-                        <div className="flex justify-between items-center py-2 px-3 bg-purple-50 dark:bg-purple-900/20 rounded border border-purple-200 dark:border-purple-800">
-                          <span className="text-sm text-purple-700 dark:text-purple-300">Short-term (&lt;1 year)</span>
-                          <span className="text-sm font-bold text-purple-900 dark:text-purple-100">
+                        <div className="flex justify-between items-center py-2 px-3 bg-violet-50 dark:bg-violet-900/20 rounded border border-violet-200 dark:border-violet-800">
+                          <span className="text-sm text-violet-700 dark:text-violet-300">Short-term (&lt;1 year)</span>
+                          <span className="text-sm font-bold text-violet-900 dark:text-violet-100">
                             {(country.crypto_short_rate * 100).toFixed(1)}%
                           </span>
                         </div>
-                        <div className="flex justify-between items-center py-2 px-3 bg-purple-50 dark:bg-purple-900/20 rounded border border-purple-200 dark:border-purple-800">
-                          <span className="text-sm text-purple-700 dark:text-purple-300">Long-term (&gt;1 year)</span>
-                          <span className="text-sm font-bold text-purple-900 dark:text-purple-100">
+                        <div className="flex justify-between items-center py-2 px-3 bg-fuchsia-50 dark:bg-fuchsia-900/20 rounded border border-fuchsia-200 dark:border-fuchsia-800">
+                          <span className="text-sm text-fuchsia-700 dark:text-fuchsia-300">Long-term (&gt;1 year)</span>
+                          <span className="text-sm font-bold text-fuchsia-900 dark:text-fuchsia-100">
                             {((country.crypto_long_rate ?? 0) * 100).toFixed(1)}%
                           </span>
                         </div>
                         {country.crypto_notes && (
-                          <div className="mt-3 p-3 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded text-xs text-purple-800 dark:text-purple-200">
+                          <div className="mt-3 p-3 bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800 rounded text-xs text-violet-800 dark:text-violet-200">
                             <p className="font-semibold mb-1">📌 Crypto Rules:</p>
                             <p>{country.crypto_notes}</p>
                           </div>
                         )}
                       </div>
                     ) : (
-                      <div className="py-6 px-3 bg-gray-50 dark:bg-gray-700/30 rounded text-center">
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <div className="py-6 px-3 bg-slate-50 dark:bg-slate-700/30 rounded text-center">
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
                           No crypto-specific data available. General CGT applies.
                         </p>
                       </div>
@@ -387,44 +414,44 @@ export default function CountriesPage() {
                 {/* Structured Tax Metadata */}
                 {(country.holding_period_months || country.long_term_discount_pct || country.exemption_threshold ||
                   country.is_flat_tax || country.is_progressive || country.is_territorial) && (
-                  <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                  <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+                    <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
                       📊 Tax Structure Details
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {country.holding_period_months && (
-                        <div className="flex justify-between items-center py-2 px-3 bg-gray-50 dark:bg-gray-700/50 rounded">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">Holding Period for Long-term</span>
-                          <span className="text-sm font-bold text-gray-900 dark:text-white">
+                        <div className="flex justify-between items-center py-2 px-3 bg-slate-50 dark:bg-slate-700/50 rounded">
+                          <span className="text-sm text-slate-600 dark:text-slate-400">Holding Period for Long-term</span>
+                          <span className="text-sm font-bold text-slate-900 dark:text-white">
                             {country.holding_period_months} months
                           </span>
                         </div>
                       )}
                       {country.long_term_discount_pct && (
-                        <div className="flex justify-between items-center py-2 px-3 bg-gray-50 dark:bg-gray-700/50 rounded">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">Long-term Discount</span>
-                          <span className="text-sm font-bold text-gray-900 dark:text-white">
+                        <div className="flex justify-between items-center py-2 px-3 bg-slate-50 dark:bg-slate-700/50 rounded">
+                          <span className="text-sm text-slate-600 dark:text-slate-400">Long-term Discount</span>
+                          <span className="text-sm font-bold text-slate-900 dark:text-white">
                             {country.long_term_discount_pct}%
                           </span>
                         </div>
                       )}
                       {country.exemption_threshold && (
-                        <div className="flex justify-between items-center py-2 px-3 bg-gray-50 dark:bg-gray-700/50 rounded">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">Exemption Threshold</span>
-                          <span className="text-sm font-bold text-gray-900 dark:text-white">
+                        <div className="flex justify-between items-center py-2 px-3 bg-slate-50 dark:bg-slate-700/50 rounded">
+                          <span className="text-sm text-slate-600 dark:text-slate-400">Exemption Threshold</span>
+                          <span className="text-sm font-bold text-slate-900 dark:text-white">
                             {country.exemption_threshold.toLocaleString()} {country.exemption_threshold_currency || ''}
                           </span>
                         </div>
                       )}
                       {(country.is_flat_tax || country.is_progressive || country.is_territorial) && (
-                        <div className="flex items-center gap-2 py-2 px-3 bg-gray-50 dark:bg-gray-700/50 rounded">
-                          <span className="text-sm text-gray-600 dark:text-gray-400">Tax System:</span>
+                        <div className="flex items-center gap-2 py-2 px-3 bg-slate-50 dark:bg-slate-700/50 rounded">
+                          <span className="text-sm text-slate-600 dark:text-slate-400">Tax System:</span>
                           <div className="flex flex-wrap gap-1">
                             {country.is_flat_tax && (
-                              <span className="text-xs bg-blue-600 text-white px-2 py-0.5 rounded">Flat Tax</span>
+                              <span className="text-xs bg-violet-600 text-white px-2 py-0.5 rounded">Flat Tax</span>
                             )}
                             {country.is_progressive && (
-                              <span className="text-xs bg-purple-600 text-white px-2 py-0.5 rounded">Progressive</span>
+                              <span className="text-xs bg-fuchsia-600 text-white px-2 py-0.5 rounded">Progressive</span>
                             )}
                             {country.is_territorial && (
                               <span className="text-xs bg-green-600 text-white px-2 py-0.5 rounded">Territorial</span>
@@ -438,29 +465,40 @@ export default function CountriesPage() {
 
                 {/* General Notes */}
                 {country.notes && (
-                  <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                  <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+                    <p className="text-xs text-slate-600 dark:text-slate-400">
                       <span className="font-semibold">Note:</span> {country.notes}
                     </p>
                   </div>
                 )}
-              </div>
+              </motion.div>
             ))}
 
             {filteredCountries.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-gray-500 dark:text-gray-400">No countries found matching your filters.</p>
-              </div>
+              <motion.div
+                className="text-center py-12"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <p className="text-slate-500 dark:text-slate-400">No countries found matching your filters.</p>
+              </motion.div>
             )}
           </div>
         )}
 
         {/* Disclaimer */}
-        <div className="mt-8 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+        <motion.div
+          className="mt-8 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
           <p className="text-sm text-yellow-900 dark:text-yellow-200">
             ⚠️ <strong>Disclaimer:</strong> Tax rates shown are for informational purposes only and may not reflect the most current regulations. Always consult a qualified tax professional for accurate advice. Last updated: {new Date().toLocaleDateString()}
           </p>
-        </div>
+        </motion.div>
       </div>
     </div>
   )

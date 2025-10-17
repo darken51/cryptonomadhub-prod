@@ -3,9 +3,20 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
+import { Header } from '@/components/Header'
+import { Footer } from '@/components/Footer'
 import { useAuth } from '@/components/providers/AuthProvider'
-import { LogOut, TrendingUp, Globe, FileText, MessageCircle, Activity, Settings, CreditCard, Wallet, PieChart, BarChart3, DollarSign } from 'lucide-react'
-import { LineChart, Line, AreaChart, Area, PieChart as RePieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import {
+  LogOut, TrendingUp, Globe, FileText, MessageCircle, Activity,
+  Settings, CreditCard, Wallet, PieChart, BarChart3, DollarSign,
+  Sparkles, ArrowRight, Zap, Shield, Target
+} from 'lucide-react'
+import {
+  LineChart, Line, AreaChart, Area, PieChart as RePieChart, Pie,
+  Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  Legend, ResponsiveContainer
+} from 'recharts'
 
 export default function DashboardPage() {
   const { user, logout, isLoading, token } = useAuth()
@@ -124,8 +135,11 @@ export default function DashboardPage() {
 
   if (isLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-violet-200 border-t-violet-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-600 dark:text-slate-400">Loading your dashboard...</p>
+        </div>
       </div>
     )
   }
@@ -135,330 +149,491 @@ export default function DashboardPage() {
     router.push('/')
   }
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FFC658', '#FF6B9D']
+  const COLORS = ['#7c3aed', '#d946ef', '#a855f7', '#e879f9', '#9333ea', '#f0abfc', '#6b21a8', '#f5d0fe']
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, ease: 'easeOut' }
+    }
+  }
+
+  const heroVariants = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 0.6, ease: 'easeOut' }
+    }
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-violet-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-violet-950/20">
+      <Header />
+
+      {/* User Info Bar */}
+      <div className="border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                NomadCrypto Hub
-              </h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{user.email}</p>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-violet-600 to-fuchsia-600 rounded-full flex items-center justify-center text-white font-bold">
+                {user.email.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <p className="text-sm font-medium text-slate-900 dark:text-white">{user.email}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Free Tier</p>
+              </div>
             </div>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
             >
               <LogOut className="w-4 h-4" />
               Logout
             </button>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Main content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome banner */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white mb-8">
-          <h2 className="text-3xl font-bold mb-2">Welcome to Your Dashboard</h2>
-          <p className="text-blue-100">
-            Start by simulating a residency change to see potential tax savings
-          </p>
-        </div>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        {/* Hero Banner */}
+        <motion.div
+          variants={heroVariants}
+          initial="hidden"
+          animate="visible"
+          className="relative overflow-hidden bg-gradient-to-r from-violet-600 via-fuchsia-600 to-violet-600 rounded-3xl p-8 md:p-12 text-white mb-12 shadow-2xl"
+        >
+          <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10"></div>
+          <div className="absolute top-0 right-0 w-64 h-64 bg-fuchsia-500/30 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-violet-500/30 rounded-full blur-3xl"></div>
 
-        {/* Action cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Chat Assistant - NEW */}
-          <Link
-            href="/chat"
-            className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl p-6 text-white hover:shadow-lg transition group relative overflow-hidden"
-          >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-            <div className="relative">
-              <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition">
-                <MessageCircle className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-lg font-semibold mb-2">
-                AI Chat Assistant
-              </h3>
-              <p className="text-sm text-white/90">
-                Ask questions about crypto taxes in any country
-              </p>
-              <span className="inline-block mt-2 bg-white/20 text-xs font-semibold px-2 py-1 rounded-full">
-                ✨ NEW
+          <div className="relative z-10">
+            <div className="flex items-center gap-2 mb-4">
+              <Sparkles className="w-6 h-6 text-yellow-300" />
+              <span className="text-sm font-semibold bg-white/20 px-3 py-1 rounded-full backdrop-blur-sm">
+                Welcome Back!
               </span>
             </div>
-          </Link>
-
-          {/* Simulate residency */}
-          <Link
-            href="/simulations/new"
-            className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition group"
-          >
-            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition">
-              <TrendingUp className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              New Simulation
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Compare tax impact of moving to a new country
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-fuchsia-100">
+              Your Dashboard
+            </h1>
+            <p className="text-lg md:text-xl text-violet-100 max-w-2xl mb-6">
+              Start by simulating a residency change to see potential tax savings across 160+ countries
             </p>
-          </Link>
+            <Link
+              href="/simulations/new"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-white text-violet-600 font-semibold rounded-xl hover:bg-violet-50 transition-all transform hover:scale-105 shadow-xl"
+            >
+              <TrendingUp className="w-5 h-5" />
+              New Simulation
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </motion.div>
 
-          {/* Compare Multiple Countries - NEW */}
-          <Link
-            href="/simulations/compare"
-            className="bg-gradient-to-br from-orange-500 to-red-500 rounded-xl p-6 text-white hover:shadow-lg transition group relative overflow-hidden"
-          >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-            <div className="relative">
-              <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition">
-                <Globe className="w-6 h-6 text-white" />
+        {/* Quick Stats */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
+        >
+          <motion.div variants={itemVariants} className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-lg hover:shadow-xl transition-shadow">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-violet-100 to-fuchsia-100 dark:from-violet-900/30 dark:to-fuchsia-900/30 rounded-xl flex items-center justify-center">
+                <FileText className="w-6 h-6 text-violet-600 dark:text-fuchsia-400" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">
-                Compare Countries
-              </h3>
-              <p className="text-sm text-white/90">
-                Side-by-side comparison of up to 5 countries
-              </p>
-              <span className="inline-block mt-2 bg-white/20 text-xs font-semibold px-2 py-1 rounded-full">
-                ✨ NEW
-              </span>
+              <Zap className="w-5 h-5 text-violet-400" />
             </div>
-          </Link>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Simulations</p>
+            <p className="text-3xl font-bold text-slate-900 dark:text-white">{stats.count}</p>
+          </motion.div>
 
-          {/* DeFi Audit - NEW */}
-          <Link
-            href="/defi-audit"
-            className="bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl p-6 text-white hover:shadow-lg transition group relative overflow-hidden"
-          >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-            <div className="relative">
-              <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition">
-                <Activity className="w-6 h-6 text-white" />
+          <motion.div variants={itemVariants} className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-lg hover:shadow-xl transition-shadow">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-emerald-100 to-green-100 dark:from-emerald-900/30 dark:to-green-900/30 rounded-xl flex items-center justify-center">
+                <DollarSign className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">
-                DeFi Audit
-              </h3>
-              <p className="text-sm text-white/90">
-                Analyze your DeFi activity and calculate taxes
-              </p>
-              <span className="inline-block mt-2 bg-white/20 text-xs font-semibold px-2 py-1 rounded-full">
-                🔥 NEW
-              </span>
+              <Target className="w-5 h-5 text-emerald-400" />
             </div>
-          </Link>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Potential Savings</p>
+            <p className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">
+              ${stats.totalSavings.toLocaleString()}
+            </p>
+          </motion.div>
 
-          {/* Tax Optimizer - NEW */}
-          <Link
-            href="/tax-optimizer"
-            className="bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl p-6 text-white hover:shadow-lg transition group relative overflow-hidden"
-          >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-            <div className="relative">
-              <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition">
-                <TrendingUp className="w-6 h-6 text-white" />
+          <motion.div variants={itemVariants} className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-lg hover:shadow-xl transition-shadow">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-cyan-100 dark:from-blue-900/30 dark:to-cyan-900/30 rounded-xl flex items-center justify-center">
+                <Globe className="w-6 h-6 text-blue-600 dark:text-cyan-400" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">
-                Tax Optimizer
-              </h3>
-              <p className="text-sm text-white/90">
-                Loss harvesting & tax savings strategies
-              </p>
-              <span className="inline-block mt-2 bg-white/20 text-xs font-semibold px-2 py-1 rounded-full">
-                💡 NEW
-              </span>
+              <Shield className="w-5 h-5 text-blue-400" />
             </div>
-          </Link>
+            <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">Countries Compared</p>
+            <p className="text-3xl font-bold text-slate-900 dark:text-white">{stats.countriesCompared}</p>
+          </motion.div>
 
-          {/* Multi-Wallet Manager - NEW */}
-          <Link
-            href="/wallets"
-            className="bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl p-6 text-white hover:shadow-lg transition group relative overflow-hidden"
-          >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-            <div className="relative">
-              <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition">
+          <motion.div variants={itemVariants} className="bg-gradient-to-br from-violet-600 to-fuchsia-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-shadow">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
                 <Wallet className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">
-                Multi-Wallet Manager
-              </h3>
-              <p className="text-sm text-white/90">
-                Manage multiple wallets as portfolio groups
-              </p>
-              <span className="inline-block mt-2 bg-white/20 text-xs font-semibold px-2 py-1 rounded-full">
-                📊 NEW
-              </span>
+              <Sparkles className="w-5 h-5 text-fuchsia-200" />
             </div>
-          </Link>
+            <p className="text-sm text-violet-100 mb-1">Portfolio Value</p>
+            <p className="text-3xl font-bold">
+              ${defiStats.totalPortfolioValue.toLocaleString()}
+            </p>
+          </motion.div>
+        </motion.div>
 
-          {/* Cost Basis Tracking - NEW */}
-          <Link
-            href="/cost-basis"
-            className="bg-gradient-to-br from-rose-500 to-pink-500 rounded-xl p-6 text-white hover:shadow-lg transition group relative overflow-hidden"
-          >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-            <div className="relative">
-              <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition">
-                <BarChart3 className="w-6 h-6 text-white" />
+        {/* Action Cards */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12"
+        >
+          {/* Chat Assistant */}
+          <motion.div variants={itemVariants}>
+            <Link
+              href="/chat"
+              className="group block h-full bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-2xl p-6 text-white hover:shadow-2xl transition-all relative overflow-hidden transform hover:scale-[1.02]"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform"></div>
+              <div className="relative z-10">
+                <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <MessageCircle className="w-7 h-7 text-white" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">AI Chat Assistant</h3>
+                <p className="text-sm text-violet-100 mb-3">
+                  Ask questions about crypto taxes in any country
+                </p>
+                <span className="inline-flex items-center gap-1 bg-white/20 text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm">
+                  <Sparkles className="w-3 h-3" />
+                  NEW
+                </span>
               </div>
-              <h3 className="text-lg font-semibold mb-2">
-                Cost Basis Tracking
+            </Link>
+          </motion.div>
+
+          {/* New Simulation */}
+          <motion.div variants={itemVariants}>
+            <Link
+              href="/simulations/new"
+              className="group block h-full bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 hover:border-violet-300 dark:hover:border-violet-700 hover:shadow-xl transition-all transform hover:scale-[1.02]"
+            >
+              <div className="w-14 h-14 bg-gradient-to-br from-violet-100 to-fuchsia-100 dark:from-violet-900/30 dark:to-fuchsia-900/30 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <TrendingUp className="w-7 h-7 text-violet-600 dark:text-fuchsia-400" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+                New Simulation
               </h3>
-              <p className="text-sm text-white/90">
-                FIFO/LIFO/HIFO lot tracking for accurate taxes
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Compare tax impact of moving to a new country
               </p>
-              <span className="inline-block mt-2 bg-white/20 text-xs font-semibold px-2 py-1 rounded-full">
-                📈 NEW
-              </span>
-            </div>
-          </Link>
+            </Link>
+          </motion.div>
+
+          {/* Compare Countries */}
+          <motion.div variants={itemVariants}>
+            <Link
+              href="/simulations/compare"
+              className="group block h-full bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl p-6 text-white hover:shadow-2xl transition-all relative overflow-hidden transform hover:scale-[1.02]"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform"></div>
+              <div className="relative z-10">
+                <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <Globe className="w-7 h-7 text-white" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">Compare Countries</h3>
+                <p className="text-sm text-orange-100 mb-3">
+                  Side-by-side comparison of up to 5 countries
+                </p>
+                <span className="inline-flex items-center gap-1 bg-white/20 text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm">
+                  <Sparkles className="w-3 h-3" />
+                  NEW
+                </span>
+              </div>
+            </Link>
+          </motion.div>
+
+          {/* DeFi Audit */}
+          <motion.div variants={itemVariants}>
+            <Link
+              href="/defi-audit"
+              className="group block h-full bg-gradient-to-br from-emerald-500 to-teal-500 rounded-2xl p-6 text-white hover:shadow-2xl transition-all relative overflow-hidden transform hover:scale-[1.02]"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform"></div>
+              <div className="relative z-10">
+                <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <Activity className="w-7 h-7 text-white" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">DeFi Audit</h3>
+                <p className="text-sm text-emerald-100 mb-3">
+                  Analyze your DeFi activity and calculate taxes
+                </p>
+                <span className="inline-flex items-center gap-1 bg-white/20 text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm">
+                  <Zap className="w-3 h-3" />
+                  NEW
+                </span>
+              </div>
+            </Link>
+          </motion.div>
+
+          {/* Tax Optimizer */}
+          <motion.div variants={itemVariants}>
+            <Link
+              href="/tax-optimizer"
+              className="group block h-full bg-gradient-to-br from-violet-600 to-fuchsia-600 rounded-2xl p-6 text-white hover:shadow-2xl transition-all relative overflow-hidden transform hover:scale-[1.02]"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform"></div>
+              <div className="relative z-10">
+                <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <TrendingUp className="w-7 h-7 text-white" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">Tax Optimizer</h3>
+                <p className="text-sm text-violet-100 mb-3">
+                  Loss harvesting & tax savings strategies
+                </p>
+                <span className="inline-flex items-center gap-1 bg-white/20 text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm">
+                  <Target className="w-3 h-3" />
+                  NEW
+                </span>
+              </div>
+            </Link>
+          </motion.div>
+
+          {/* Multi-Wallet Manager */}
+          <motion.div variants={itemVariants}>
+            <Link
+              href="/wallets"
+              className="group block h-full bg-gradient-to-br from-cyan-500 to-blue-500 rounded-2xl p-6 text-white hover:shadow-2xl transition-all relative overflow-hidden transform hover:scale-[1.02]"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform"></div>
+              <div className="relative z-10">
+                <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <Wallet className="w-7 h-7 text-white" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">Multi-Wallet Manager</h3>
+                <p className="text-sm text-cyan-100 mb-3">
+                  Manage multiple wallets as portfolio groups
+                </p>
+                <span className="inline-flex items-center gap-1 bg-white/20 text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm">
+                  <PieChart className="w-3 h-3" />
+                  NEW
+                </span>
+              </div>
+            </Link>
+          </motion.div>
+
+          {/* Cost Basis Tracking */}
+          <motion.div variants={itemVariants}>
+            <Link
+              href="/cost-basis"
+              className="group block h-full bg-gradient-to-br from-rose-500 to-pink-500 rounded-2xl p-6 text-white hover:shadow-2xl transition-all relative overflow-hidden transform hover:scale-[1.02]"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform"></div>
+              <div className="relative z-10">
+                <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <BarChart3 className="w-7 h-7 text-white" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">Cost Basis Tracking</h3>
+                <p className="text-sm text-rose-100 mb-3">
+                  FIFO/LIFO/HIFO lot tracking for accurate taxes
+                </p>
+                <span className="inline-flex items-center gap-1 bg-white/20 text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm">
+                  <BarChart3 className="w-3 h-3" />
+                  NEW
+                </span>
+              </div>
+            </Link>
+          </motion.div>
 
           {/* Crypto Cards & Tools */}
-          <Link
-            href="/tools"
-            className="bg-gradient-to-br from-yellow-500 to-orange-500 rounded-xl p-6 text-white hover:shadow-lg transition group relative overflow-hidden"
-          >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
-            <div className="relative">
-              <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition">
-                <CreditCard className="w-6 h-6 text-white" />
+          <motion.div variants={itemVariants}>
+            <Link
+              href="/tools"
+              className="group block h-full bg-gradient-to-br from-yellow-500 to-orange-500 rounded-2xl p-6 text-white hover:shadow-2xl transition-all relative overflow-hidden transform hover:scale-[1.02]"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform"></div>
+              <div className="relative z-10">
+                <div className="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                  <CreditCard className="w-7 h-7 text-white" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">Crypto Cards & Tools</h3>
+                <p className="text-sm text-yellow-100 mb-3">
+                  Spend your crypto globally with the best crypto debit cards
+                </p>
+                <span className="inline-flex items-center gap-1 bg-white/20 text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm">
+                  <CreditCard className="w-3 h-3" />
+                  Featured
+                </span>
               </div>
-              <h3 className="text-lg font-semibold mb-2">
-                Crypto Cards & Tools
-              </h3>
-              <p className="text-sm text-white/90">
-                Spend your crypto globally with the best crypto debit cards
-              </p>
-              <span className="inline-block mt-2 bg-white/20 text-xs font-semibold px-2 py-1 rounded-full">
-                💳 Featured
-              </span>
-            </div>
-          </Link>
+            </Link>
+          </motion.div>
 
           {/* Countries */}
-          <Link
-            href="/countries"
-            className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition group"
-          >
-            <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition">
-              <Globe className="w-6 h-6 text-green-600 dark:text-green-400" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              Countries
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Browse tax regulations for 98 countries
-            </p>
-          </Link>
+          <motion.div variants={itemVariants}>
+            <Link
+              href="/countries"
+              className="group block h-full bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 hover:border-violet-300 dark:hover:border-violet-700 hover:shadow-xl transition-all transform hover:scale-[1.02]"
+            >
+              <div className="w-14 h-14 bg-gradient-to-br from-emerald-100 to-green-100 dark:from-emerald-900/30 dark:to-green-900/30 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <Globe className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+                Countries
+              </h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Browse tax regulations for 98 countries
+              </p>
+            </Link>
+          </motion.div>
 
           {/* History */}
-          <Link
-            href="/simulations/history"
-            className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition group"
-          >
-            <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition">
-              <FileText className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              History
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              View your past simulations
-            </p>
-          </Link>
+          <motion.div variants={itemVariants}>
+            <Link
+              href="/simulations/history"
+              className="group block h-full bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 hover:border-violet-300 dark:hover:border-violet-700 hover:shadow-xl transition-all transform hover:scale-[1.02]"
+            >
+              <div className="w-14 h-14 bg-gradient-to-br from-violet-100 to-fuchsia-100 dark:from-violet-900/30 dark:to-fuchsia-900/30 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <FileText className="w-7 h-7 text-violet-600 dark:text-fuchsia-400" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+                History
+              </h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                View your past simulations
+              </p>
+            </Link>
+          </motion.div>
 
           {/* Settings */}
-          <Link
-            href="/settings"
-            className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition group"
-          >
-            <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition">
-              <Settings className="w-6 h-6 text-gray-600 dark:text-gray-400" />
-            </div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              Settings
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Manage your account preferences
-            </p>
-          </Link>
-        </div>
+          <motion.div variants={itemVariants}>
+            <Link
+              href="/settings"
+              className="group block h-full bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 hover:border-violet-300 dark:hover:border-violet-700 hover:shadow-xl transition-all transform hover:scale-[1.02]"
+            >
+              <div className="w-14 h-14 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <Settings className="w-7 h-7 text-slate-600 dark:text-slate-400" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+                Settings
+              </h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Manage your account preferences
+              </p>
+            </Link>
+          </motion.div>
+        </motion.div>
 
-        {/* Quick stats */}
-        <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Detailed Stats Section */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12"
+        >
           {/* Tax Residency Stats */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Tax Residency Stats
-            </h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Simulations</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.count}</p>
+          <motion.div variants={itemVariants} className="bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-lg">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-violet-100 to-fuchsia-100 dark:from-violet-900/30 dark:to-fuchsia-900/30 rounded-xl flex items-center justify-center">
+                <Globe className="w-6 h-6 text-violet-600 dark:text-fuchsia-400" />
               </div>
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Countries Compared</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.countriesCompared}</p>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                Tax Residency Stats
+              </h3>
+            </div>
+            <div className="grid grid-cols-2 gap-6">
+              <div className="bg-gradient-to-br from-violet-50 to-fuchsia-50 dark:from-violet-900/10 dark:to-fuchsia-900/10 rounded-xl p-4">
+                <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">Simulations</p>
+                <p className="text-3xl font-bold text-violet-600 dark:text-fuchsia-400">{stats.count}</p>
               </div>
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Potential Savings</p>
-                <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+              <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/10 dark:to-cyan-900/10 rounded-xl p-4">
+                <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">Countries Compared</p>
+                <p className="text-3xl font-bold text-blue-600 dark:text-cyan-400">{stats.countriesCompared}</p>
+              </div>
+              <div className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/10 dark:to-green-900/10 rounded-xl p-4">
+                <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">Potential Savings</p>
+                <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
                   ${stats.totalSavings.toLocaleString()}
                 </p>
               </div>
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Subscription</p>
-                <p className="text-sm font-semibold text-gray-900 dark:text-white">Free Tier</p>
+              <div className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/50 dark:to-slate-700/50 rounded-xl p-4">
+                <p className="text-sm text-slate-600 dark:text-slate-400 mb-2">Subscription</p>
+                <p className="text-lg font-bold text-slate-900 dark:text-white">Free Tier</p>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* DeFi Portfolio Stats */}
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              DeFi Portfolio Stats
-            </h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Portfolio Value</p>
-                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                  ${defiStats.totalPortfolioValue.toLocaleString()}
-                </p>
+          <motion.div variants={itemVariants} className="bg-gradient-to-br from-violet-600 to-fuchsia-600 rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32"></div>
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                  <Wallet className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-bold">
+                  DeFi Portfolio Stats
+                </h3>
               </div>
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Unrealized Gains</p>
-                <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                  ${defiStats.unrealizedGains.toLocaleString()}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Tax Liability</p>
-                <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
-                  ${defiStats.taxLiability.toLocaleString()}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Cost Basis Lots</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{defiStats.totalLots}</p>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                  <p className="text-sm text-violet-100 mb-2">Portfolio Value</p>
+                  <p className="text-3xl font-bold">
+                    ${defiStats.totalPortfolioValue.toLocaleString()}
+                  </p>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                  <p className="text-sm text-violet-100 mb-2">Unrealized Gains</p>
+                  <p className="text-3xl font-bold">
+                    ${defiStats.unrealizedGains.toLocaleString()}
+                  </p>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                  <p className="text-sm text-violet-100 mb-2">Tax Liability</p>
+                  <p className="text-3xl font-bold">
+                    ${defiStats.taxLiability.toLocaleString()}
+                  </p>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                  <p className="text-sm text-violet-100 mb-2">Cost Basis Lots</p>
+                  <p className="text-3xl font-bold">{defiStats.totalLots}</p>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Charts Section */}
         {(tokenDistribution.length > 0 || costBasisChart.length > 0) && (
-          <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12"
+          >
             {/* Token Distribution Pie Chart */}
             {tokenDistribution.length > 0 && (
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              <motion.div variants={itemVariants} className="bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-lg">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-3">
+                  <PieChart className="w-6 h-6 text-violet-600 dark:text-fuchsia-400" />
                   Portfolio Token Distribution
                 </h3>
                 <ResponsiveContainer width="100%" height={300}>
@@ -480,80 +655,107 @@ export default function DashboardPage() {
                     <Tooltip formatter={(value: number) => `$${value.toLocaleString()}`} />
                   </RePieChart>
                 </ResponsiveContainer>
-              </div>
+              </motion.div>
             )}
 
             {/* Cost Basis vs Current Value */}
             {costBasisChart.length > 0 && (
-              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              <motion.div variants={itemVariants} className="bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-lg">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-3">
+                  <BarChart3 className="w-6 h-6 text-violet-600 dark:text-fuchsia-400" />
                   Cost Basis vs Current Value
                 </h3>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={costBasisChart.slice(0, 6)}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="token" />
-                    <YAxis />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                    <XAxis dataKey="token" stroke="#64748b" />
+                    <YAxis stroke="#64748b" />
                     <Tooltip formatter={(value: number) => `$${value.toLocaleString()}`} />
                     <Legend />
-                    <Bar dataKey="costBasis" fill="#6366f1" name="Cost Basis" />
-                    <Bar dataKey="currentValue" fill="#10b981" name="Current Value" />
+                    <Bar dataKey="costBasis" fill="#7c3aed" name="Cost Basis" radius={[8, 8, 0, 0]} />
+                    <Bar dataKey="currentValue" fill="#d946ef" name="Current Value" radius={[8, 8, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
-              </div>
+              </motion.div>
             )}
-          </div>
+          </motion.div>
         )}
 
         {/* Recent Simulations */}
         {recentSimulations.length > 0 && (
-          <div className="mt-8 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <motion.div
+            variants={itemVariants}
+            initial="hidden"
+            animate="visible"
+            className="bg-white dark:bg-slate-900 rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-lg"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+                <FileText className="w-6 h-6 text-violet-600 dark:text-fuchsia-400" />
                 Recent Simulations
               </h3>
               <Link
                 href="/simulations/history"
-                className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                className="text-sm font-medium text-violet-600 dark:text-fuchsia-400 hover:underline flex items-center gap-1"
               >
                 View All
+                <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
             <div className="space-y-3">
               {recentSimulations.map((sim: any) => (
                 <div
                   key={sim.id}
-                  className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+                  className="flex items-center justify-between p-4 bg-gradient-to-r from-slate-50 to-violet-50/50 dark:from-slate-800/50 dark:to-violet-900/10 rounded-xl hover:from-violet-50 hover:to-fuchsia-50 dark:hover:from-violet-900/20 dark:hover:to-fuchsia-900/20 transition-all border border-slate-200 dark:border-slate-700"
                 >
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      {sim.current_country} → {sim.target_country}
+                    <p className="text-base font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                      {sim.current_country}
+                      <ArrowRight className="w-4 h-4 text-violet-500" />
+                      {sim.target_country}
                     </p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
                       {new Date(sim.created_at).toLocaleDateString()}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-bold text-green-600 dark:text-green-400">
+                    <p className="text-lg font-bold bg-gradient-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">
                       ${sim.savings?.toLocaleString() || '0'}
                     </p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                    <p className="text-xs text-slate-600 dark:text-slate-400">
                       saved
                     </p>
                   </div>
                 </div>
               ))}
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Disclaimer */}
-        <div className="mt-8 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
-          <p className="text-sm text-yellow-900 dark:text-yellow-200">
-            <span className="font-bold">⚠️ Reminder:</span> This tool provides general information only and is NOT financial or legal advice. Always consult licensed professionals before making decisions.
-          </p>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+          className="mt-12 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border border-yellow-200 dark:border-yellow-800 rounded-2xl p-6 shadow-lg"
+        >
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0 w-10 h-10 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center">
+              <Shield className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-yellow-900 dark:text-yellow-200 mb-1">
+                Important Reminder
+              </p>
+              <p className="text-sm text-yellow-800 dark:text-yellow-300">
+                This tool provides general information only and is NOT financial or legal advice. Always consult licensed professionals before making decisions.
+              </p>
+            </div>
+          </div>
+        </motion.div>
       </main>
+
+      <Footer />
     </div>
   )
 }

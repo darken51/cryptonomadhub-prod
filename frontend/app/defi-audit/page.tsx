@@ -5,7 +5,10 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { useToast } from '@/components/providers/ToastProvider'
-import { ArrowLeft, Plus, ExternalLink } from 'lucide-react'
+import { Header } from '@/components/Header'
+import { Footer } from '@/components/Footer'
+import { ArrowLeft, Plus, ExternalLink, ChevronDown, Activity } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface Audit {
   id: number
@@ -243,9 +246,22 @@ export default function DeFiAuditPage() {
 
   if (isLoading || isLoadingAudits) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <p className="text-gray-600 dark:text-gray-400">Loading...</p>
-      </div>
+      <>
+        <Header />
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-violet-50/30 to-fuchsia-50/30 dark:from-slate-950 dark:via-violet-950/20 dark:to-fuchsia-950/20">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center"
+          >
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center">
+              <Activity className="w-8 h-8 text-white animate-pulse" />
+            </div>
+            <p className="text-slate-600 dark:text-slate-400 font-medium">Loading...</p>
+          </motion.div>
+        </div>
+        <Footer />
+      </>
     )
   }
 
@@ -254,360 +270,453 @@ export default function DeFiAuditPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 mb-4"
+    <>
+      <Header />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-violet-50/30 to-fuchsia-50/30 dark:from-slate-950 dark:via-violet-950/20 dark:to-fuchsia-950/20 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-8"
           >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Dashboard
-          </Link>
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                DeFi Audit
-              </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-2">
-                Analyze your DeFi activity and calculate tax implications
-              </p>
-              <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 rounded-full text-xs font-medium">
-                <span>⚠️ BETA</span>
-                <span>This feature is in beta testing</span>
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-violet-600 dark:hover:text-fuchsia-400 mb-4 transition-colors group"
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              Back to Dashboard
+            </Link>
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent mb-2">
+                  DeFi Audit
+                </h1>
+                <p className="text-slate-600 dark:text-slate-400 text-lg">
+                  Analyze your DeFi activity and calculate tax implications
+                </p>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 text-amber-800 dark:text-amber-200 rounded-full text-sm font-medium shadow-sm"
+                >
+                  <span>⚠️ BETA</span>
+                  <span>This feature is in beta testing</span>
+                </motion.div>
               </div>
-            </div>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-            >
-              <Plus className="w-4 h-4" />
-              New Audit
-            </button>
-          </div>
-        </div>
-
-        {/* Audits List */}
-        {audits.length === 0 ? (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-12 text-center">
-            <div className="text-6xl mb-4">📊</div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              No audits yet
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
-              Create your first DeFi audit to analyze your on-chain activity
-            </p>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-            >
-              <Plus className="w-5 h-5" />
-              Create First Audit
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-6">
-            {audits.map((audit) => (
-              <div
-                key={audit.id}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 border border-gray-200 dark:border-gray-700"
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowCreateModal(true)}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all font-semibold"
               >
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                        Audit #{audit.id}
-                      </h3>
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          audit.status === 'completed'
-                            ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200'
-                            : audit.status === 'processing'
-                            ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200'
-                            : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200'
-                        }`}
-                      >
-                        {audit.status}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {formatDate(audit.start_date)} - {formatDate(audit.end_date)}
-                    </p>
-                    <div className="flex items-center gap-2 mt-2">
-                      {audit.chains.map((chain) => (
-                        <span
-                          key={chain}
-                          className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-xs"
-                        >
-                          {chain}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  {audit.status === 'completed' && (
-                    <Link
-                      href={`/defi-audit/${audit.id}`}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition text-sm"
-                    >
-                      View Report
-                      <ExternalLink className="w-4 h-4" />
-                    </Link>
-                  )}
-                </div>
-
-                {audit.status === 'completed' && (
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-                    <div>
-                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
-                        Transactions
-                      </p>
-                      <p className="text-xl font-bold text-gray-900 dark:text-white">
-                        {audit.total_transactions}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
-                        Volume
-                      </p>
-                      <p className="text-xl font-bold text-gray-900 dark:text-white">
-                        {formatCurrency(audit.total_volume_usd)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
-                        Net Gains
-                      </p>
-                      <p className={`text-xl font-bold ${
-                        audit.total_gains_usd - audit.total_losses_usd > 0
-                          ? 'text-green-600 dark:text-green-400'
-                          : 'text-red-600 dark:text-red-400'
-                      }`}>
-                        {formatCurrency(audit.total_gains_usd - audit.total_losses_usd)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
-                        Total Fees
-                      </p>
-                      <p className="text-xl font-bold text-gray-900 dark:text-white">
-                        {formatCurrency(audit.total_fees_usd)}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Create Modal */}
-        {showCreateModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-                Create DeFi Audit
-              </h2>
-
-              <div className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Wallet Address *
-                  </label>
-                  <input
-                    type="text"
-                    value={walletAddress}
-                    onChange={(e) => {
-                      const address = e.target.value
-                      setWalletAddress(address)
-
-                      // Auto-detect and pre-select appropriate chains
-                      if (address.length >= 26) {
-                        const chainType = detectChainTypeFromAddress(address)
-                        setDetectedChainType(chainType)
-
-                        if (chainType === 'evm') {
-                          // For EVM, auto-select all major EVM chains
-                          const evmChains = ['ethereum', 'polygon', 'bsc', 'arbitrum', 'optimism', 'base', 'avalanche']
-                          setSelectedChains(evmChains)
-                        } else if (chainType === 'solana') {
-                          // For Solana, just select solana
-                          setSelectedChains(['solana'])
-                        }
-                        // For bitcoin and other, no auto-selection (not supported in DeFi audit)
-                      } else {
-                        setDetectedChainType(null)
-                      }
-                    }}
-                    placeholder="0x..., 7xKXtg..., etc."
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-900 dark:text-white"
-                  />
-                  {detectedChainType && (
-                    <div className="mt-2 flex items-center gap-2">
-                      {detectedChainType === 'evm' && (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 rounded-full text-xs font-medium">
-                          ✓ EVM address detected - 7 blockchains auto-selected
-                        </span>
-                      )}
-                      {detectedChainType === 'solana' && (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200 rounded-full text-xs font-medium">
-                          ✓ Solana address detected - blockchain auto-selected
-                        </span>
-                      )}
-                      {detectedChainType === 'bitcoin' && (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200 rounded-full text-xs font-medium">
-                          ⚠️ Bitcoin address (not supported in DeFi audit)
-                        </span>
-                      )}
-                      {detectedChainType === 'other' && (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full text-xs font-medium">
-                          ⚠️ Unknown address format
-                        </span>
-                      )}
-                    </div>
-                  )}
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Blockchain will be automatically detected and selected below
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Start Date (Optional)
-                    </label>
-                    <input
-                      type="date"
-                      value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-900 dark:text-white"
-                    />
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Leave empty to scan from genesis
-                    </p>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      End Date (Optional)
-                    </label>
-                    <input
-                      type="date"
-                      value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-900 dark:text-white"
-                    />
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Leave empty to scan until today
-                    </p>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                    Blockchains ({selectedChains.length} selected - auto-detected)
-                  </label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-                    Blockchains are automatically selected based on your address. You can adjust the selection if needed.
-                  </p>
-                  <div className="space-y-3 max-h-96 overflow-y-auto">
-                    {categories.map((category) => {
-                      const categoryChains = availableChains.filter(c => c.category === category)
-                      const isExpanded = expandedCategories.includes(category)
-
-                      return (
-                        <div key={category} className="border border-gray-300 dark:border-gray-600 rounded-lg">
-                          <button
-                            type="button"
-                            onClick={() => toggleCategory(category)}
-                            className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition rounded-lg"
-                          >
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium text-gray-900 dark:text-white">
-                                {category}
-                              </span>
-                              <span className="text-xs text-gray-500 dark:text-gray-400">
-                                ({categoryChains.length} chains)
-                              </span>
-                            </div>
-                            <svg
-                              className={`w-5 h-5 text-gray-500 dark:text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                          </button>
-
-                          {isExpanded && (
-                            <div className="p-3 grid grid-cols-1 md:grid-cols-2 gap-2">
-                              {categoryChains.map((chain) => (
-                                <label
-                                  key={chain.id}
-                                  className="flex items-center gap-2 p-2 border border-gray-200 dark:border-gray-700 rounded cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition"
-                                >
-                                  <input
-                                    type="checkbox"
-                                    checked={selectedChains.includes(chain.id)}
-                                    onChange={() => toggleChain(chain.id)}
-                                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                  />
-                                  <div className="flex items-center gap-2 flex-1">
-                                    <span className="text-sm font-medium text-gray-900 dark:text-white">
-                                      {chain.name}
-                                    </span>
-                                    {chain.status === 'beta' && (
-                                      <span className="px-1.5 py-0.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 rounded text-xs">
-                                        Beta
-                                      </span>
-                                    )}
-                                  </div>
-                                </label>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-
-                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
-                  <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                    <strong>⚠️ Beta Feature:</strong> DeFi audit is currently in beta.
-                    Transaction parsing may be incomplete. Always verify results with a tax professional.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-3 mt-6">
-                <button
-                  onClick={() => {
-                    setShowCreateModal(false)
-                    setWalletAddress('')
-                    setSelectedChains(['ethereum'])
-                    setStartDate('')
-                    setEndDate('')
-                    setDetectedChainType(null)
-                  }}
-                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"
-                  disabled={isCreating}
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleCreateAudit}
-                  disabled={isCreating}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isCreating ? 'Creating...' : 'Create Audit'}
-                </button>
-              </div>
+                <Plus className="w-5 h-5" />
+                New Audit
+              </motion.button>
             </div>
-          </div>
-        )}
+          </motion.div>
+
+          {/* Audits List */}
+          {audits.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-12 text-center"
+            >
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+                className="text-6xl mb-4"
+              >
+                📊
+              </motion.div>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+                No audits yet
+              </h2>
+              <p className="text-slate-600 dark:text-slate-400 mb-8 max-w-md mx-auto">
+                Create your first DeFi audit to analyze your on-chain activity and calculate tax implications
+              </p>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowCreateModal(true)}
+                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all font-semibold text-lg"
+              >
+                <Plus className="w-6 h-6" />
+                Create First Audit
+              </motion.button>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="grid grid-cols-1 gap-6"
+            >
+              {audits.map((audit, index) => (
+                <motion.div
+                  key={audit.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 * index }}
+                  whileHover={{ y: -4 }}
+                  className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-2xl border border-slate-200 dark:border-slate-800 p-6 transition-all duration-300 group"
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                          Audit #{audit.id}
+                        </h3>
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                            audit.status === 'completed'
+                              ? 'bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 text-green-700 dark:text-green-300'
+                              : audit.status === 'processing'
+                              ? 'bg-gradient-to-r from-violet-100 to-fuchsia-100 dark:from-violet-900/30 dark:to-fuchsia-900/30 text-violet-700 dark:text-fuchsia-300'
+                              : 'bg-gradient-to-r from-red-100 to-rose-100 dark:from-red-900/30 dark:to-rose-900/30 text-red-700 dark:text-rose-300'
+                          }`}
+                        >
+                          {audit.status}
+                        </span>
+                      </div>
+                      <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
+                        {formatDate(audit.start_date)} - {formatDate(audit.end_date)}
+                      </p>
+                      <div className="flex items-center gap-2 mt-3 flex-wrap">
+                        {audit.chains.map((chain) => (
+                          <span
+                            key={chain}
+                            className="px-3 py-1.5 bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-600"
+                          >
+                            {chain}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    {audit.status === 'completed' && (
+                      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                        <Link
+                          href={`/defi-audit/${audit.id}`}
+                          className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-slate-900 to-slate-800 dark:from-white dark:to-slate-100 text-white dark:text-slate-900 rounded-xl hover:shadow-lg transition-all text-sm font-semibold group"
+                        >
+                          View Report
+                          <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                        </Link>
+                      </motion.div>
+                    )}
+                  </div>
+
+                  {audit.status === 'completed' && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.2 }}
+                      className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-200 dark:border-slate-800"
+                    >
+                      <div className="p-3 rounded-xl bg-gradient-to-br from-violet-50 to-fuchsia-50 dark:from-violet-950/30 dark:to-fuchsia-950/30 border border-violet-100 dark:border-violet-900/50">
+                        <p className="text-xs text-slate-600 dark:text-slate-400 mb-1 font-medium">
+                          Transactions
+                        </p>
+                        <p className="text-2xl font-bold bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent">
+                          {audit.total_transactions}
+                        </p>
+                      </div>
+                      <div className="p-3 rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/30 dark:to-cyan-950/30 border border-blue-100 dark:border-blue-900/50">
+                        <p className="text-xs text-slate-600 dark:text-slate-400 mb-1 font-medium">
+                          Volume
+                        </p>
+                        <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                          {formatCurrency(audit.total_volume_usd)}
+                        </p>
+                      </div>
+                      <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border border-emerald-100 dark:border-emerald-900/50">
+                        <p className="text-xs text-slate-600 dark:text-slate-400 mb-1 font-medium">
+                          Net Gains
+                        </p>
+                        <p className={`text-2xl font-bold ${
+                          audit.total_gains_usd - audit.total_losses_usd > 0
+                            ? 'text-green-600 dark:text-green-400'
+                            : 'text-red-600 dark:text-red-400'
+                        }`}>
+                          {formatCurrency(audit.total_gains_usd - audit.total_losses_usd)}
+                        </p>
+                      </div>
+                      <div className="p-3 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border border-amber-100 dark:border-amber-900/50">
+                        <p className="text-xs text-slate-600 dark:text-slate-400 mb-1 font-medium">
+                          Total Fees
+                        </p>
+                        <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                          {formatCurrency(audit.total_fees_usd)}
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+
+          {/* Create Modal */}
+          <AnimatePresence>
+            {showCreateModal && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+                onClick={() => {
+                  setShowCreateModal(false)
+                  setWalletAddress('')
+                  setSelectedChains(['ethereum'])
+                  setStartDate('')
+                  setEndDate('')
+                  setDetectedChainType(null)
+                }}
+              >
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                  transition={{ type: "spring", duration: 0.5 }}
+                  className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-8 w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-slate-200 dark:border-slate-800"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-600 to-fuchsia-600 flex items-center justify-center">
+                      <Activity className="w-6 h-6 text-white" />
+                    </div>
+                    <h2 className="text-3xl font-bold bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent">
+                      Create DeFi Audit
+                    </h2>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                        Wallet Address *
+                      </label>
+                      <input
+                        type="text"
+                        value={walletAddress}
+                        onChange={(e) => {
+                          const address = e.target.value
+                          setWalletAddress(address)
+
+                          // Auto-detect and pre-select appropriate chains
+                          if (address.length >= 26) {
+                            const chainType = detectChainTypeFromAddress(address)
+                            setDetectedChainType(chainType)
+
+                            if (chainType === 'evm') {
+                              // For EVM, auto-select all major EVM chains
+                              const evmChains = ['ethereum', 'polygon', 'bsc', 'arbitrum', 'optimism', 'base', 'avalanche']
+                              setSelectedChains(evmChains)
+                            } else if (chainType === 'solana') {
+                              // For Solana, just select solana
+                              setSelectedChains(['solana'])
+                            }
+                            // For bitcoin and other, no auto-selection (not supported in DeFi audit)
+                          } else {
+                            setDetectedChainType(null)
+                          }
+                        }}
+                        placeholder="0x..., 7xKXtg..., etc."
+                        className="w-full px-4 py-3 border-2 border-slate-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-violet-500 dark:bg-slate-800 dark:text-white transition-all"
+                      />
+                      {detectedChainType && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="mt-3 flex items-center gap-2"
+                        >
+                          {detectedChainType === 'evm' && (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-violet-100 to-fuchsia-100 dark:from-violet-900/30 dark:to-fuchsia-900/30 text-violet-700 dark:text-fuchsia-300 rounded-lg text-xs font-semibold">
+                              ✓ EVM address detected - 7 blockchains auto-selected
+                            </span>
+                          )}
+                          {detectedChainType === 'solana' && (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 text-purple-700 dark:text-pink-300 rounded-lg text-xs font-semibold">
+                              ✓ Solana address detected - blockchain auto-selected
+                            </span>
+                          )}
+                          {detectedChainType === 'bitcoin' && (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-orange-100 to-amber-100 dark:from-orange-900/30 dark:to-amber-900/30 text-orange-700 dark:text-amber-300 rounded-lg text-xs font-semibold">
+                              ⚠️ Bitcoin address (not supported in DeFi audit)
+                            </span>
+                          )}
+                          {detectedChainType === 'other' && (
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-xs font-semibold">
+                              ⚠️ Unknown address format
+                            </span>
+                          )}
+                        </motion.div>
+                      )}
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                        Blockchain will be automatically detected and selected below
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                          Start Date (Optional)
+                        </label>
+                        <input
+                          type="date"
+                          value={startDate}
+                          onChange={(e) => setStartDate(e.target.value)}
+                          className="w-full px-4 py-3 border-2 border-slate-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-violet-500 dark:bg-slate-800 dark:text-white transition-all"
+                        />
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                          Leave empty to scan from genesis
+                        </p>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                          End Date (Optional)
+                        </label>
+                        <input
+                          type="date"
+                          value={endDate}
+                          onChange={(e) => setEndDate(e.target.value)}
+                          className="w-full px-4 py-3 border-2 border-slate-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-violet-500 dark:bg-slate-800 dark:text-white transition-all"
+                        />
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                          Leave empty to scan until today
+                        </p>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
+                        Blockchains ({selectedChains.length} selected - auto-detected)
+                      </label>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
+                        Blockchains are automatically selected based on your address. You can adjust the selection if needed.
+                      </p>
+                      <div className="space-y-3 max-h-96 overflow-y-auto">
+                        {categories.map((category) => {
+                          const categoryChains = availableChains.filter(c => c.category === category)
+                          const isExpanded = expandedCategories.includes(category)
+
+                          return (
+                            <motion.div
+                              key={category}
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              className="border-2 border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden"
+                            >
+                              <button
+                                type="button"
+                                onClick={() => toggleCategory(category)}
+                                className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 hover:from-violet-50 hover:to-fuchsia-50 dark:hover:from-violet-950/30 dark:hover:to-fuchsia-950/30 transition-all"
+                              >
+                                <div className="flex items-center gap-3">
+                                  <span className="font-semibold text-slate-900 dark:text-white">
+                                    {category}
+                                  </span>
+                                  <span className="text-xs text-slate-500 dark:text-slate-400 font-medium px-2 py-1 bg-white dark:bg-slate-900 rounded-full">
+                                    {categoryChains.length} chains
+                                  </span>
+                                </div>
+                                <ChevronDown
+                                  className={`w-5 h-5 text-slate-500 dark:text-slate-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                                />
+                              </button>
+
+                              <AnimatePresence>
+                                {isExpanded && (
+                                  <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: "auto", opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="overflow-hidden"
+                                  >
+                                    <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-2 bg-slate-50 dark:bg-slate-800/50">
+                                      {categoryChains.map((chain) => (
+                                        <motion.label
+                                          key={chain.id}
+                                          whileHover={{ scale: 1.02 }}
+                                          whileTap={{ scale: 0.98 }}
+                                          className="flex items-center gap-3 p-3 border-2 border-slate-200 dark:border-slate-700 rounded-xl cursor-pointer hover:border-violet-400 dark:hover:border-fuchsia-600 hover:bg-white dark:hover:bg-slate-900 transition-all"
+                                        >
+                                          <input
+                                            type="checkbox"
+                                            checked={selectedChains.includes(chain.id)}
+                                            onChange={() => toggleChain(chain.id)}
+                                            className="w-5 h-5 rounded border-slate-300 text-violet-600 focus:ring-violet-500"
+                                          />
+                                          <div className="flex items-center gap-2 flex-1">
+                                            <span className="text-sm font-semibold text-slate-900 dark:text-white">
+                                              {chain.name}
+                                            </span>
+                                            {chain.status === 'beta' && (
+                                              <span className="px-2 py-0.5 bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 text-amber-700 dark:text-amber-300 rounded-lg text-xs font-bold">
+                                                Beta
+                                              </span>
+                                            )}
+                                          </div>
+                                        </motion.label>
+                                      ))}
+                                    </div>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </motion.div>
+                          )
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-2 border-amber-200 dark:border-amber-800 rounded-xl p-4">
+                      <p className="text-sm text-amber-800 dark:text-amber-200 font-medium">
+                        <strong>⚠️ Beta Feature:</strong> DeFi audit is currently in beta.
+                        Transaction parsing may be incomplete. Always verify results with a tax professional.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 mt-8">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => {
+                        setShowCreateModal(false)
+                        setWalletAddress('')
+                        setSelectedChains(['ethereum'])
+                        setStartDate('')
+                        setEndDate('')
+                        setDetectedChainType(null)
+                      }}
+                      className="flex-1 px-6 py-3 border-2 border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all font-semibold"
+                      disabled={isCreating}
+                    >
+                      Cancel
+                    </motion.button>
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={handleCreateAudit}
+                      disabled={isCreating}
+                      className="flex-1 px-6 py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isCreating ? 'Creating...' : 'Create Audit'}
+                    </motion.button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
-    </div>
+      <Footer />
+    </>
   )
 }

@@ -5,7 +5,10 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { useToast } from '@/components/providers/ToastProvider'
-import { ArrowLeft, Send, Bot, User as UserIcon, Sparkles } from 'lucide-react'
+import { Header } from '@/components/Header'
+import { Footer } from '@/components/Footer'
+import { Send, Bot, User as UserIcon, Sparkles } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 // Helper to render text with clickable links
 function renderTextWithLinks(text: string) {
@@ -24,7 +27,7 @@ function renderTextWithLinks(text: string) {
           href={part}
           target="_blank"
           rel="noopener noreferrer"
-          className="underline hover:text-blue-400 transition"
+          className="underline text-violet-600 dark:text-fuchsia-400 hover:text-violet-700 dark:hover:text-fuchsia-300 transition-colors"
         >
           {part}
         </a>
@@ -36,7 +39,7 @@ function renderTextWithLinks(text: string) {
         <Link
           key={i}
           href={part}
-          className="underline hover:text-blue-400 transition font-medium"
+          className="underline text-violet-600 dark:text-fuchsia-400 hover:text-violet-700 dark:hover:text-fuchsia-300 transition-colors font-medium"
         >
           {part}
         </Link>
@@ -153,145 +156,196 @@ export default function ChatPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 border-4 border-violet-200 dark:border-violet-900 border-t-violet-600 dark:border-t-fuchsia-500 rounded-full animate-spin"></div>
+          <p className="text-slate-600 dark:text-slate-400">Loading...</p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
-      {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-4">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link
-              href="/dashboard"
-              className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <div className="flex items-center gap-3">
-              <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-2 rounded-lg">
-                <Bot className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-lg font-bold text-gray-900 dark:text-white">
-                  Tax Assistant
-                </h1>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
-                  Powered by AI • Not financial advice
-                </p>
-              </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-violet-50/20 to-fuchsia-50/20 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex flex-col">
+      <Header />
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col max-w-5xl mx-auto w-full px-4 py-8">
+        {/* Page Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-8 text-center"
+        >
+          <div className="inline-flex items-center justify-center gap-3 mb-4">
+            <div className="bg-gradient-to-br from-violet-500 to-fuchsia-600 p-3 rounded-2xl shadow-lg">
+              <Bot className="w-8 h-8 text-white" />
             </div>
           </div>
-        </div>
-      </div>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
+            AI Tax Assistant
+          </h1>
+          <p className="text-sm text-slate-600 dark:text-slate-400">
+            Powered by AI • Not financial advice
+          </p>
+        </motion.div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-6">
-        <div className="max-w-4xl mx-auto space-y-6">
-          {messages.map((message, index) => (
-            <div
-              key={index}
-              className={`flex gap-4 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
-            >
-              {/* Avatar */}
-              <div
-                className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
-                  message.role === 'user'
-                    ? 'bg-blue-600'
-                    : 'bg-gradient-to-br from-purple-500 to-pink-500'
-                }`}
+        {/* Messages Container */}
+        <div className="flex-1 overflow-y-auto mb-6 space-y-6">
+          <AnimatePresence mode="popLayout">
+            {messages.map((message, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{
+                  duration: 0.3,
+                  delay: index * 0.05,
+                  ease: "easeOut"
+                }}
+                className={`flex gap-4 ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
               >
-                {message.role === 'user' ? (
-                  <UserIcon className="w-5 h-5 text-white" />
-                ) : (
-                  <Bot className="w-5 h-5 text-white" />
-                )}
-              </div>
+                {/* Avatar */}
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center shadow-lg ${
+                    message.role === 'user'
+                      ? 'bg-gradient-to-br from-violet-600 to-violet-700'
+                      : 'bg-gradient-to-br from-violet-500 to-fuchsia-600'
+                  }`}
+                >
+                  {message.role === 'user' ? (
+                    <UserIcon className="w-5 h-5 text-white" />
+                  ) : (
+                    <Bot className="w-5 h-5 text-white" />
+                  )}
+                </motion.div>
 
-              {/* Message Bubble */}
-              <div
-                className={`flex-1 max-w-2xl px-4 py-3 rounded-2xl ${
-                  message.role === 'user'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700'
-                }`}
-              >
-                <p className={`text-sm whitespace-pre-wrap leading-relaxed ${message.role === 'user' ? '!text-white' : ''}`}>
-                  {renderTextWithLinks(message.content)}
-                </p>
-              </div>
-            </div>
-          ))}
+                {/* Message Bubble */}
+                <motion.div
+                  whileHover={{ scale: 1.01 }}
+                  className={`flex-1 max-w-2xl px-5 py-4 rounded-2xl shadow-lg transition-shadow hover:shadow-xl ${
+                    message.role === 'user'
+                      ? 'bg-gradient-to-br from-violet-600 to-violet-700 text-white'
+                      : 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700'
+                  }`}
+                >
+                  <p className={`text-sm whitespace-pre-wrap leading-relaxed ${message.role === 'user' ? '!text-white' : ''}`}>
+                    {renderTextWithLinks(message.content)}
+                  </p>
+                </motion.div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
 
           {/* Typing indicator */}
-          {isTyping && (
-            <div className="flex gap-4">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br from-purple-500 to-pink-500">
-                <Bot className="w-5 h-5 text-white" />
-              </div>
-              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-4 py-3 rounded-2xl">
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+          <AnimatePresence>
+            {isTyping && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="flex gap-4"
+              >
+                <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-gradient-to-br from-violet-500 to-fuchsia-600 shadow-lg">
+                  <Bot className="w-5 h-5 text-white" />
                 </div>
-              </div>
-            </div>
-          )}
+                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-5 py-4 rounded-2xl shadow-lg">
+                  <div className="flex gap-1.5">
+                    <motion.div
+                      animate={{ y: [0, -8, 0] }}
+                      transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
+                      className="w-2 h-2 bg-violet-500 dark:bg-fuchsia-500 rounded-full"
+                    />
+                    <motion.div
+                      animate={{ y: [0, -8, 0] }}
+                      transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }}
+                      className="w-2 h-2 bg-violet-500 dark:bg-fuchsia-500 rounded-full"
+                    />
+                    <motion.div
+                      animate={{ y: [0, -8, 0] }}
+                      transition={{ duration: 0.6, repeat: Infinity, delay: 0.4 }}
+                      className="w-2 h-2 bg-violet-500 dark:bg-fuchsia-500 rounded-full"
+                    />
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <div ref={messagesEndRef} />
         </div>
-      </div>
 
-      {/* Suggestions */}
-      {suggestions.length > 0 && (
-        <div className="px-4 py-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="w-4 h-4 text-purple-500" />
-              <p className="text-xs text-gray-600 dark:text-gray-400">Suggested questions:</p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {suggestions.map((suggestion, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleSuggestionClick(suggestion)}
-                  className="px-3 py-1.5 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition"
-                >
-                  {suggestion}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Input */}
-      <div className="px-4 py-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
-        <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
-          <div className="flex gap-3">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about crypto taxes..."
-              className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-900 dark:text-white"
-              disabled={isTyping}
-            />
-            <button
-              type="submit"
-              disabled={!input.trim() || isTyping}
-              className="px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+        {/* Suggestions */}
+        <AnimatePresence>
+          {suggestions.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="mb-4"
             >
-              <Send className="w-4 h-4" />
-              Send
-            </button>
-          </div>
-        </form>
+              <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-slate-200 dark:border-slate-700 rounded-2xl p-4 shadow-lg">
+                <div className="flex items-center gap-2 mb-3">
+                  <Sparkles className="w-4 h-4 text-violet-600 dark:text-fuchsia-500" />
+                  <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    Suggested questions:
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {suggestions.map((suggestion, index) => (
+                    <motion.button
+                      key={index}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.05 }}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleSuggestionClick(suggestion)}
+                      className="px-4 py-2 text-sm bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full hover:bg-violet-100 dark:hover:bg-violet-900/20 hover:text-violet-700 dark:hover:text-fuchsia-400 transition-all shadow-sm hover:shadow-md font-medium"
+                    >
+                      {suggestion}
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Input */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <form onSubmit={handleSubmit} className="relative">
+            <div className="flex gap-3">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Ask about crypto taxes..."
+                className="flex-1 px-5 py-4 border-2 border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-violet-500 dark:focus:ring-fuchsia-500 focus:border-transparent bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 shadow-lg transition-all"
+                disabled={isTyping}
+              />
+              <motion.button
+                type="submit"
+                disabled={!input.trim() || isTyping}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-6 py-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white rounded-2xl font-semibold hover:from-violet-700 hover:to-fuchsia-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center gap-2 shadow-lg hover:shadow-xl"
+              >
+                <Send className="w-5 h-5" />
+                <span className="hidden sm:inline">Send</span>
+              </motion.button>
+            </div>
+          </form>
+        </motion.div>
       </div>
+
+      <Footer />
     </div>
   )
 }
