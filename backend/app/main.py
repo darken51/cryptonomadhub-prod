@@ -6,7 +6,10 @@ from app.database import engine, Base
 from app.models import (
     User, Regulation, RegulationHistory, Simulation,
     FeatureFlag, AuditLog, DeFiProtocol, DeFiTransaction, DeFiAudit,
-    License
+    License,
+    CostBasisLot, CostBasisDisposal, UserCostBasisSettings, WashSaleViolation,
+    WalletGroup, WalletGroupMember, InterWalletTransfer, ConsolidatedBalance,
+    TaxOpportunity, TaxHarvestingTransaction, TaxOptimizationSettings
 )
 from app.middleware import (
     limiter,
@@ -63,7 +66,10 @@ async def root():
 
 
 # Import routers
-from app.routers import auth, simulations, paddle_webhook, chat, admin, regulations, defi_audit, health, users
+from app.routers import (
+    auth, simulations, paddle_webhook, chat, admin, regulations,
+    defi_audit, health, users, cost_basis, tax_optimizer, wallets
+)
 
 app.include_router(health.router)
 app.include_router(auth.router)
@@ -74,3 +80,6 @@ app.include_router(chat.router)
 app.include_router(admin.router)
 app.include_router(regulations.router)
 app.include_router(defi_audit.router)
+app.include_router(cost_basis.router)
+app.include_router(tax_optimizer.router)
+app.include_router(wallets.router)

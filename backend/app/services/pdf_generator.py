@@ -340,20 +340,20 @@ class PDFGenerator:
             <div class="country-name">📍 {current_reg.get('country_name', current_country)}</div>
             <div class="rate-item">
                 <span class="rate-label">Short-term CGT (&lt;1 year)</span>
-                <span class="rate-value">{current_reg.get('cgt_short_rate', 0)*100:.1f}%</span>
+                <span class="rate-value">{(current_reg.get('cgt_short_rate') or 0)*100:.1f}%</span>
             </div>
             <div class="rate-item">
                 <span class="rate-label">Long-term CGT (&gt;1 year)</span>
-                <span class="rate-value">{current_reg.get('cgt_long_rate', 0)*100:.1f}%</span>
+                <span class="rate-value">{(current_reg.get('cgt_long_rate') or 0)*100:.1f}%</span>
             </div>
             {f'''
             <div class="rate-item">
                 <span class="rate-label">Crypto Short-term</span>
-                <span class="rate-value">{current_reg.get('crypto_short_rate', 0)*100:.1f}%</span>
+                <span class="rate-value">{(current_reg.get('crypto_short_rate') or 0)*100:.1f}%</span>
             </div>
             <div class="rate-item">
                 <span class="rate-label">Crypto Long-term</span>
-                <span class="rate-value">{current_reg.get('crypto_long_rate', 0)*100:.1f}%</span>
+                <span class="rate-value">{(current_reg.get('crypto_long_rate') or 0)*100:.1f}%</span>
             </div>
             ''' if current_reg.get('crypto_short_rate') else ''}
         </div>
@@ -362,20 +362,20 @@ class PDFGenerator:
             <div class="country-name">🎯 {target_reg.get('country_name', target_country)}</div>
             <div class="rate-item">
                 <span class="rate-label">Short-term CGT (&lt;1 year)</span>
-                <span class="rate-value">{target_reg.get('cgt_short_rate', 0)*100:.1f}%</span>
+                <span class="rate-value">{(target_reg.get('cgt_short_rate') or 0)*100:.1f}%</span>
             </div>
             <div class="rate-item">
                 <span class="rate-label">Long-term CGT (&gt;1 year)</span>
-                <span class="rate-value">{target_reg.get('cgt_long_rate', 0)*100:.1f}%</span>
+                <span class="rate-value">{(target_reg.get('cgt_long_rate') or 0)*100:.1f}%</span>
             </div>
             {f'''
             <div class="rate-item">
                 <span class="rate-label">Crypto Short-term</span>
-                <span class="rate-value">{target_reg.get('crypto_short_rate', 0)*100:.1f}%</span>
+                <span class="rate-value">{(target_reg.get('crypto_short_rate') or 0)*100:.1f}%</span>
             </div>
             <div class="rate-item">
                 <span class="rate-label">Crypto Long-term</span>
-                <span class="rate-value">{target_reg.get('crypto_long_rate', 0)*100:.1f}%</span>
+                <span class="rate-value">{(target_reg.get('crypto_long_rate') or 0)*100:.1f}%</span>
             </div>
             ''' if target_reg.get('crypto_short_rate') else ''}
         </div>

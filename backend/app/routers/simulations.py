@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Response as FastAPIResponse
 from fastapi.responses import Response
 from sqlalchemy.orm import Session
 from app.database import get_db
@@ -8,17 +8,35 @@ from app.routers.auth import get_current_user
 from app.services.tax_simulator import TaxSimulator
 from app.services.pdf_generator import PDFGenerator
 from app.middleware import limiter, get_rate_limit
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 from typing import List
+import re
 
 router = APIRouter(prefix="/simulations", tags=["Simulations"])
 
 
 class SimulationRequest(BaseModel):
-    current_country: str
-    target_country: str
-    short_term_gains: float = 0
-    long_term_gains: float = 0
+    current_country: str = Field(..., min_length=2, max_length=2, description="ISO 3166-1 alpha-2 country code")
+    target_country: str = Field(..., min_length=2, max_length=2, description="ISO 3166-1 alpha-2 country code")
+    short_term_gains: float = Field(default=0, ge=0, le=1_000_000_000, description="Short-term capital gains (USD)")
+    long_term_gains: float = Field(default=0, ge=0, le=1_000_000_000, description="Long-term capital gains (USD)")
+
+    @field_validator('current_country', 'target_country')
+    @classmethod
+    def validate_country_code(cls, v: str) -> str:
+        """Validate country code format (uppercase, 2 letters)"""
+        v = v.upper()
+        if not re.match(r'^[A-Z]{2}$', v):
+            raise ValueError('Country code must be 2 uppercase letters (ISO 3166-1 alpha-2)')
+        return v
+
+    @field_validator('target_country')
+    @classmethod
+    def validate_different_countries(cls, v: str, info) -> str:
+        """Ensure target country is different from current country"""
+        if 'current_country' in info.data and v.upper() == info.data['current_country'].upper():
+            raise ValueError('Target country must be different from current country')
+        return v
 
 
 class SimulationResponse(BaseModel):
@@ -36,10 +54,37 @@ class SimulationResponse(BaseModel):
 
 
 class CompareRequest(BaseModel):
-    current_country: str
-    target_countries: List[str]  # List of 2-5 countries
-    short_term_gains: float = 0
-    long_term_gains: float = 0
+    current_country: str = Field(..., min_length=2, max_length=2, description="ISO 3166-1 alpha-2 country code")
+    target_countries: List[str] = Field(..., min_length=2, max_length=5, description="List of 2-5 country codes")
+    short_term_gains: float = Field(default=0, ge=0, le=1_000_000_000, description="Short-term capital gains (USD)")
+    long_term_gains: float = Field(default=0, ge=0, le=1_000_000_000, description="Long-term capital gains (USD)")
+
+    @field_validator('current_country')
+    @classmethod
+    def validate_current_country(cls, v: str) -> str:
+        """Validate country code format (uppercase, 2 letters)"""
+        v = v.upper()
+        if not re.match(r'^[A-Z]{2}$', v):
+            raise ValueError('Country code must be 2 uppercase letters (ISO 3166-1 alpha-2)')
+        return v
+
+    @field_validator('target_countries')
+    @classmethod
+    def validate_target_countries(cls, v: List[str]) -> List[str]:
+        """Validate target countries list"""
+        # Normalize to uppercase
+        v = [country.upper() for country in v]
+
+        # Check format
+        for country in v:
+            if not re.match(r'^[A-Z]{2}$', country):
+                raise ValueError(f'Invalid country code: {country}. Must be 2 uppercase letters')
+
+        # Check for duplicates
+        if len(v) != len(set(v)):
+            raise ValueError('Duplicate countries in target_countries list')
+
+        return v
 
 
 class CountryComparison(BaseModel):
@@ -58,12 +103,15 @@ class CompareResponse(BaseModel):
     short_term_gains: float
     long_term_gains: float
     total_gains: float
+    recommendations: List[str] = []
 
 
 @router.post("/residency", response_model=SimulationResponse)
-# @limiter.limit(get_rate_limit("simulations"))  # Temporarily disabled due to slowapi compatibility issue
+@limiter.limit(get_rate_limit("simulations"))
 async def simulate_residency_change(
-    request: SimulationRequest,
+    request: Request,
+    response: FastAPIResponse,
+    simulation_request: SimulationRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -80,10 +128,10 @@ async def simulate_residency_change(
     try:
         result, explanation = await simulator.simulate_residency_change(
             user_id=current_user.id,
-            current_country=request.current_country,
-            target_country=request.target_country,
-            short_term_gains=request.short_term_gains,
-            long_term_gains=request.long_term_gains
+            current_country=simulation_request.current_country,
+            target_country=simulation_request.target_country,
+            short_term_gains=simulation_request.short_term_gains,
+            long_term_gains=simulation_request.long_term_gains
         )
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
@@ -116,9 +164,11 @@ async def simulate_residency_change(
 
 
 @router.post("/compare", response_model=CompareResponse)
-# @limiter.limit(get_rate_limit("simulations"))  # Temporarily disabled due to slowapi compatibility issue
+@limiter.limit(get_rate_limit("simulations"))
 async def compare_countries(
-    request: CompareRequest,
+    request: Request,
+    response: FastAPIResponse,
+    compare_request: CompareRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -130,28 +180,28 @@ async def compare_countries(
     """
 
     # Validation
-    if len(request.target_countries) < 2:
+    if len(compare_request.target_countries) < 2:
         raise HTTPException(status_code=400, detail="At least 2 target countries required")
-    if len(request.target_countries) > 5:
+    if len(compare_request.target_countries) > 5:
         raise HTTPException(status_code=400, detail="Maximum 5 target countries allowed")
 
     # Calculate current country tax
     from app.models.regulation import Regulation
     current_reg = db.query(Regulation).filter(
-        Regulation.country_code == request.current_country
+        Regulation.country_code == compare_request.current_country
     ).first()
 
     if not current_reg:
-        raise HTTPException(status_code=404, detail=f"Country {request.current_country} not found")
+        raise HTTPException(status_code=404, detail=f"Country {compare_request.current_country} not found")
 
     # Calculate current tax using same logic as TaxSimulator
-    current_tax_short = request.short_term_gains * float(current_reg.cgt_short_rate)
-    current_tax_long = request.long_term_gains * float(current_reg.cgt_long_rate)
+    current_tax_short = compare_request.short_term_gains * float(current_reg.cgt_short_rate)
+    current_tax_long = compare_request.long_term_gains * float(current_reg.cgt_long_rate)
     current_tax = current_tax_short + current_tax_long
 
     # Calculate tax for each target country
     comparisons = []
-    for country_code in request.target_countries:
+    for country_code in compare_request.target_countries:
         try:
             target_reg = db.query(Regulation).filter(
                 Regulation.country_code == country_code
@@ -161,13 +211,13 @@ async def compare_countries(
                 continue  # Skip invalid countries
 
             # Calculate target tax
-            target_tax_short = request.short_term_gains * float(target_reg.cgt_short_rate)
-            target_tax_long = request.long_term_gains * float(target_reg.cgt_long_rate)
+            target_tax_short = compare_request.short_term_gains * float(target_reg.cgt_short_rate)
+            target_tax_long = compare_request.long_term_gains * float(target_reg.cgt_long_rate)
             target_tax = target_tax_short + target_tax_long
 
             savings = current_tax - target_tax
             savings_percent = (savings / current_tax * 100) if current_tax > 0 else 0
-            total_gains = request.short_term_gains + request.long_term_gains
+            total_gains = compare_request.short_term_gains + compare_request.long_term_gains
             effective_rate = (target_tax / total_gains * 100) if total_gains > 0 else 0
 
             comparisons.append(CountryComparison(
@@ -185,19 +235,35 @@ async def compare_countries(
     # Sort by savings (highest savings first)
     comparisons.sort(key=lambda x: x.savings, reverse=True)
 
+    # Generate recommendations
+    recommendations = []
+    total_gains = compare_request.short_term_gains + compare_request.long_term_gains
+
+    # Crypto cards recommendation
+    if total_gains >= 1000:
+        recommendations.append("💳 Spending abroad? Check out crypto cards for global payments → Visit /tools for recommended cards (RedotPay 5M+ users, Kast 160+ countries with 3-10% rewards)")
+
+    # Digital residency recommendation - check if any target country has low tax
+    has_low_tax_option = any(comp.effective_rate <= 15 for comp in comparisons)
+    if has_low_tax_option:
+        recommendations.append("🌐 Tax optimization tip: Palau Digital Residency offers 0% tax on digital income + official govt ID for exchange KYC → See /tools for details")
+
     return CompareResponse(
-        current_country=request.current_country,
+        current_country=compare_request.current_country,
         current_tax=current_tax,
         comparisons=comparisons,
-        short_term_gains=request.short_term_gains,
-        long_term_gains=request.long_term_gains,
-        total_gains=request.short_term_gains + request.long_term_gains
+        short_term_gains=compare_request.short_term_gains,
+        long_term_gains=compare_request.long_term_gains,
+        total_gains=compare_request.short_term_gains + compare_request.long_term_gains,
+        recommendations=recommendations
     )
 
 
 @router.get("/history")
-# @limiter.limit(get_rate_limit("read_only"))  # Temporarily disabled due to slowapi compatibility issue
+@limiter.limit(get_rate_limit("read_only"))
 async def get_simulation_history(
+    request: Request,
+    response: FastAPIResponse,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -214,8 +280,10 @@ async def get_simulation_history(
 
 
 @router.get("/{simulation_id}")
-# @limiter.limit(get_rate_limit("read_only"))  # Temporarily disabled due to slowapi compatibility issue
+@limiter.limit(get_rate_limit("read_only"))
 async def get_simulation(
+    request: Request,
+    response: FastAPIResponse,
     simulation_id: int,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -234,8 +302,10 @@ async def get_simulation(
 
 
 @router.get("/{simulation_id}/export/pdf")
-# @limiter.limit(get_rate_limit("simulations"))  # Temporarily disabled due to slowapi compatibility issue
+@limiter.limit(get_rate_limit("simulations"))
 async def export_simulation_pdf(
+    request: Request,
+    response: FastAPIResponse,
     simulation_id: int,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)

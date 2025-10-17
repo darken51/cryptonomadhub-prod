@@ -11,6 +11,7 @@ class Regulation(Base):
     id = Column(Integer, primary_key=True, index=True)
     country_code = Column(String(2), unique=True, index=True, nullable=False)
     country_name = Column(String(100), nullable=False)
+    flag_emoji = Column(String(10))  # Country flag emoji (e.g., 🇺🇸, 🇫🇷)
 
     # Tax Rates (decimal 0-1, ex: 0.20 = 20%)
     cgt_short_rate = Column(Numeric(5, 4), nullable=False)  # Short-term capital gains (general)
@@ -24,6 +25,16 @@ class Regulation(Base):
     staking_rate = Column(Numeric(5, 4))                     # Staking rewards
     mining_rate = Column(Numeric(5, 4))                      # Mining income
 
+    # Structured crypto tax metadata (from scraper IA)
+    holding_period_months = Column(Integer)                  # Holding period for long-term (e.g., 12 for DE, PT)
+    is_flat_tax = Column(Integer)                           # 1 if flat tax, 0 otherwise (e.g., BG, PL)
+    is_progressive = Column(Integer)                        # 1 if progressive tax, 0 otherwise (e.g., DE, ES, GB)
+    is_territorial = Column(Integer)                        # 1 if territorial taxation, 0 otherwise (e.g., PA)
+    crypto_specific = Column(Integer)                       # 1 if has crypto-specific rules, 0 otherwise
+    long_term_discount_pct = Column(Numeric(5, 2))         # Long-term discount % (e.g., 33 for IN, 50 for AU)
+    exemption_threshold = Column(Numeric(12, 2))           # Exemption threshold amount
+    exemption_threshold_currency = Column(String(3))        # Currency code (e.g., EUR, USD, GBP)
+
     # Rules
     nft_treatment = Column(String(50))  # "collectible", "capital_gain", etc
     residency_rule = Column(Text)        # Ex: "183 days or domicile test"
@@ -35,11 +46,14 @@ class Regulation(Base):
     # Metadata
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
     source_url = Column(Text)
+    data_sources = Column(ARRAY(String(50)))  # List of sources used (e.g., ["Tax Foundation", "KPMG", "Koinly"])
+    data_quality = Column(String(20))  # "high", "medium", "low", "unknown"
 
     def to_dict(self):
         return {
             "country_code": self.country_code,
             "country_name": self.country_name,
+            "flag_emoji": self.flag_emoji,
             "cgt_short_rate": float(self.cgt_short_rate) if self.cgt_short_rate else None,
             "cgt_long_rate": float(self.cgt_long_rate) if self.cgt_long_rate else None,
             "crypto_short_rate": float(self.crypto_short_rate) if self.crypto_short_rate else None,
@@ -47,10 +61,22 @@ class Regulation(Base):
             "crypto_notes": self.crypto_notes,
             "staking_rate": float(self.staking_rate) if self.staking_rate else None,
             "mining_rate": float(self.mining_rate) if self.mining_rate else None,
+            # Structured crypto tax metadata
+            "holding_period_months": self.holding_period_months,
+            "is_flat_tax": bool(self.is_flat_tax) if self.is_flat_tax is not None else None,
+            "is_progressive": bool(self.is_progressive) if self.is_progressive is not None else None,
+            "is_territorial": bool(self.is_territorial) if self.is_territorial is not None else None,
+            "crypto_specific": bool(self.crypto_specific) if self.crypto_specific is not None else None,
+            "long_term_discount_pct": float(self.long_term_discount_pct) if self.long_term_discount_pct else None,
+            "exemption_threshold": float(self.exemption_threshold) if self.exemption_threshold else None,
+            "exemption_threshold_currency": self.exemption_threshold_currency,
             "residency_rule": self.residency_rule,
             "treaty_countries": self.treaty_countries,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
-            "notes": self.notes
+            "notes": self.notes,
+            "data_sources": self.data_sources,
+            "data_quality": self.data_quality,
+            "source_url": self.source_url
         }
 
     @property

@@ -3,17 +3,29 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useTranslations } from 'next-intl'
 import { useAuth } from '@/components/providers/AuthProvider'
-import { LogOut, TrendingUp, Globe, FileText, MessageCircle, Activity, Settings, CreditCard } from 'lucide-react'
+import { LogOut, TrendingUp, Globe, FileText, MessageCircle, Activity, Settings, CreditCard, Wallet, PieChart, BarChart3, DollarSign } from 'lucide-react'
+import { LineChart, Line, AreaChart, Area, PieChart as RePieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
 export default function DashboardPage() {
-  const t = useTranslations('dashboard')
-  const tCommon = useTranslations('common')
   const { user, logout, isLoading, token } = useAuth()
   const router = useRouter()
   const [recentSimulations, setRecentSimulations] = useState<any[]>([])
   const [stats, setStats] = useState({ count: 0, totalSavings: 0, countriesCompared: 0 })
+
+  // DeFi Stats
+  const [defiStats, setDefiStats] = useState({
+    totalPortfolioValue: 0,
+    unrealizedGains: 0,
+    unrealizedLosses: 0,
+    taxLiability: 0,
+    totalLots: 0,
+    totalAudits: 0
+  })
+
+  const [portfolioChart, setPortfolioChart] = useState<any[]>([])
+  const [tokenDistribution, setTokenDistribution] = useState<any[]>([])
+  const [costBasisChart, setCostBasisChart] = useState<any[]>([])
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -48,6 +60,65 @@ export default function DashboardPage() {
           })
         })
         .catch(err => console.error('Failed to fetch simulations:', err))
+
+      // Fetch DeFi stats
+      Promise.all([
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/cost-basis/portfolio`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }).then(r => r.json()).catch(() => null),
+
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/tax-optimizer/analyze`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }).then(r => r.json()).catch(() => null),
+
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/defi-audit/history`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }).then(r => r.json()).catch(() => null)
+      ]).then(([portfolio, taxAnalysis, audits]) => {
+        if (portfolio) {
+          setDefiStats(prev => ({
+            ...prev,
+            totalLots: portfolio.total_lots || 0,
+            totalPortfolioValue: portfolio.total_value_usd || 0
+          }))
+
+          // Build token distribution
+          if (portfolio.tokens_summary) {
+            const tokens = Object.entries(portfolio.tokens_summary).map(([token, data]: [string, any]) => ({
+              name: token,
+              value: data.total_value_usd
+            }))
+            setTokenDistribution(tokens)
+          }
+
+          // Build cost basis chart
+          if (portfolio.by_token) {
+            const cbData = Object.entries(portfolio.by_token).map(([token, data]: [string, any]) => ({
+              token,
+              costBasis: data.total_cost_basis,
+              currentValue: data.total_current_value,
+              gain: data.total_current_value - data.total_cost_basis
+            }))
+            setCostBasisChart(cbData)
+          }
+        }
+
+        if (taxAnalysis) {
+          setDefiStats(prev => ({
+            ...prev,
+            unrealizedGains: taxAnalysis.unrealized_gains || 0,
+            unrealizedLosses: taxAnalysis.unrealized_losses || 0,
+            taxLiability: (taxAnalysis.unrealized_gains || 0) * 0.20 // Estimate
+          }))
+        }
+
+        if (audits) {
+          setDefiStats(prev => ({
+            ...prev,
+            totalAudits: audits.length || 0
+          }))
+        }
+      })
     }
   }, [token])
 
@@ -63,6 +134,8 @@ export default function DashboardPage() {
     logout()
     router.push('/')
   }
+
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FFC658', '#FF6B9D']
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -91,9 +164,9 @@ export default function DashboardPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome banner */}
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white mb-8">
-          <h2 className="text-3xl font-bold mb-2">{t('title')}</h2>
+          <h2 className="text-3xl font-bold mb-2">Welcome to Your Dashboard</h2>
           <p className="text-blue-100">
-            {t('subtitle')}
+            Start by simulating a residency change to see potential tax savings
           </p>
         </div>
 
@@ -110,13 +183,13 @@ export default function DashboardPage() {
                 <MessageCircle className="w-6 h-6 text-white" />
               </div>
               <h3 className="text-lg font-semibold mb-2">
-                {t('cards.aiChat.title')}
+                AI Chat Assistant
               </h3>
               <p className="text-sm text-white/90">
-                {t('cards.aiChat.description')}
+                Ask questions about crypto taxes in any country
               </p>
               <span className="inline-block mt-2 bg-white/20 text-xs font-semibold px-2 py-1 rounded-full">
-                ✨ {tCommon('new')}
+                ✨ NEW
               </span>
             </div>
           </Link>
@@ -130,10 +203,10 @@ export default function DashboardPage() {
               <TrendingUp className="w-6 h-6 text-blue-600 dark:text-blue-400" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              {t('cards.newSimulation.title')}
+              New Simulation
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              {t('cards.newSimulation.description')}
+              Compare tax impact of moving to a new country
             </p>
           </Link>
 
@@ -148,13 +221,13 @@ export default function DashboardPage() {
                 <Globe className="w-6 h-6 text-white" />
               </div>
               <h3 className="text-lg font-semibold mb-2">
-                {t('cards.compareCountries.title')}
+                Compare Countries
               </h3>
               <p className="text-sm text-white/90">
-                {t('cards.compareCountries.description')}
+                Side-by-side comparison of up to 5 countries
               </p>
               <span className="inline-block mt-2 bg-white/20 text-xs font-semibold px-2 py-1 rounded-full">
-                ✨ {tCommon('new')}
+                ✨ NEW
               </span>
             </div>
           </Link>
@@ -170,13 +243,79 @@ export default function DashboardPage() {
                 <Activity className="w-6 h-6 text-white" />
               </div>
               <h3 className="text-lg font-semibold mb-2">
-                {t('cards.defiAudit.title')}
+                DeFi Audit
               </h3>
               <p className="text-sm text-white/90">
-                {t('cards.defiAudit.description')}
+                Analyze your DeFi activity and calculate taxes
               </p>
               <span className="inline-block mt-2 bg-white/20 text-xs font-semibold px-2 py-1 rounded-full">
-                🔥 {tCommon('new')}
+                🔥 NEW
+              </span>
+            </div>
+          </Link>
+
+          {/* Tax Optimizer - NEW */}
+          <Link
+            href="/tax-optimizer"
+            className="bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl p-6 text-white hover:shadow-lg transition group relative overflow-hidden"
+          >
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+            <div className="relative">
+              <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                <TrendingUp className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">
+                Tax Optimizer
+              </h3>
+              <p className="text-sm text-white/90">
+                Loss harvesting & tax savings strategies
+              </p>
+              <span className="inline-block mt-2 bg-white/20 text-xs font-semibold px-2 py-1 rounded-full">
+                💡 NEW
+              </span>
+            </div>
+          </Link>
+
+          {/* Multi-Wallet Manager - NEW */}
+          <Link
+            href="/wallets"
+            className="bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl p-6 text-white hover:shadow-lg transition group relative overflow-hidden"
+          >
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+            <div className="relative">
+              <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                <Wallet className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">
+                Multi-Wallet Manager
+              </h3>
+              <p className="text-sm text-white/90">
+                Manage multiple wallets as portfolio groups
+              </p>
+              <span className="inline-block mt-2 bg-white/20 text-xs font-semibold px-2 py-1 rounded-full">
+                📊 NEW
+              </span>
+            </div>
+          </Link>
+
+          {/* Cost Basis Tracking - NEW */}
+          <Link
+            href="/cost-basis"
+            className="bg-gradient-to-br from-rose-500 to-pink-500 rounded-xl p-6 text-white hover:shadow-lg transition group relative overflow-hidden"
+          >
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+            <div className="relative">
+              <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition">
+                <BarChart3 className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2">
+                Cost Basis Tracking
+              </h3>
+              <p className="text-sm text-white/90">
+                FIFO/LIFO/HIFO lot tracking for accurate taxes
+              </p>
+              <span className="inline-block mt-2 bg-white/20 text-xs font-semibold px-2 py-1 rounded-full">
+                📈 NEW
               </span>
             </div>
           </Link>
@@ -212,10 +351,10 @@ export default function DashboardPage() {
               <Globe className="w-6 h-6 text-green-600 dark:text-green-400" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              {t('cards.countries.title')}
+              Countries
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              {t('cards.countries.description')}
+              Browse tax regulations for 98 countries
             </p>
           </Link>
 
@@ -228,10 +367,10 @@ export default function DashboardPage() {
               <FileText className="w-6 h-6 text-purple-600 dark:text-purple-400" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              {t('cards.history.title')}
+              History
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              {t('cards.history.description')}
+              View your past simulations
             </p>
           </Link>
 
@@ -244,53 +383,140 @@ export default function DashboardPage() {
               <Settings className="w-6 h-6 text-gray-600 dark:text-gray-400" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-              {t('cards.settings.title')}
+              Settings
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              {t('cards.settings.description')}
+              Manage your account preferences
             </p>
           </Link>
         </div>
 
         {/* Quick stats */}
-        <div className="mt-8 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            {t('quickStats.title')}
-          </h3>
-          <div className="grid md:grid-cols-4 gap-4">
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{t('quickStats.simulations')}</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.count}</p>
+        <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Tax Residency Stats */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              Tax Residency Stats
+            </h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Simulations</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.count}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Countries Compared</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.countriesCompared}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Potential Savings</p>
+                <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  ${stats.totalSavings.toLocaleString()}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Subscription</p>
+                <p className="text-sm font-semibold text-gray-900 dark:text-white">Free Tier</p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{t('quickStats.countriesCompared')}</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.countriesCompared}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{t('quickStats.totalSavings')}</p>
-              <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                ${stats.totalSavings.toLocaleString()}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{t('quickStats.subscription')}</p>
-              <p className="text-sm font-semibold text-gray-900 dark:text-white">{t('quickStats.freeTier')}</p>
+          </div>
+
+          {/* DeFi Portfolio Stats */}
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              DeFi Portfolio Stats
+            </h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Portfolio Value</p>
+                <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  ${defiStats.totalPortfolioValue.toLocaleString()}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Unrealized Gains</p>
+                <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  ${defiStats.unrealizedGains.toLocaleString()}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Tax Liability</p>
+                <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                  ${defiStats.taxLiability.toLocaleString()}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">Cost Basis Lots</p>
+                <p className="text-2xl font-bold text-gray-900 dark:text-white">{defiStats.totalLots}</p>
+              </div>
             </div>
           </div>
         </div>
+
+        {/* Charts Section */}
+        {(tokenDistribution.length > 0 || costBasisChart.length > 0) && (
+          <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Token Distribution Pie Chart */}
+            {tokenDistribution.length > 0 && (
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  Portfolio Token Distribution
+                </h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <RePieChart>
+                    <Pie
+                      data={tokenDistribution.slice(0, 8)}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={(entry) => `${entry.name}: $${entry.value.toFixed(0)}`}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {tokenDistribution.slice(0, 8).map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip formatter={(value: number) => `$${value.toLocaleString()}`} />
+                  </RePieChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+
+            {/* Cost Basis vs Current Value */}
+            {costBasisChart.length > 0 && (
+              <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  Cost Basis vs Current Value
+                </h3>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={costBasisChart.slice(0, 6)}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="token" />
+                    <YAxis />
+                    <Tooltip formatter={(value: number) => `$${value.toLocaleString()}`} />
+                    <Legend />
+                    <Bar dataKey="costBasis" fill="#6366f1" name="Cost Basis" />
+                    <Bar dataKey="currentValue" fill="#10b981" name="Current Value" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Recent Simulations */}
         {recentSimulations.length > 0 && (
           <div className="mt-8 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {t('recentSimulations.title')}
+                Recent Simulations
               </h3>
               <Link
                 href="/simulations/history"
                 className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
               >
-                {t('recentSimulations.viewAll')}
+                View All
               </Link>
             </div>
             <div className="space-y-3">
@@ -312,7 +538,7 @@ export default function DashboardPage() {
                       ${sim.savings?.toLocaleString() || '0'}
                     </p>
                     <p className="text-xs text-gray-600 dark:text-gray-400">
-                      {t('recentSimulations.saved')}
+                      saved
                     </p>
                   </div>
                 </div>
@@ -324,8 +550,7 @@ export default function DashboardPage() {
         {/* Disclaimer */}
         <div className="mt-8 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
           <p className="text-sm text-yellow-900 dark:text-yellow-200">
-            <span className="font-bold">⚠️ {t('disclaimer').split(':')[0]}:</span>
-            {t('disclaimer').split(':').slice(1).join(':')}
+            <span className="font-bold">⚠️ Reminder:</span> This tool provides general information only and is NOT financial or legal advice. Always consult licensed professionals before making decisions.
           </p>
         </div>
       </main>

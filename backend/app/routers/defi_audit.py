@@ -4,7 +4,7 @@ DeFi Audit Endpoints
 API routes for DeFi transaction auditing
 """
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Response as FastAPIResponse
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.user import User
@@ -12,10 +12,11 @@ from app.models.defi_protocol import DeFiAudit
 from app.routers.auth import get_current_user
 from app.services.defi_audit_service import DeFiAuditService
 from app.middleware import limiter, get_rate_limit
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional
 from datetime import datetime
 import logging
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -23,10 +24,42 @@ router = APIRouter(prefix="/defi", tags=["DeFi Audit"])
 
 
 class CreateAuditRequest(BaseModel):
-    wallet_address: str
-    chains: List[str]  # ["ethereum", "polygon", "bsc"]
-    start_date: Optional[str] = None  # ISO date string
-    end_date: Optional[str] = None  # ISO date string
+    wallet_address: str = Field(..., min_length=26, max_length=100, description="Wallet address (EVM or Solana)")
+    chains: List[str] = Field(..., min_length=1, max_length=10, description="List of blockchain networks (1-10 chains)")
+    start_date: Optional[str] = Field(None, description="ISO date string (YYYY-MM-DD)")
+    end_date: Optional[str] = Field(None, description="ISO date string (YYYY-MM-DD)")
+
+    @field_validator('wallet_address')
+    @classmethod
+    def validate_wallet_address(cls, v: str) -> str:
+        """Validate wallet address format (EVM: 0x... or Solana: base58)"""
+        v = v.strip()
+
+        # EVM address: 0x followed by 40 hex characters
+        if re.match(r'^0x[a-fA-F0-9]{40}$', v):
+            return v.lower()
+
+        # Solana address: base58, 32-44 characters
+        if re.match(r'^[1-9A-HJ-NP-Za-km-z]{32,44}$', v):
+            return v
+
+        raise ValueError('Invalid wallet address format. Must be EVM (0x...) or Solana (base58)')
+
+    @field_validator('chains')
+    @classmethod
+    def validate_chains(cls, v: List[str]) -> List[str]:
+        """Validate and normalize chain names"""
+        if not v:
+            raise ValueError('At least one chain must be specified')
+
+        # Normalize to lowercase
+        v = [chain.lower().strip() for chain in v]
+
+        # Check for duplicates
+        if len(v) != len(set(v)):
+            raise ValueError('Duplicate chains in list')
+
+        return v
 
 
 class AuditResponse(BaseModel):
@@ -49,10 +82,11 @@ class AuditResponse(BaseModel):
 
 
 @router.post("/audit", response_model=AuditResponse)
-# @limiter.limit(get_rate_limit("defi_audit"))  # Temporarily disabled
+@limiter.limit(get_rate_limit("defi_audit"))
 async def create_defi_audit(
-
-    request: CreateAuditRequest,
+    request: Request,
+    response: FastAPIResponse,
+    audit_request: CreateAuditRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -98,7 +132,7 @@ async def create_defi_audit(
         "unichain", "world",
         "solana"
     ]
-    invalid_chains = [c for c in request.chains if c.lower() not in supported_chains]
+    invalid_chains = [c for c in audit_request.chains if c.lower() not in supported_chains]
     if invalid_chains:
         raise HTTPException(
             status_code=400,
@@ -108,26 +142,26 @@ async def create_defi_audit(
     # Parse dates
     start_date = None
     end_date = None
-    if request.start_date:
+    if audit_request.start_date:
         try:
-            start_date = datetime.fromisoformat(request.start_date.replace('Z', '+00:00'))
+            start_date = datetime.fromisoformat(audit_request.start_date.replace('Z', '+00:00'))
         except ValueError:
             raise HTTPException(status_code=400, detail="Invalid start_date format. Use ISO format.")
 
-    if request.end_date:
+    if audit_request.end_date:
         try:
-            end_date = datetime.fromisoformat(request.end_date.replace('Z', '+00:00'))
+            end_date = datetime.fromisoformat(audit_request.end_date.replace('Z', '+00:00'))
         except ValueError:
             raise HTTPException(status_code=400, detail="Invalid end_date format. Use ISO format.")
 
     # Create audit
     service = DeFiAuditService(db)
-    logger.info(f"Creating audit for wallet {request.wallet_address} on chains {request.chains}")
+    logger.info(f"Creating audit for wallet {audit_request.wallet_address} on chains {audit_request.chains}")
     try:
         audit = await service.create_audit(
             user_id=current_user.id,
-            wallet_address=request.wallet_address,
-            chains=request.chains,
+            wallet_address=audit_request.wallet_address,
+            chains=audit_request.chains,
             start_date=start_date,
             end_date=end_date
         )
@@ -160,9 +194,10 @@ async def create_defi_audit(
 
 
 @router.get("/audits", response_model=List[AuditResponse])
-# @limiter.limit(get_rate_limit("read_only"))  # Temporarily disabled
+@limiter.limit(get_rate_limit("read_only"))
 async def list_user_audits(
-
+    request: Request,
+    response: FastAPIResponse,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -196,9 +231,10 @@ async def list_user_audits(
 
 
 @router.get("/audit/{audit_id}")
-# @limiter.limit(get_rate_limit("read_only"))  # Temporarily disabled
+@limiter.limit(get_rate_limit("read_only"))
 async def get_audit_report(
-
+    request: Request,
+    response: FastAPIResponse,
     audit_id: int,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)

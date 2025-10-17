@@ -4,10 +4,13 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { ArrowLeft, Search, TrendingDown, Info } from 'lucide-react'
+import WorldTaxMap from '@/components/WorldTaxMap'
 
 interface Country {
   country_code: string
   country_name: string
+  flag_emoji?: string
+  source_url?: string
   cgt_short_rate: number
   cgt_long_rate: number
   crypto_short_rate?: number
@@ -17,6 +20,16 @@ interface Country {
   data_quality?: 'high' | 'medium' | 'low' | 'unknown'
   data_sources?: string[]
   updated_at?: string
+
+  // Structured crypto tax metadata
+  holding_period_months?: number
+  is_flat_tax?: boolean
+  is_progressive?: boolean
+  is_territorial?: boolean
+  crypto_specific?: boolean
+  long_term_discount_pct?: number
+  exemption_threshold?: number
+  exemption_threshold_currency?: string
 }
 
 export default function CountriesPage() {
@@ -232,6 +245,13 @@ export default function CountriesPage() {
           </div>
         </div>
 
+        {/* World Map */}
+        {!isLoading && countries.length > 0 && (
+          <div className="mb-8">
+            <WorldTaxMap countries={countries} />
+          </div>
+        )}
+
         {/* Loading */}
         {isLoading && (
           <div className="space-y-4">
@@ -256,6 +276,9 @@ export default function CountriesPage() {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2 flex-wrap">
+                      {country.flag_emoji && (
+                        <span className="text-3xl">{country.flag_emoji}</span>
+                      )}
                       <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
                         {country.country_name}
                       </h3>
@@ -276,7 +299,7 @@ export default function CountriesPage() {
                       </div>
                     )}
                     {country.data_sources && country.data_sources.length > 0 && (
-                      <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+                      <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400 mb-2">
                         <span>Sources:</span>
                         {country.data_sources.map((source, idx) => (
                           <span key={idx} className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded">
@@ -284,6 +307,19 @@ export default function CountriesPage() {
                           </span>
                         ))}
                       </div>
+                    )}
+                    {country.source_url && (
+                      <a
+                        href={country.source_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                      >
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                        Official Tax Source
+                      </a>
                     )}
                   </div>
                 </div>
@@ -347,6 +383,58 @@ export default function CountriesPage() {
                     )}
                   </div>
                 </div>
+
+                {/* Structured Tax Metadata */}
+                {(country.holding_period_months || country.long_term_discount_pct || country.exemption_threshold ||
+                  country.is_flat_tax || country.is_progressive || country.is_territorial) && (
+                  <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
+                      📊 Tax Structure Details
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {country.holding_period_months && (
+                        <div className="flex justify-between items-center py-2 px-3 bg-gray-50 dark:bg-gray-700/50 rounded">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">Holding Period for Long-term</span>
+                          <span className="text-sm font-bold text-gray-900 dark:text-white">
+                            {country.holding_period_months} months
+                          </span>
+                        </div>
+                      )}
+                      {country.long_term_discount_pct && (
+                        <div className="flex justify-between items-center py-2 px-3 bg-gray-50 dark:bg-gray-700/50 rounded">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">Long-term Discount</span>
+                          <span className="text-sm font-bold text-gray-900 dark:text-white">
+                            {country.long_term_discount_pct}%
+                          </span>
+                        </div>
+                      )}
+                      {country.exemption_threshold && (
+                        <div className="flex justify-between items-center py-2 px-3 bg-gray-50 dark:bg-gray-700/50 rounded">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">Exemption Threshold</span>
+                          <span className="text-sm font-bold text-gray-900 dark:text-white">
+                            {country.exemption_threshold.toLocaleString()} {country.exemption_threshold_currency || ''}
+                          </span>
+                        </div>
+                      )}
+                      {(country.is_flat_tax || country.is_progressive || country.is_territorial) && (
+                        <div className="flex items-center gap-2 py-2 px-3 bg-gray-50 dark:bg-gray-700/50 rounded">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">Tax System:</span>
+                          <div className="flex flex-wrap gap-1">
+                            {country.is_flat_tax && (
+                              <span className="text-xs bg-blue-600 text-white px-2 py-0.5 rounded">Flat Tax</span>
+                            )}
+                            {country.is_progressive && (
+                              <span className="text-xs bg-purple-600 text-white px-2 py-0.5 rounded">Progressive</span>
+                            )}
+                            {country.is_territorial && (
+                              <span className="text-xs bg-green-600 text-white px-2 py-0.5 rounded">Territorial</span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {/* General Notes */}
                 {country.notes && (

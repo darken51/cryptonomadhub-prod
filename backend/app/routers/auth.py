@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, HTTPException, status, Request, Response
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from app.database import get_db
@@ -7,10 +7,11 @@ from app.utils.security import hash_password, verify_password, create_access_tok
 from app.middleware import limiter, get_rate_limit
 from app.services.license_service import LicenseService
 from app.services.email_service import EmailService
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field, field_validator
 from datetime import datetime, timedelta
 import secrets
 import logging
+import re
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -19,7 +20,23 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 class UserRegister(BaseModel):
     email: EmailStr
-    password: str
+    password: str = Field(..., min_length=8, max_length=128, description="Password (8-128 characters)")
+
+    @field_validator('password')
+    @classmethod
+    def validate_password_strength(cls, v: str) -> str:
+        """Validate password strength"""
+        if len(v) < 8:
+            raise ValueError('Password must be at least 8 characters long')
+        if len(v) > 128:
+            raise ValueError('Password must be at most 128 characters long')
+        if not re.search(r'[A-Z]', v):
+            raise ValueError('Password must contain at least one uppercase letter')
+        if not re.search(r'[a-z]', v):
+            raise ValueError('Password must contain at least one lowercase letter')
+        if not re.search(r'[0-9]', v):
+            raise ValueError('Password must contain at least one digit')
+        return v
 
 
 class UserResponse(BaseModel):
@@ -38,12 +55,28 @@ class ForgotPasswordRequest(BaseModel):
 
 
 class ResetPasswordRequest(BaseModel):
-    token: str
-    new_password: str
+    token: str = Field(..., min_length=32, max_length=256, description="Password reset token")
+    new_password: str = Field(..., min_length=8, max_length=128, description="New password")
+
+    @field_validator('new_password')
+    @classmethod
+    def validate_password_strength(cls, v: str) -> str:
+        """Validate password strength"""
+        if len(v) < 8:
+            raise ValueError('Password must be at least 8 characters long')
+        if len(v) > 128:
+            raise ValueError('Password must be at most 128 characters long')
+        if not re.search(r'[A-Z]', v):
+            raise ValueError('Password must contain at least one uppercase letter')
+        if not re.search(r'[a-z]', v):
+            raise ValueError('Password must contain at least one lowercase letter')
+        if not re.search(r'[0-9]', v):
+            raise ValueError('Password must contain at least one digit')
+        return v
 
 
 class VerifyEmailRequest(BaseModel):
-    token: str
+    token: str = Field(..., min_length=32, max_length=256, description="Email verification token")
 
 
 async def get_current_user(
@@ -73,8 +106,13 @@ async def get_current_user(
 
 
 @router.post("/register", response_model=UserResponse)
-# @limiter.limit(get_rate_limit("auth_register"))  # Temporarily disabled due to slowapi compatibility issue
-async def register(user_data: UserRegister, db: Session = Depends(get_db)):
+@limiter.limit(get_rate_limit("auth_register"))
+async def register(
+    request: Request,
+    response: Response,
+    user_data: UserRegister,
+    db: Session = Depends(get_db)
+):
     """Register new user"""
 
     # Check if user exists
@@ -132,8 +170,10 @@ async def register(user_data: UserRegister, db: Session = Depends(get_db)):
 
 
 @router.post("/login", response_model=Token)
-# @limiter.limit(get_rate_limit("auth_login"))  # Temporarily disabled due to slowapi compatibility issue
+@limiter.limit(get_rate_limit("auth_login"))
 async def login(
+    request: Request,
+    response: Response,
     form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
@@ -157,8 +197,12 @@ async def login(
 
 
 @router.get("/me", response_model=UserResponse)
-# @limiter.limit(get_rate_limit("read_only"))  # Temporarily disabled due to slowapi compatibility issue
-async def get_me(current_user: User = Depends(get_current_user)):
+@limiter.limit(get_rate_limit("read_only"))
+async def get_me(
+    request: Request,
+    response: Response,
+    current_user: User = Depends(get_current_user)
+):
     """Get current user info"""
     return UserResponse(
         id=current_user.id,
@@ -168,8 +212,10 @@ async def get_me(current_user: User = Depends(get_current_user)):
 
 
 @router.post("/forgot-password")
-# @limiter.limit(get_rate_limit("auth_password_reset"))  # Temporarily disabled
+@limiter.limit(get_rate_limit("auth_password_reset"))
 async def forgot_password(
+    request: Request,
+    response: Response,
     data: ForgotPasswordRequest,
     db: Session = Depends(get_db)
 ):
@@ -213,8 +259,10 @@ async def forgot_password(
 
 
 @router.post("/reset-password")
-# @limiter.limit(get_rate_limit("auth_password_reset"))  # Temporarily disabled
+@limiter.limit(get_rate_limit("auth_password_reset"))
 async def reset_password(
+    request: Request,
+    response: Response,
     data: ResetPasswordRequest,
     db: Session = Depends(get_db)
 ):
@@ -261,8 +309,10 @@ async def reset_password(
 
 
 @router.post("/send-verification")
-# @limiter.limit(get_rate_limit("auth_verify_email"))  # Temporarily disabled
+@limiter.limit(get_rate_limit("auth_verify_email"))
 async def send_verification_email(
+    request: Request,
+    response: Response,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -305,8 +355,10 @@ async def send_verification_email(
 
 
 @router.post("/verify-email")
-# @limiter.limit(get_rate_limit("auth_verify_email"))  # Temporarily disabled
+@limiter.limit(get_rate_limit("auth_verify_email"))
 async def verify_email(
+    request: Request,
+    response: Response,
     data: VerifyEmailRequest,
     db: Session = Depends(get_db)
 ):

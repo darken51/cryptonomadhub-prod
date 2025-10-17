@@ -1,246 +1,233 @@
 import Link from 'next/link'
+import { Check, X } from 'lucide-react'
+import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/Card'
+import { Badge } from '@/components/ui/Badge'
+import { Button } from '@/components/ui/Button'
 
 export default function Pricing() {
+  const plans = [
+    {
+      name: 'Free',
+      price: '$0',
+      period: '/month',
+      description: 'Perfect for exploring crypto tax optimization',
+      features: [
+        { text: '5 tax simulations/month', included: true },
+        { text: '20 AI chat messages/month', included: true },
+        { text: 'Access to 98 countries data', included: true },
+        { text: 'DeFi audits', included: false },
+        { text: 'PDF exports', included: false },
+      ],
+      cta: 'Get Started',
+      ctaVariant: 'secondary' as const,
+      href: '/auth/register',
+    },
+    {
+      name: 'Starter',
+      price: '$20',
+      period: '/month',
+      badge: 'popular',
+      description: 'Best for individual investors',
+      features: [
+        { text: '50 tax simulations/month', included: true },
+        { text: '200 AI chat messages/month', included: true },
+        { text: '5 DeFi audits/month', included: true },
+        { text: 'PDF report exports', included: true },
+        { text: 'Priority email support', included: true },
+      ],
+      cta: 'Start Free Trial',
+      ctaVariant: 'primary' as const,
+      href: '/auth/register',
+      highlight: true,
+    },
+    {
+      name: 'Pro',
+      price: '$50',
+      period: '/month',
+      badge: 'best-value',
+      description: 'For professional traders',
+      features: [
+        { text: '500 tax simulations/month', included: true },
+        { text: '2000 AI chat messages/month', included: true },
+        { text: '50 DeFi audits/month', included: true },
+        { text: 'Unlimited PDF exports', included: true },
+        { text: 'Priority support', included: true },
+      ],
+      cta: 'Start Free Trial',
+      ctaVariant: 'primary' as const,
+      href: '/auth/register',
+    },
+    {
+      name: 'Enterprise',
+      price: 'Custom',
+      period: '',
+      description: 'For teams and businesses',
+      features: [
+        { text: 'Unlimited everything', included: true },
+        { text: 'Custom integrations', included: true },
+        { text: 'Dedicated account manager', included: true },
+        { text: 'SLA guarantees', included: true },
+        { text: 'API access', included: true },
+      ],
+      cta: 'Contact Sales',
+      ctaVariant: 'secondary' as const,
+      href: 'mailto:sales@cryptonomadhub.com',
+      dark: true,
+    },
+  ]
+
   return (
     <div className="min-h-screen flex flex-col">
-      <main className="flex-1 bg-gray-50 dark:bg-gray-900 py-12 px-4">
+      <Header />
+      <main className="flex-1 py-12 md:py-16 px-4">
         <div className="max-w-7xl mx-auto">
-          {/* Back Link */}
-          <div className="mb-8">
-            <Link href="/" className="text-blue-600 hover:underline">
-              ← Back to Home
-            </Link>
-          </div>
 
           {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+          <div className="text-center mb-12 space-y-3">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold">
               Simple, Transparent Pricing
             </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-400">
-              Choose the plan that fits your needs
+            <p className="text-base md:text-lg text-fg-muted max-w-2xl mx-auto">
+              Choose the plan that fits your needs. No hidden fees. Cancel anytime.
             </p>
           </div>
 
           {/* Pricing Cards */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
-            {/* FREE */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 border-2 border-gray-200 dark:border-gray-700">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Free</h2>
-              <div className="mb-6">
-                <span className="text-4xl font-bold text-gray-900 dark:text-white">$0</span>
-                <span className="text-gray-600 dark:text-gray-400">/month</span>
-              </div>
-
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 font-bold">✓</span>
-                  <span className="text-gray-700 dark:text-gray-300">5 tax simulations/month</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 font-bold">✓</span>
-                  <span className="text-gray-700 dark:text-gray-300">20 AI chat messages/month</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 font-bold">✓</span>
-                  <span className="text-gray-700 dark:text-gray-300">Access to 98 countries data</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-red-500 font-bold">✗</span>
-                  <span className="text-gray-500 dark:text-gray-500">No DeFi audits</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-red-500 font-bold">✗</span>
-                  <span className="text-gray-500 dark:text-gray-500">No PDF exports</span>
-                </li>
-              </ul>
-
-              <Link
-                href="/auth/register"
-                className="block w-full text-center py-2 px-4 border-2 border-blue-600 text-blue-600 rounded-lg font-semibold hover:bg-blue-50 dark:hover:bg-blue-900/20 transition"
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 mb-24">
+            {plans.map((plan) => (
+              <Card
+                key={plan.name}
+                variant={plan.highlight ? 'glow' : plan.dark ? 'gradient' : 'default'}
+                className={`flex flex-col bento-card ${plan.highlight ? 'scale-105 md:scale-110' : ''}`}
               >
-                Get Started
-              </Link>
-            </div>
+                <CardHeader>
+                  <div className="flex justify-between items-start mb-4">
+                    <CardTitle className={plan.dark ? 'text-white' : ''}>{plan.name}</CardTitle>
+                    {plan.badge === 'popular' && <Badge variant="popular" size="sm">POPULAR</Badge>}
+                    {plan.badge === 'best-value' && <Badge variant="savings" size="sm">BEST VALUE</Badge>}
+                  </div>
 
-            {/* STARTER */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 border-2 border-blue-500">
-              <div className="flex justify-between items-start mb-2">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Starter</h2>
-                <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded">POPULAR</span>
-              </div>
-              <div className="mb-6">
-                <span className="text-4xl font-bold text-gray-900 dark:text-white">$20</span>
-                <span className="text-gray-600 dark:text-gray-400">/month</span>
-              </div>
+                  <div className="mb-4">
+                    <span className={`text-5xl font-extrabold ${plan.dark ? 'text-white' : 'text-fg'}`}>
+                      {plan.price}
+                    </span>
+                    {plan.period && (
+                      <span className={plan.dark ? 'text-gray-300' : 'text-fg-muted'}>
+                        {plan.period}
+                      </span>
+                    )}
+                  </div>
 
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 font-bold">✓</span>
-                  <span className="text-gray-700 dark:text-gray-300">50 tax simulations/month</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 font-bold">✓</span>
-                  <span className="text-gray-700 dark:text-gray-300">200 AI chat messages/month</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 font-bold">✓</span>
-                  <span className="text-gray-700 dark:text-gray-300">5 DeFi audits/month</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 font-bold">✓</span>
-                  <span className="text-gray-700 dark:text-gray-300">PDF report exports</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 font-bold">✓</span>
-                  <span className="text-gray-700 dark:text-gray-300">Priority email support</span>
-                </li>
-              </ul>
+                  <CardDescription className={plan.dark ? 'text-gray-300' : ''}>
+                    {plan.description}
+                  </CardDescription>
+                </CardHeader>
 
-              <Link
-                href="/auth/register"
-                className="block w-full text-center py-2 px-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
-              >
-                Start Free Trial
-              </Link>
-            </div>
+                <CardContent className="flex-1">
+                  <ul className="space-y-3">
+                    {plan.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-start gap-3">
+                        {feature.included ? (
+                          <Check className={`w-5 h-5 flex-shrink-0 ${plan.dark ? 'text-emerald-400' : 'text-green-600'} mt-0.5`} />
+                        ) : (
+                          <X className="w-5 h-5 flex-shrink-0 text-gray-400 mt-0.5" />
+                        )}
+                        <span className={`text-sm ${plan.dark ? 'text-gray-200' : feature.included ? 'text-fg' : 'text-fg-muted/60'}`}>
+                          {feature.text}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
 
-            {/* PRO */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 border-2 border-purple-500">
-              <div className="flex justify-between items-start mb-2">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Pro</h2>
-                <span className="bg-purple-100 text-purple-800 text-xs font-semibold px-2 py-1 rounded">BEST VALUE</span>
-              </div>
-              <div className="mb-6">
-                <span className="text-4xl font-bold text-gray-900 dark:text-white">$50</span>
-                <span className="text-gray-600 dark:text-gray-400">/month</span>
-              </div>
-
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 font-bold">✓</span>
-                  <span className="text-gray-700 dark:text-gray-300">500 tax simulations/month</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 font-bold">✓</span>
-                  <span className="text-gray-700 dark:text-gray-300">2000 AI chat messages/month</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 font-bold">✓</span>
-                  <span className="text-gray-700 dark:text-gray-300">50 DeFi audits/month</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 font-bold">✓</span>
-                  <span className="text-gray-700 dark:text-gray-300">Unlimited PDF exports</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-500 font-bold">✓</span>
-                  <span className="text-gray-700 dark:text-gray-300">Priority support</span>
-                </li>
-              </ul>
-
-              <Link
-                href="/auth/register"
-                className="block w-full text-center py-2 px-4 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition"
-              >
-                Start Free Trial
-              </Link>
-            </div>
-
-            {/* ENTERPRISE */}
-            <div className="bg-gradient-to-br from-gray-900 to-gray-800 dark:from-gray-800 dark:to-gray-900 rounded-lg shadow-lg p-6 border-2 border-yellow-500">
-              <h2 className="text-2xl font-bold text-white mb-2">Enterprise</h2>
-              <div className="mb-6">
-                <span className="text-4xl font-bold text-white">Custom</span>
-              </div>
-
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-start gap-2">
-                  <span className="text-yellow-400 font-bold">✓</span>
-                  <span className="text-gray-200">Unlimited everything</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-yellow-400 font-bold">✓</span>
-                  <span className="text-gray-200">Custom integrations</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-yellow-400 font-bold">✓</span>
-                  <span className="text-gray-200">Dedicated account manager</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-yellow-400 font-bold">✓</span>
-                  <span className="text-gray-200">SLA guarantees</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-yellow-400 font-bold">✓</span>
-                  <span className="text-gray-200">API access</span>
-                </li>
-              </ul>
-
-              <a
-                href="mailto:sales@cryptonomadhub.com"
-                className="block w-full text-center py-2 px-4 bg-yellow-500 text-gray-900 rounded-lg font-semibold hover:bg-yellow-400 transition"
-              >
-                Contact Sales
-              </a>
-            </div>
+                <CardFooter>
+                  <Button
+                    asChild
+                    variant={plan.ctaVariant}
+                    size="lg"
+                    fullWidth
+                    className={plan.dark ? 'bg-white hover:bg-gray-100 text-gray-900' : ''}
+                  >
+                    {plan.href.startsWith('mailto:') ? (
+                      <a href={plan.href}>{plan.cta}</a>
+                    ) : (
+                      <Link href={plan.href}>{plan.cta}</Link>
+                    )}
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
           </div>
 
           {/* FAQ Section */}
-          <div className="mt-16 max-w-3xl mx-auto">
-            <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-8">
+          <div className="max-w-3xl mx-auto mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
               Frequently Asked Questions
             </h2>
 
-            <div className="space-y-6">
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                  Can I cancel anytime?
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Yes, you can cancel your subscription at any time from your account settings. No questions asked.
-                </p>
-              </div>
+            <div className="space-y-4">
+              <Card variant="default">
+                <CardHeader>
+                  <CardTitle className="text-lg">Can I cancel anytime?</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-fg-muted">
+                    Yes, you can cancel your subscription at any time from your account settings. No questions asked.
+                  </p>
+                </CardContent>
+              </Card>
 
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                  Do you offer refunds?
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  We don't offer refunds for partial months, but you can cancel at any time to prevent future charges.
-                </p>
-              </div>
+              <Card variant="default">
+                <CardHeader>
+                  <CardTitle className="text-lg">Do you offer refunds?</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-fg-muted">
+                    We don't offer refunds for partial months, but you can cancel at any time to prevent future charges.
+                  </p>
+                </CardContent>
+              </Card>
 
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                  How does billing work?
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Billing is monthly and automatic. All payments are processed securely through Paddle, our Merchant of Record.
-                </p>
-              </div>
+              <Card variant="default">
+                <CardHeader>
+                  <CardTitle className="text-lg">How does billing work?</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-fg-muted">
+                    Billing is monthly and automatic. All payments are processed securely through Paddle, our Merchant of Record.
+                  </p>
+                </CardContent>
+              </Card>
 
-              <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                  What happens if I exceed my limits?
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  You'll be notified when you reach 80% of your monthly quota. If you exceed limits, you'll need to upgrade to continue using the service.
-                </p>
-              </div>
+              <Card variant="default">
+                <CardHeader>
+                  <CardTitle className="text-lg">What happens if I exceed my limits?</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-fg-muted">
+                    You'll be notified when you reach 80% of your monthly quota. If you exceed limits, you'll need to upgrade to continue using the service.
+                  </p>
+                </CardContent>
+              </Card>
             </div>
           </div>
 
           {/* Legal Disclaimer */}
-          <div className="mt-16 max-w-4xl mx-auto p-6 bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 rounded">
-            <p className="text-sm text-gray-700 dark:text-gray-300">
-              <strong>⚠️ Disclaimer:</strong> NomadCrypto Hub is NOT financial, tax, or legal advice.
-              All information provided is for educational purposes only. Consult with licensed tax professionals
-              before making any financial decisions. See our{' '}
-              <Link href="/terms" className="text-blue-600 hover:underline">Terms of Service</Link> for more details.
-            </p>
-          </div>
+          <Card variant="highlight" className="max-w-4xl mx-auto border-l-4 border-l-yellow-500">
+            <CardContent className="pt-6">
+              <p className="text-sm">
+                <strong className="font-bold">⚠️ Disclaimer:</strong> NomadCrypto Hub is NOT financial, tax, or legal advice.
+                All information provided is for educational purposes only. Consult with licensed tax professionals
+                before making any financial decisions. See our{' '}
+                <Link href="/terms" className="text-brand-primary hover:text-brand-secondary font-medium underline">
+                  Terms of Service
+                </Link>{' '}
+                for more details.
+              </p>
+            </CardContent>
+          </Card>
         </div>
       </main>
 

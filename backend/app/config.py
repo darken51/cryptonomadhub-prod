@@ -58,11 +58,12 @@ class Settings(BaseSettings):
     SMTP_FROM_NAME: str = "NomadCrypto Hub"
 
     # Blockchain API Keys
+    # SECURITY: These MUST be set in .env file, NOT hardcoded here
     # Single Etherscan API key works for 50+ EVM chains via v2 API
-    ETHERSCAN_API_KEY: str = "2M26H3ME9KNUUW85D7AAMVYCTBUEQUJCHG"
+    ETHERSCAN_API_KEY: str = ""
 
     # Solana API Key (Helius/Solscan)
-    SOLANA_API_KEY: str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkQXQiOjE3NjAyNzYzODY3NTgsImVtYWlsIjoid2VsZ29saW1pdGVkQGdtYWlsLmNvbSIsImFjdGlvbiI6InRva2VuLWFwaSIsImFwaVZlcnNpb24iOiJ2MiIsImlhdCI6MTc2MDI3NjM4Nn0.scTr8oQ2rODGcDkqH4GDpy8A8b_xT9KzxdeTVaR8p68"
+    SOLANA_API_KEY: str = ""
 
     class Config:
         env_file = ".env"

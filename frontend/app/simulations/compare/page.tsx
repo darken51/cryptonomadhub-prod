@@ -7,6 +7,46 @@ import { useAuth } from '@/components/providers/AuthProvider'
 import { useToast } from '@/components/providers/ToastProvider'
 import { ArrowLeft, Calculator } from 'lucide-react'
 
+// Helper to render text with clickable links
+function renderTextWithLinks(text: string) {
+  // Split by URLs and internal paths
+  const urlPattern = /(https?:\/\/[^\s]+)|(\/[a-z-]+)/gi
+  const parts = text.split(urlPattern).filter(part => part !== undefined && part !== '')
+
+  return parts.map((part, i) => {
+    if (!part) return null
+
+    // External URL
+    if (part.match(/^https?:\/\//)) {
+      return (
+        <a
+          key={i}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-blue-600 dark:hover:text-blue-400 transition"
+        >
+          {part}
+        </a>
+      )
+    }
+    // Internal path like /tools, /cost-basis
+    if (part.match(/^\/[a-z-]+$/)) {
+      return (
+        <Link
+          key={i}
+          href={part}
+          className="underline hover:text-blue-600 dark:hover:text-blue-400 transition font-medium"
+        >
+          {part}
+        </Link>
+      )
+    }
+    // Regular text
+    return <span key={i}>{part}</span>
+  })
+}
+
 // Regional groupings for countries
 const REGION_MAP: Record<string, string> = {
   // Europe
@@ -81,6 +121,7 @@ interface CompareResult {
   short_term_gains: number
   long_term_gains: number
   total_gains: number
+  recommendations?: string[]
 }
 
 export default function ComparePage() {
@@ -538,6 +579,22 @@ export default function ComparePage() {
                     </div>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Recommendations */}
+            {result.recommendations && result.recommendations.length > 0 && (
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 sm:p-6">
+                <h3 className="text-base sm:text-lg font-semibold text-blue-900 dark:text-blue-200 mb-3">
+                  💡 Recommendations for Digital Nomads
+                </h3>
+                <ul className="space-y-2">
+                  {result.recommendations.map((item: string, i: number) => (
+                    <li key={i} className="text-sm text-blue-800 dark:text-blue-300">
+                      • {renderTextWithLinks(item)}
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
           </div>

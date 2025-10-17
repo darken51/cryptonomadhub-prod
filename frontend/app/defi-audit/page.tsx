@@ -26,6 +26,30 @@ interface Audit {
   completed_at: string | null
 }
 
+// Detect blockchain type from wallet address
+function detectChainTypeFromAddress(address: string): 'evm' | 'solana' | 'bitcoin' | 'other' {
+  const addr = address.trim()
+
+  // EVM addresses (0x...)
+  if (/^0x[a-fA-F0-9]{40}$/.test(addr)) {
+    return 'evm'
+  }
+
+  // Solana (base58, 32-44 chars)
+  if (/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(addr)) {
+    return 'solana'
+  }
+
+  // Bitcoin formats
+  if (/^1[a-km-zA-HJ-NP-Z1-9]{25,34}$/.test(addr) ||
+      /^3[a-km-zA-HJ-NP-Z1-9]{25,34}$/.test(addr) ||
+      /^bc1[a-z0-9]{39,59}$/i.test(addr)) {
+    return 'bitcoin'
+  }
+
+  return 'other'
+}
+
 export default function DeFiAuditPage() {
   const { user, token, isLoading } = useAuth()
   const { showToast } = useToast()
@@ -42,6 +66,7 @@ export default function DeFiAuditPage() {
   const [endDate, setEndDate] = useState('')
   const [isCreating, setIsCreating] = useState(false)
   const [expandedCategories, setExpandedCategories] = useState<string[]>(['Major Networks', 'Layer 2s'])
+  const [detectedChainType, setDetectedChainType] = useState<string | null>(null)
 
   const availableChains = [
     // Major Networks
@@ -173,6 +198,7 @@ export default function DeFiAuditPage() {
       setSelectedChains(['ethereum'])
       setStartDate('')
       setEndDate('')
+      setDetectedChainType(null)
       await fetchAudits()
     } catch (error: any) {
       showToast(error.message || 'Failed to create audit', 'error')
@@ -391,12 +417,57 @@ export default function DeFiAuditPage() {
                   <input
                     type="text"
                     value={walletAddress}
-                    onChange={(e) => setWalletAddress(e.target.value)}
-                    placeholder="0x..."
+                    onChange={(e) => {
+                      const address = e.target.value
+                      setWalletAddress(address)
+
+                      // Auto-detect and pre-select appropriate chains
+                      if (address.length >= 26) {
+                        const chainType = detectChainTypeFromAddress(address)
+                        setDetectedChainType(chainType)
+
+                        if (chainType === 'evm') {
+                          // For EVM, auto-select all major EVM chains
+                          const evmChains = ['ethereum', 'polygon', 'bsc', 'arbitrum', 'optimism', 'base', 'avalanche']
+                          setSelectedChains(evmChains)
+                        } else if (chainType === 'solana') {
+                          // For Solana, just select solana
+                          setSelectedChains(['solana'])
+                        }
+                        // For bitcoin and other, no auto-selection (not supported in DeFi audit)
+                      } else {
+                        setDetectedChainType(null)
+                      }
+                    }}
+                    placeholder="0x..., 7xKXtg..., etc."
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-900 dark:text-white"
                   />
+                  {detectedChainType && (
+                    <div className="mt-2 flex items-center gap-2">
+                      {detectedChainType === 'evm' && (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 rounded-full text-xs font-medium">
+                          ✓ EVM address detected - 7 blockchains auto-selected
+                        </span>
+                      )}
+                      {detectedChainType === 'solana' && (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-200 rounded-full text-xs font-medium">
+                          ✓ Solana address detected - blockchain auto-selected
+                        </span>
+                      )}
+                      {detectedChainType === 'bitcoin' && (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200 rounded-full text-xs font-medium">
+                          ⚠️ Bitcoin address (not supported in DeFi audit)
+                        </span>
+                      )}
+                      {detectedChainType === 'other' && (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-full text-xs font-medium">
+                          ⚠️ Unknown address format
+                        </span>
+                      )}
+                    </div>
+                  )}
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Enter the wallet address you want to audit
+                    Blockchain will be automatically detected and selected below
                   </p>
                 </div>
 
@@ -434,8 +505,11 @@ export default function DeFiAuditPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                    Select Blockchains * ({selectedChains.length} selected)
+                    Blockchains ({selectedChains.length} selected - auto-detected)
                   </label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                    Blockchains are automatically selected based on your address. You can adjust the selection if needed.
+                  </p>
                   <div className="space-y-3 max-h-96 overflow-y-auto">
                     {categories.map((category) => {
                       const categoryChains = availableChains.filter(c => c.category === category)
@@ -515,6 +589,7 @@ export default function DeFiAuditPage() {
                     setSelectedChains(['ethereum'])
                     setStartDate('')
                     setEndDate('')
+                    setDetectedChainType(null)
                   }}
                   className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                   disabled={isCreating}

@@ -193,3 +193,74 @@ def test_sources_task():
         }
     finally:
         db.close()
+
+
+@shared_task(name='app.tasks.tax_sync_tasks.enrich_scraper_data_task')
+def enrich_scraper_data_task():
+    """
+    Enrich countries updated by scraper IA with metadata
+
+    Simplified version that:
+    1. Finds countries recently updated by scraper IA (have source_url but no data_sources)
+    2. Maps source_url to data_sources array
+    3. Sets data_quality = "medium" (single official source)
+
+    Runs daily at 7 AM UTC (1 hour after daily scraper check)
+    """
+    logger.info("Starting simplified data enrichment task")
+
+    db = SessionLocal()
+    try:
+        # Find countries updated by scraper IA (no data_sources)
+        countries_to_enrich = db.query(Regulation).filter(
+            Regulation.data_sources == None,
+            Regulation.source_url != None
+        ).all()
+
+        if not countries_to_enrich:
+            logger.info("No countries to enrich")
+            return {
+                'status': 'completed',
+                'enriched': 0,
+                'message': 'No countries need enrichment',
+                'timestamp': datetime.utcnow().isoformat()
+            }
+
+        logger.info(f"Found {len(countries_to_enrich)} countries to enrich")
+
+        enriched = 0
+        for regulation in countries_to_enrich:
+            try:
+                # Extract domain from source_url
+                source_domain = regulation.source_url
+                if source_domain:
+                    # Map to data_sources
+                    regulation.data_sources = ["Official Tax Authority", "Crypto Tax Scraper IA"]
+                    regulation.data_quality = "medium"
+
+                    db.commit()
+                    enriched += 1
+                    logger.info(f"Enriched {regulation.country_code} with metadata from {source_domain}")
+            except Exception as e:
+                logger.error(f"Failed to enrich {regulation.country_code}: {e}")
+                db.rollback()
+                continue
+
+        logger.info(f"Enrichment completed: {enriched} countries enriched")
+
+        return {
+            'status': 'completed',
+            'total': len(countries_to_enrich),
+            'enriched': enriched,
+            'timestamp': datetime.utcnow().isoformat()
+        }
+
+    except Exception as e:
+        logger.error(f"Enrichment task failed: {e}")
+        return {
+            'status': 'error',
+            'error': str(e),
+            'timestamp': datetime.utcnow().isoformat()
+        }
+    finally:
+        db.close()

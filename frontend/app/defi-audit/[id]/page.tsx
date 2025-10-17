@@ -296,6 +296,152 @@ export default function AuditReportPage() {
           </div>
         </div>
 
+        {/* Volume Breakdown */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+            Volume Breakdown
+          </h2>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* By Chain */}
+            <div>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
+                By Chain
+              </h3>
+              <div className="space-y-2">
+                {report.chains.map((chain) => {
+                  const chainVolume = report.transactions
+                    ?.filter((tx) => tx.chain.toLowerCase() === chain.toLowerCase())
+                    .reduce((sum, tx) => sum + (tx.value_usd || 0), 0) || 0
+                  const percentage = report.summary.total_volume_usd > 0
+                    ? (chainVolume / report.summary.total_volume_usd * 100).toFixed(1)
+                    : 0
+
+                  return (
+                    <div key={chain} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                      <span className="text-sm font-medium text-gray-900 dark:text-white capitalize">
+                        {chain}
+                      </span>
+                      <div className="text-right">
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                          {formatCurrency(chainVolume)}
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {percentage}%
+                        </p>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* By Transaction Type */}
+            <div>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
+                By Transaction Type
+              </h3>
+              <div className="space-y-2">
+                {report.transactions && (() => {
+                  const typeVolumes: Record<string, number> = {}
+                  report.transactions.forEach((tx) => {
+                    const type = tx.type || 'unknown'
+                    typeVolumes[type] = (typeVolumes[type] || 0) + (tx.value_usd || 0)
+                  })
+
+                  return Object.entries(typeVolumes)
+                    .sort(([, a], [, b]) => b - a)
+                    .slice(0, 5)
+                    .map(([type, volume]) => {
+                      const percentage = report.summary.total_volume_usd > 0
+                        ? (volume / report.summary.total_volume_usd * 100).toFixed(1)
+                        : 0
+
+                      return (
+                        <div key={type} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                          <span className="text-sm font-medium text-gray-900 dark:text-white capitalize">
+                            {type.replace(/_/g, ' ')}
+                          </span>
+                          <div className="text-right">
+                            <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                              {formatCurrency(volume)}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              {percentage}%
+                            </p>
+                          </div>
+                        </div>
+                      )
+                    })
+                })()}
+              </div>
+            </div>
+
+            {/* By Token */}
+            <div>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
+                By Token (Top 5)
+              </h3>
+              <div className="space-y-2">
+                {report.transactions && (() => {
+                  const tokenVolumes: Record<string, number> = {}
+
+                  // Collect volume from both token_in and token_out
+                  report.transactions.forEach((tx: any) => {
+                    // Token out (selling/sending)
+                    if (tx.token_out && tx.amount_out) {
+                      const token = tx.token_out
+                      const volume = tx.value_usd || 0
+                      tokenVolumes[token] = (tokenVolumes[token] || 0) + volume
+                    }
+                    // Token in (buying/receiving)
+                    if (tx.token_in && tx.amount_in) {
+                      const token = tx.token_in
+                      const volume = tx.value_usd || 0
+                      tokenVolumes[token] = (tokenVolumes[token] || 0) + volume
+                    }
+                  })
+
+                  const entries = Object.entries(tokenVolumes)
+                    .sort(([, a], [, b]) => b - a)
+                    .slice(0, 5)
+
+                  if (entries.length === 0) {
+                    return (
+                      <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          No token data available
+                        </p>
+                      </div>
+                    )
+                  }
+
+                  return entries.map(([token, volume]) => {
+                    const percentage = report.summary.total_volume_usd > 0
+                      ? (volume / report.summary.total_volume_usd * 100).toFixed(1)
+                      : 0
+
+                    return (
+                      <div key={token} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                        <span className="text-sm font-medium text-gray-900 dark:text-white uppercase">
+                          {token}
+                        </span>
+                        <div className="text-right">
+                          <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                            {formatCurrency(volume)}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            {percentage}%
+                          </p>
+                        </div>
+                      </div>
+                    )
+                  })
+                })()}
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Protocols Used */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-8">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">

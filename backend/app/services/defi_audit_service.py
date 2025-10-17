@@ -13,6 +13,7 @@ from app.models.defi_protocol import (
     TransactionType, ProtocolType
 )
 from app.models.user import User
+from app.models.cost_basis import CostBasisLot, CostBasisDisposal
 from app.services.blockchain_parser import BlockchainParser
 from app.services.defi_connectors import DeFiConnectorFactory
 import logging
@@ -210,6 +211,26 @@ class DeFiAuditService:
             transaction_type=tx_data.get("transaction_type"),
             protocol_type=tx_data.get("protocol_type")
         )
+
+        # For income transactions (staking, rewards), set gain_loss to the value received
+        if tax_info.get("category") == "income" and not tax_info.get("gain_loss"):
+            # Use the value of tokens received as the taxable income
+            tax_info["gain_loss"] = tx_data.get("usd_value_out", 0)
+
+        # For capital gains transactions (swaps, sells), calculate using cost basis if available
+        if tax_info.get("category") == "capital_gains" and tx_data.get("token_out") and tx_data.get("amount_out"):
+            cost_basis_result = self._calculate_gain_loss_with_cost_basis(
+                user_id=user_id,
+                token_out=tx_data.get("token_out"),
+                amount_out=tx_data.get("amount_out"),
+                usd_value_out=tx_data.get("usd_value_out", 0),
+                timestamp=tx_data.get("timestamp")
+            )
+
+            if cost_basis_result:
+                tax_info["gain_loss"] = cost_basis_result["gain_loss"]
+                tax_info["holding_period_days"] = cost_basis_result["holding_period_days"]
+                print(f"[COST BASIS] Calculated gain/loss: ${cost_basis_result['gain_loss']:.2f} using {cost_basis_result['method']} method")
 
         # Create transaction record
         # Convert datetime objects to strings for JSON storage
@@ -439,8 +460,14 @@ class DeFiAuditService:
                 else:
                     total_losses += abs(gain)
 
-            elif tx.gain_loss_usd and tx.tax_category == "income":
-                ordinary_income += Decimal(tx.gain_loss_usd)
+            # Income from staking/rewards - use usd_value_out (tokens received)
+            elif tx.tax_category == "income":
+                # For income transactions (staking, rewards, interest), use the value of tokens received
+                if tx.gain_loss_usd:
+                    ordinary_income += Decimal(tx.gain_loss_usd)
+                elif tx.usd_value_out:
+                    # If gain_loss_usd is not set, use the value of tokens received
+                    ordinary_income += Decimal(tx.usd_value_out)
 
             # Protocol breakdown
             if tx.protocol:
@@ -515,6 +542,16 @@ class DeFiAuditService:
 
     def _serialize_transaction(self, tx: DeFiTransaction) -> Dict:
         """Serialize transaction to dict"""
+        # Calculate transaction value (for volume calculations)
+        # Use the maximum of in/out values, or the one that exists
+        value_usd = 0.0
+        if tx.usd_value_in and tx.usd_value_out:
+            value_usd = max(float(tx.usd_value_in), float(tx.usd_value_out))
+        elif tx.usd_value_in:
+            value_usd = float(tx.usd_value_in)
+        elif tx.usd_value_out:
+            value_usd = float(tx.usd_value_out)
+
         return {
             "id": tx.id,
             "tx_hash": tx.tx_hash,
@@ -529,8 +566,9 @@ class DeFiAuditService:
             "amount_out": float(tx.amount_out) if tx.amount_out else None,
             "usd_value_in": float(tx.usd_value_in) if tx.usd_value_in else None,
             "usd_value_out": float(tx.usd_value_out) if tx.usd_value_out else None,
+            "value_usd": value_usd,  # Total transaction value for volume breakdown
             "gain_loss_usd": float(tx.gain_loss_usd) if tx.gain_loss_usd else None,
-            "fees_usd": float(tx.gas_fee_usd or 0) + float(tx.protocol_fee_usd or 0)
+            "fee_usd": float(tx.gas_fee_usd or 0) + float(tx.protocol_fee_usd or 0)
         }
 
     def _generate_recommendations(self, audit: DeFiAudit) -> List[str]:
@@ -560,3 +598,101 @@ class DeFiAuditService:
             )
 
         return recommendations
+
+    def _calculate_gain_loss_with_cost_basis(
+        self,
+        user_id: int,
+        token_out: str,
+        amount_out: float,
+        usd_value_out: float,
+        timestamp: datetime
+    ) -> Optional[Dict]:
+        """
+        Calculate gain/loss using cost basis lots (FIFO method)
+
+        Args:
+            user_id: User ID
+            token_out: Token being sold/swapped
+            amount_out: Amount of token
+            usd_value_out: USD value received
+            timestamp: Transaction timestamp
+
+        Returns:
+            Dict with cost_basis, gain_loss, holding_period_days or None if no lots found
+        """
+        if not token_out or not amount_out or amount_out <= 0:
+            return None
+
+        # Find available cost basis lots for this token (FIFO = oldest first)
+        lots = self.db.query(CostBasisLot).filter(
+            CostBasisLot.user_id == user_id,
+            CostBasisLot.token == token_out.upper(),
+            CostBasisLot.remaining_amount > 0
+        ).order_by(CostBasisLot.acquisition_date.asc()).all()
+
+        if not lots:
+            # No cost basis found - assume $0 cost basis (worst case for taxes)
+            return {
+                "cost_basis": 0.0,
+                "gain_loss": usd_value_out,  # All proceeds are gain
+                "holding_period_days": 0,
+                "method": "assumed_zero"
+            }
+
+        # Calculate using FIFO
+        remaining_to_sell = amount_out
+        total_cost_basis = 0.0
+        oldest_acquisition_date = None
+
+        for lot in lots:
+            if remaining_to_sell <= 0:
+                break
+
+            # How much can we take from this lot?
+            amount_from_lot = min(remaining_to_sell, lot.remaining_amount)
+
+            # Calculate cost basis for this portion
+            cost_for_portion = amount_from_lot * lot.acquisition_price_usd
+            total_cost_basis += cost_for_portion
+
+            # Track oldest acquisition date for holding period
+            if oldest_acquisition_date is None:
+                oldest_acquisition_date = lot.acquisition_date
+
+            # Update remaining
+            remaining_to_sell -= amount_from_lot
+
+            # Create disposal record
+            disposal = CostBasisDisposal(
+                user_id=user_id,
+                lot_id=lot.id,
+                disposal_date=timestamp,
+                disposal_method="fifo",
+                amount_disposed=amount_from_lot,
+                disposal_price_usd=usd_value_out / amount_out if amount_out > 0 else 0,
+                proceeds_usd=amount_from_lot * (usd_value_out / amount_out) if amount_out > 0 else 0,
+                cost_basis_usd=cost_for_portion,
+                gain_loss_usd=(amount_from_lot * (usd_value_out / amount_out) if amount_out > 0 else 0) - cost_for_portion
+            )
+            self.db.add(disposal)
+
+            # Update lot
+            lot.remaining_amount -= amount_from_lot
+            lot.disposed_amount += amount_from_lot
+
+        self.db.commit()
+
+        # Calculate gain/loss
+        gain_loss = usd_value_out - total_cost_basis
+
+        # Calculate holding period
+        holding_period_days = 0
+        if oldest_acquisition_date:
+            holding_period_days = (timestamp - oldest_acquisition_date).days
+
+        return {
+            "cost_basis": total_cost_basis,
+            "gain_loss": gain_loss,
+            "holding_period_days": holding_period_days,
+            "method": "fifo"
+        }

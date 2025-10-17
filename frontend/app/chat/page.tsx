@@ -7,6 +7,46 @@ import { useAuth } from '@/components/providers/AuthProvider'
 import { useToast } from '@/components/providers/ToastProvider'
 import { ArrowLeft, Send, Bot, User as UserIcon, Sparkles } from 'lucide-react'
 
+// Helper to render text with clickable links
+function renderTextWithLinks(text: string) {
+  // Split by URLs and internal paths
+  const urlPattern = /(https?:\/\/[^\s]+)|(\/[a-z-]+)/gi
+  const parts = text.split(urlPattern).filter(part => part !== undefined && part !== '')
+
+  return parts.map((part, i) => {
+    if (!part) return null
+
+    // External URL
+    if (part.match(/^https?:\/\//)) {
+      return (
+        <a
+          key={i}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-blue-400 transition"
+        >
+          {part}
+        </a>
+      )
+    }
+    // Internal path like /tools, /cost-basis
+    if (part.match(/^\/[a-z-]+$/)) {
+      return (
+        <Link
+          key={i}
+          href={part}
+          className="underline hover:text-blue-400 transition font-medium"
+        >
+          {part}
+        </Link>
+      )
+    }
+    // Regular text
+    return <span key={i}>{part}</span>
+  })
+}
+
 interface Message {
   role: 'user' | 'assistant'
   content: string
@@ -179,8 +219,8 @@ export default function ChatPage() {
                     : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700'
                 }`}
               >
-                <p className="text-sm whitespace-pre-wrap leading-relaxed">
-                  {message.content}
+                <p className={`text-sm whitespace-pre-wrap leading-relaxed ${message.role === 'user' ? '!text-white' : ''}`}>
+                  {renderTextWithLinks(message.content)}
                 </p>
               </div>
             </div>

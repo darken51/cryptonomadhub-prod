@@ -39,6 +39,12 @@ celery_app.conf.beat_schedule = {
         'schedule': crontab(hour=6, minute=0),  # Daily 6 AM
     },
 
+    # Enrich scraper IA data with aggregator (every day at 7 AM UTC)
+    'daily-enrich-scraper-data': {
+        'task': 'app.tasks.tax_sync_tasks.enrich_scraper_data_task',
+        'schedule': crontab(hour=7, minute=0),  # Daily 7 AM
+    },
+
     # License management tasks
     # Reset monthly usage (1st of month at 00:00 UTC)
     'reset-usage-monthly': {

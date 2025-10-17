@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.user import User
@@ -29,10 +29,11 @@ class ChatResponse(BaseModel):
 
 
 @router.post("/message", response_model=ChatResponse)
-# @limiter.limit(get_rate_limit("chat"))  # Temporarily disabled
+@limiter.limit(get_rate_limit("chat"))
 async def send_chat_message(
-
-    request: ChatRequest,
+    request: Request,
+    response: Response,
+    chat_request: ChatRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -51,8 +52,8 @@ async def send_chat_message(
     try:
         response = await assistant.process_message(
             user_id=current_user.id,
-            message=request.message,
-            conversation_history=[msg.dict() for msg in request.conversation_history]
+            message=chat_request.message,
+            conversation_history=[msg.dict() for msg in chat_request.conversation_history]
         )
 
         return ChatResponse(

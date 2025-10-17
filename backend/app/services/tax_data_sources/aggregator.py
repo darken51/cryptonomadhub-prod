@@ -303,17 +303,40 @@ class TaxDataAggregator:
 
             merged = result['merged']
 
-            # Get existing regulation
+            # Get existing regulation or create new one
             regulation = self.db.query(Regulation).filter(
                 Regulation.country_code == country_code
             ).first()
 
+            is_new_country = False
             if not regulation:
-                return {
-                    'success': False,
-                    'country_code': country_code,
-                    'error': 'Country not in database'
-                }
+                # Auto-create new country if scraper found data
+                logger.info(f"🆕 Creating new country entry for {country_code}")
+
+                # Get country name from sources
+                country_name = country_code  # Fallback
+                if 'tax_foundation' in result['sources']:
+                    country_name = result['sources']['tax_foundation'].get('country_name', country_code)
+                elif 'kpmg' in result['sources']:
+                    country_name = result['sources']['kpmg'].get('country_name', country_code)
+                elif 'pwc' in result['sources']:
+                    country_name = result['sources']['pwc'].get('country_name', country_code)
+                elif 'koinly' in result['sources']:
+                    country_name = result['sources']['koinly'].get('country_name', country_code)
+
+                # Create with minimal data (will be updated below)
+                regulation = Regulation(
+                    country_code=country_code,
+                    country_name=country_name,
+                    cgt_short_rate=merged['cgt_rate'] or 0.0,
+                    cgt_long_rate=merged['cgt_rate'] or 0.0,
+                    residency_rule="Standard residency rules apply (verify with local authority)",
+                    defi_reporting="Unknown - please verify with local tax authority",
+                    penalties_max="Unknown - please verify with local tax authority"
+                )
+                self.db.add(regulation)
+                self.db.flush()  # Get ID without committing
+                is_new_country = True
 
             # Update if we have CGT data
             if merged.get('cgt_rate') is not None:
@@ -375,6 +398,10 @@ class TaxDataAggregator:
 
                     regulation.notes = new_note[:500]  # Limit length
 
+                    # Store sources and quality in dedicated fields
+                    regulation.data_sources = merged['sources_used']
+                    regulation.data_quality = merged['data_quality']
+
                     self.db.commit()
 
                     # Create notification if CGT changed
@@ -389,12 +416,13 @@ class TaxDataAggregator:
                     return {
                         'success': True,
                         'country_code': country_code,
-                        'action': 'updated' if cgt_changed else 'crypto_updated',
+                        'action': 'created' if is_new_country else ('updated' if cgt_changed else 'crypto_updated'),
                         'old_rate': old_rate,
                         'new_rate': new_rate,
                         'crypto_updated': crypto_needs_update,
                         'confidence': result['confidence'],
-                        'sources': merged['sources_used']
+                        'sources': merged['sources_used'],
+                        'is_new': is_new_country
                     }
                 else:
                     return {

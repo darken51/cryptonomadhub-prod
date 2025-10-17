@@ -149,22 +149,30 @@ class TaxSimulator:
             f"6. Net savings: ${savings:,.0f} ({(savings/current_tax*100 if current_tax > 0 else 0):.1f}% reduction)"
         ]
 
+        # Helper to format source label
+        def get_source_label(regulation) -> str:
+            if regulation.data_sources and len(regulation.data_sources) > 0:
+                return ", ".join(regulation.data_sources)
+            return f"Tax authority {regulation.country_code}"
+
         rules_applied = [
             {
                 "country": reg_current.country_code,
-                "rule": "Crypto Tax" if current_uses_crypto else "Capital Gains Tax",
+                "rule": f"{reg_current.country_code} - {'Crypto Tax' if current_uses_crypto else 'Capital Gains Tax'}",
+                "value": f"Short-term: {current_short_rate*100:.1f}%, Long-term: {current_long_rate*100:.1f}%",
                 "rate_short": current_short_rate,
                 "rate_long": current_long_rate,
                 "crypto_specific": current_uses_crypto,
-                "source": reg_current.source_url or f"Tax authority {reg_current.country_code}"
+                "source": get_source_label(reg_current)
             },
             {
                 "country": reg_target.country_code,
-                "rule": "Crypto Tax" if target_uses_crypto else "Capital Gains Tax",
+                "rule": f"{reg_target.country_code} - {'Crypto Tax' if target_uses_crypto else 'Capital Gains Tax'}",
+                "value": f"Short-term: {target_short_rate*100:.1f}%, Long-term: {target_long_rate*100:.1f}%",
                 "rate_short": target_short_rate,
                 "rate_long": target_long_rate,
                 "crypto_specific": target_uses_crypto,
-                "source": reg_target.source_url or f"Tax authority {reg_target.country_code}"
+                "source": get_source_label(reg_target)
             }
         ]
 
@@ -182,10 +190,43 @@ class TaxSimulator:
 
         decision = f"Moving from {reg_current.country_code} to {reg_target.country_code} saves ${savings:,.0f}/year"
 
-        sources = [
-            f"{reg_current.country_name} tax authority",
-            f"{reg_target.country_name} tax authority"
-        ]
+        # Build sources from actual data sources
+        sources = []
+
+        # Helper to generate source URLs
+        def get_source_urls(regulation) -> List[str]:
+            urls = []
+
+            # Use source_url if available
+            if regulation.source_url:
+                urls.append(regulation.source_url)
+
+            # Add URLs based on data_sources
+            if regulation.data_sources:
+                for source in regulation.data_sources:
+                    if source == "Tax Foundation":
+                        urls.append("https://taxfoundation.org/data/all/global/capital-gains-tax-rates-by-country/")
+                    elif source == "KPMG":
+                        urls.append("https://kpmg.com/xx/en/home/services/tax/tax-tools-and-resources/tax-rates-online.html")
+                    elif source == "Koinly":
+                        urls.append(f"https://koinly.io/cryptocurrency-taxes/{regulation.country_code.lower()}/")
+                    elif source == "PwC":
+                        urls.append("https://taxsummaries.pwc.com/")
+                    elif source == "OECD":
+                        urls.append("https://www.oecd.org/tax/tax-policy/tax-database/")
+
+            # Fallback if no sources available
+            if not urls:
+                urls.append(f"{regulation.country_name} tax authority")
+
+            return urls
+
+        # Get sources for both countries
+        sources.extend(get_source_urls(reg_current))
+        sources.extend(get_source_urls(reg_target))
+
+        # Remove duplicates while preserving order
+        sources = list(dict.fromkeys(sources))
 
         return SimulationExplanation(
             decision=decision,
@@ -215,6 +256,17 @@ class TaxSimulator:
 
         # Reporting
         items.append(f"📋 {reg_target.country_name} DeFi reporting: {reg_target.defi_reporting}")
+
+        # Subtle affiliate recommendations based on context
+
+        # Crypto debit cards - suggest when relocating or with significant gains (always show)
+        if total_gains >= 1000:
+            items.append("💳 Spending abroad? Check out crypto cards for global payments → Visit /tools for recommended cards (RedotPay 5M+ users, Kast 160+ countries with 3-10% rewards)")
+
+        # Digital residency - suggest for low-tax countries or KYC needs
+        target_rate = float(reg_target.crypto_long_rate) if reg_target.crypto_long_rate is not None else float(reg_target.cgt_long_rate)
+        if target_rate <= 0.15:  # 15% or less
+            items.append("🌐 Tax optimization tip: Palau Digital Residency offers 0% tax on digital income + official govt ID for exchange KYC → See /tools for details")
 
         return items
 

@@ -1,8 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import { NextIntlClientProvider } from 'next-intl'
-import { getMessages, getLocale } from 'next-intl/server'
 import { AuthProvider } from '@/components/providers/AuthProvider'
 import { ToastProvider } from '@/components/providers/ToastProvider'
 
@@ -14,24 +12,19 @@ export const metadata: Metadata = {
   keywords: 'crypto, tax, digital nomad, optimization, bitcoin, ethereum, DeFi',
 }
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const locale = await getLocale()
-  const messages = await getMessages()
-
   return (
-    <html lang={locale}>
+    <html lang="en">
       <body className={inter.className}>
-        <NextIntlClientProvider messages={messages} locale={locale}>
-          <AuthProvider>
-            <ToastProvider>
-              {children}
-            </ToastProvider>
-          </AuthProvider>
-        </NextIntlClientProvider>
+        <AuthProvider>
+          <ToastProvider>
+            {children}
+          </ToastProvider>
+        </AuthProvider>
       </body>
     </html>
   )

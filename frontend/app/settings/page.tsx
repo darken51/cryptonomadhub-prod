@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useTranslations } from 'next-intl'
 import { useAuth } from '@/components/providers/AuthProvider'
 import LanguageSwitcher from '@/components/LanguageSwitcher'
 import {
@@ -20,8 +19,6 @@ import {
 } from 'lucide-react'
 
 export default function SettingsPage() {
-  const t = useTranslations('settings')
-  const tCommon = useTranslations('common')
   const { user, logout, isLoading, token } = useAuth()
   const router = useRouter()
 
@@ -260,7 +257,7 @@ export default function SettingsPage() {
             </Link>
             <div>
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                {t('title')}
+                Account Settings
               </h1>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{user.email}</p>
             </div>
@@ -459,7 +456,7 @@ export default function SettingsPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t('preferences.language')}
+                  Language
                 </label>
                 <LanguageSwitcher variant="dropdown" />
               </div>

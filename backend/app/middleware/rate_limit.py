@@ -68,6 +68,7 @@ RATE_LIMITS = {
     "simulations": "20/minute, 100/hour",  # Tax simulations
     "chat": "15/minute, 60/hour",  # AI chat
     "defi_audit": "10/minute, 30/hour",  # DeFi audit (more expensive)
+    "wallet_operations": "100/minute, 500/hour",  # Wallet group management (high refresh rate)
 
     # Data retrieval - lenient limits
     "read_only": "60/minute, 500/hour",  # GET endpoints

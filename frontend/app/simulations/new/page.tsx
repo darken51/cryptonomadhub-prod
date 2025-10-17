@@ -8,6 +8,46 @@ import { useToast } from '@/components/providers/ToastProvider'
 import { SimulationExplainer } from '@/components/SimulationExplainer'
 import { ArrowLeft, Calculator } from 'lucide-react'
 
+// Helper to render text with clickable links
+function renderTextWithLinks(text: string) {
+  // Split by URLs and internal paths
+  const urlPattern = /(https?:\/\/[^\s]+)|(\/[a-z-]+)/gi
+  const parts = text.split(urlPattern).filter(part => part !== undefined && part !== '')
+
+  return parts.map((part, i) => {
+    if (!part) return null
+
+    // External URL
+    if (part.match(/^https?:\/\//)) {
+      return (
+        <a
+          key={i}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-blue-600 dark:hover:text-blue-400 transition"
+        >
+          {part}
+        </a>
+      )
+    }
+    // Internal path like /tools, /cost-basis
+    if (part.match(/^\/[a-z-]+$/)) {
+      return (
+        <Link
+          key={i}
+          href={part}
+          className="underline hover:text-blue-600 dark:hover:text-blue-400 transition font-medium"
+        >
+          {part}
+        </Link>
+      )
+    }
+    // Regular text
+    return <span key={i}>{part}</span>
+  })
+}
+
 // Regional groupings for countries
 const REGION_MAP: Record<string, string> = {
   // Europe
@@ -64,6 +104,8 @@ const REGION_MAP: Record<string, string> = {
 interface Country {
   code: string
   name: string
+  flag_emoji?: string
+  source_url?: string
 }
 
 export default function NewSimulationPage() {
@@ -108,7 +150,9 @@ export default function NewSimulationPage() {
         // Convert to simple format
         const countryList: Country[] = data.map((c: any) => ({
           code: c.country_code,
-          name: c.country_name
+          name: c.country_name,
+          flag_emoji: c.flag_emoji,
+          source_url: c.source_url
         }))
 
         setCountries(countryList)
@@ -243,7 +287,7 @@ export default function NewSimulationPage() {
                   <optgroup key={region} label={`🌍 ${region}`}>
                     {countries.map((country) => (
                       <option key={country.code} value={country.code}>
-                        {country.name}
+                        {country.flag_emoji ? `${country.flag_emoji} ` : ''}{country.name}
                       </option>
                     ))}
                   </optgroup>
@@ -270,7 +314,7 @@ export default function NewSimulationPage() {
                   <optgroup key={region} label={`🌍 ${region}`}>
                     {countries.map((country) => (
                       <option key={country.code} value={country.code}>
-                        {country.name}
+                        {country.flag_emoji ? `${country.flag_emoji} ` : ''}{country.name}
                       </option>
                     ))}
                   </optgroup>
@@ -527,7 +571,7 @@ export default function NewSimulationPage() {
                 <ul className="space-y-2">
                   {result.considerations.map((item: string, i: number) => (
                     <li key={i} className="text-sm text-blue-800 dark:text-blue-300">
-                      • {item}
+                      • {renderTextWithLinks(item)}
                     </li>
                   ))}
                 </ul>

@@ -160,19 +160,32 @@ export function SimulationExplainer({ explanation }: SimulationExplainerProps) {
               <span>🔗</span> Official Sources
             </h4>
             <ul className="space-y-2">
-              {explanation.sources.map((source, index) => (
-                <li key={index}>
-                  <a
-                    href={source}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-2"
-                  >
-                    <span className="truncate">{source}</span>
-                    <span className="flex-shrink-0">↗</span>
-                  </a>
-                </li>
-              ))}
+              {explanation.sources.map((source, index) => {
+                // Check if source is a valid URL
+                const isUrl = source.startsWith('http://') || source.startsWith('https://')
+
+                return (
+                  <li key={index}>
+                    {isUrl ? (
+                      <a
+                        href={source}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-2"
+                      >
+                        <span className="truncate">{source}</span>
+                        <span className="flex-shrink-0">↗</span>
+                      </a>
+                    ) : (
+                      <span className="text-sm text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                        <span className="text-gray-400">•</span>
+                        <span>{source}</span>
+                        <span className="text-xs text-gray-500 dark:text-gray-500 italic">(pending verification)</span>
+                      </span>
+                    )}
+                  </li>
+                )
+              })}
             </ul>
           </div>
 
