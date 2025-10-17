@@ -8,7 +8,9 @@ import { useAuth } from '@/components/providers/AuthProvider'
 import { useToast } from '@/components/providers/ToastProvider'
 import { AppHeader } from '@/components/AppHeader'
 import { Footer } from '@/components/Footer'
-import { ArrowLeft, Calculator, GitCompare } from 'lucide-react'
+import { Tooltip } from '@/components/Tooltip'
+import { ArrowLeft, Calculator, GitCompare, RotateCcw } from 'lucide-react'
+import { groupCountriesByRegion } from '@/lib/constants'
 
 // Helper to render text with clickable links
 function renderTextWithLinks(text: string) {
@@ -50,58 +52,7 @@ function renderTextWithLinks(text: string) {
   })
 }
 
-// Regional groupings for countries
-const REGION_MAP: Record<string, string> = {
-  // Europe
-  'AD': 'Europe', 'AL': 'Europe', 'AT': 'Europe', 'BE': 'Europe', 'BG': 'Europe',
-  'BA': 'Europe', 'BY': 'Europe', 'CH': 'Europe', 'CZ': 'Europe', 'DE': 'Europe',
-  'DK': 'Europe', 'EE': 'Europe', 'ES': 'Europe', 'FI': 'Europe', 'FR': 'Europe',
-  'GB': 'Europe', 'GI': 'Europe', 'GR': 'Europe', 'HR': 'Europe', 'HU': 'Europe',
-  'IE': 'Europe', 'IS': 'Europe', 'IT': 'Europe', 'LI': 'Europe', 'LT': 'Europe',
-  'LU': 'Europe', 'LV': 'Europe', 'MC': 'Europe', 'MD': 'Europe', 'ME': 'Europe',
-  'MK': 'Europe', 'MT': 'Europe', 'NL': 'Europe', 'NO': 'Europe', 'PL': 'Europe',
-  'PT': 'Europe', 'RO': 'Europe', 'RS': 'Europe', 'RU': 'Europe', 'SE': 'Europe',
-  'SI': 'Europe', 'SK': 'Europe', 'UA': 'Europe', 'XK': 'Europe',
-
-  // Americas
-  'AR': 'Americas', 'BB': 'Americas', 'BO': 'Americas', 'BR': 'Americas',
-  'CA': 'Americas', 'CL': 'Americas', 'CO': 'Americas', 'CR': 'Americas',
-  'DO': 'Americas', 'EC': 'Americas', 'GT': 'Americas', 'GY': 'Americas',
-  'HN': 'Americas', 'JM': 'Americas', 'MX': 'Americas', 'NI': 'Americas',
-  'PA': 'Americas', 'PE': 'Americas', 'PR': 'Americas', 'PY': 'Americas',
-  'SV': 'Americas', 'TT': 'Americas', 'US': 'Americas', 'UY': 'Americas',
-  'VE': 'Americas',
-
-  // Asia & Pacific
-  'AU': 'Asia & Pacific', 'AZ': 'Asia & Pacific', 'BD': 'Asia & Pacific',
-  'BN': 'Asia & Pacific', 'CN': 'Asia & Pacific', 'GE': 'Asia & Pacific',
-  'HK': 'Asia & Pacific', 'ID': 'Asia & Pacific', 'IN': 'Asia & Pacific',
-  'JP': 'Asia & Pacific', 'KH': 'Asia & Pacific', 'KR': 'Asia & Pacific',
-  'KZ': 'Asia & Pacific', 'LA': 'Asia & Pacific', 'LK': 'Asia & Pacific',
-  'MM': 'Asia & Pacific', 'MN': 'Asia & Pacific', 'MO': 'Asia & Pacific',
-  'MY': 'Asia & Pacific', 'NZ': 'Asia & Pacific', 'PG': 'Asia & Pacific',
-  'PH': 'Asia & Pacific', 'PK': 'Asia & Pacific', 'SG': 'Asia & Pacific',
-  'TH': 'Asia & Pacific', 'TL': 'Asia & Pacific', 'TW': 'Asia & Pacific',
-  'UZ': 'Asia & Pacific', 'VN': 'Asia & Pacific',
-
-  // Middle East & Africa
-  'AE': 'Middle East & Africa', 'AM': 'Middle East & Africa', 'AO': 'Middle East & Africa',
-  'BH': 'Middle East & Africa', 'BW': 'Middle East & Africa', 'CD': 'Middle East & Africa',
-  'CG': 'Middle East & Africa', 'CI': 'Middle East & Africa', 'CM': 'Middle East & Africa',
-  'CV': 'Middle East & Africa', 'DZ': 'Middle East & Africa', 'EG': 'Middle East & Africa',
-  'ET': 'Middle East & Africa', 'GA': 'Middle East & Africa', 'GH': 'Middle East & Africa',
-  'GQ': 'Middle East & Africa', 'IL': 'Middle East & Africa', 'IQ': 'Middle East & Africa',
-  'JO': 'Middle East & Africa', 'KE': 'Middle East & Africa', 'KW': 'Middle East & Africa',
-  'LB': 'Middle East & Africa', 'LR': 'Middle East & Africa', 'LY': 'Middle East & Africa',
-  'MA': 'Middle East & Africa', 'MG': 'Middle East & Africa', 'MR': 'Middle East & Africa',
-  'MU': 'Middle East & Africa', 'MZ': 'Middle East & Africa', 'NA': 'Middle East & Africa',
-  'NG': 'Middle East & Africa', 'OM': 'Middle East & Africa', 'PS': 'Middle East & Africa',
-  'QA': 'Middle East & Africa', 'RW': 'Middle East & Africa', 'SA': 'Middle East & Africa',
-  'SC': 'Middle East & Africa', 'SN': 'Middle East & Africa', 'SZ': 'Middle East & Africa',
-  'TD': 'Middle East & Africa', 'TN': 'Middle East & Africa', 'TR': 'Middle East & Africa',
-  'TZ': 'Middle East & Africa', 'UG': 'Middle East & Africa', 'ZA': 'Middle East & Africa',
-  'ZM': 'Middle East & Africa', 'ZW': 'Middle East & Africa',
-}
+// Region mapping now imported from shared constants
 
 interface Country {
   code: string
@@ -111,6 +62,7 @@ interface Country {
 interface CountryComparison {
   country_code: string
   country_name: string
+  flag_emoji?: string
   tax_amount: number
   savings: number
   savings_percent: number
@@ -140,6 +92,7 @@ export default function ComparePage() {
   const [result, setResult] = useState<CompareResult | null>(null)
   const [countries, setCountries] = useState<Country[]>([])
   const [countriesByRegion, setCountriesByRegion] = useState<Record<string, Country[]>>({})
+  const [searchTerm, setSearchTerm] = useState('')
 
   // Fetch countries on mount
   useEffect(() => {
@@ -160,21 +113,8 @@ export default function ComparePage() {
 
         setCountries(countryList)
 
-        // Group by region
-        const grouped: Record<string, Country[]> = {}
-        countryList.forEach(country => {
-          const region = REGION_MAP[country.code] || 'Other'
-          if (!grouped[region]) {
-            grouped[region] = []
-          }
-          grouped[region].push(country)
-        })
-
-        // Sort countries within each region
-        Object.keys(grouped).forEach(region => {
-          grouped[region].sort((a, b) => a.name.localeCompare(b.name))
-        })
-
+        // Group by region using shared utility
+        const grouped = groupCountriesByRegion(countryList)
         setCountriesByRegion(grouped)
       }
     } catch (error) {
@@ -192,6 +132,27 @@ export default function ComparePage() {
       }
       setSelectedCountries([...selectedCountries, countryCode])
     }
+  }
+
+  // Filter countries by search term
+  const filteredCountriesByRegion = Object.entries(countriesByRegion).reduce((acc, [region, countries]) => {
+    const filtered = countries.filter(country =>
+      country.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      country.code.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    if (filtered.length > 0) {
+      acc[region] = filtered
+    }
+    return acc
+  }, {} as Record<string, Country[]>)
+
+  const handleReset = () => {
+    setCurrentCountry('')
+    setSelectedCountries([])
+    setShortTermGains('')
+    setLongTermGains('')
+    setResult(null)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -347,8 +308,25 @@ export default function ComparePage() {
                     : `${selectedCountries.length}/5 countries selected`
                   }
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {Object.entries(countriesByRegion).map(([region, countries]) => (
+
+                {/* Search Input */}
+                <div className="mb-4">
+                  <input
+                    type="search"
+                    placeholder="🔍 Search countries..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full px-4 py-2.5 text-sm border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                  />
+                  {searchTerm && (
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                      Found {Object.values(filteredCountriesByRegion).flat().length} countries
+                    </p>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-96 overflow-y-auto pr-2">
+                  {Object.entries(filteredCountriesByRegion).map(([region, countries]) => (
                     <div key={region} className="space-y-2">
                       <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                         {region}
@@ -384,9 +362,10 @@ export default function ComparePage() {
                 <div>
                   <label
                     htmlFor="shortTermGains"
-                    className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2"
+                    className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2"
                   >
                     Short-Term Gains (held &lt;1 year)
+                    <Tooltip content="Crypto held less than 12 months before selling. Often taxed as ordinary income at higher rates." />
                   </label>
                   <div className="relative">
                     <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm sm:text-base">$</span>
@@ -406,9 +385,10 @@ export default function ComparePage() {
                 <div>
                   <label
                     htmlFor="longTermGains"
-                    className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2"
+                    className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2"
                   >
                     Long-Term Gains (held &gt;1 year)
+                    <Tooltip content="Crypto held more than 12 months before selling. Often taxed at preferential capital gains rates (lower than short-term)." />
                   </label>
                   <div className="relative">
                     <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm sm:text-base">$</span>
@@ -518,6 +498,24 @@ export default function ComparePage() {
                 </div>
               </div>
 
+              {/* Reset Button */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="flex justify-end"
+              >
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleReset}
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl shadow-md hover:shadow-lg transition-all font-medium border border-slate-300 dark:border-slate-600"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  New Comparison
+                </motion.button>
+              </motion.div>
+
               {/* Comparison Table */}
               <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xl">
                 <div className="overflow-x-auto">
@@ -563,7 +561,7 @@ export default function ComparePage() {
                           </td>
                           <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center gap-2">
-                              <span className="text-lg">{comparison.country_code === 'AE' ? '🇦🇪' : comparison.country_code === 'PT' ? '🇵🇹' : '🌍'}</span>
+                              <span className="text-lg">{comparison.flag_emoji || '🌍'}</span>
                               <div>
                                 <div className="text-sm font-medium text-slate-900 dark:text-white">
                                   {comparison.country_name}

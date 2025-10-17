@@ -326,10 +326,9 @@ class PDFGenerator:
             ${abs(savings):,.2f} ({abs(savings_percent):.1f}%)
         </div>
         <p style="margin-top: 10px; color: #475569;">
-            {'You would save' if savings > 0 else 'You would pay'}
-            <strong>${abs(savings):,.2f}</strong> per year by
-            {'moving' if savings > 0 else 'staying in your current country instead of moving'}
-            to {target_reg.get('country_name', target_country)}.
+            Based on the provided gains, {target_reg.get('country_name', target_country)} shows a
+            <strong>${abs(savings):,.2f} {'lower' if savings > 0 else 'higher'}</strong>
+            annual tax liability compared to {current_reg.get('country_name', current_country)}.
         </p>
     </div>
 

@@ -9,7 +9,9 @@ import { useToast } from '@/components/providers/ToastProvider'
 import { SimulationExplainer } from '@/components/SimulationExplainer'
 import { AppHeader } from '@/components/AppHeader'
 import { Footer } from '@/components/Footer'
-import { ArrowLeft, Calculator, Sparkles } from 'lucide-react'
+import { Tooltip } from '@/components/Tooltip'
+import { ArrowLeft, Calculator, Sparkles, RotateCcw } from 'lucide-react'
+import { groupCountriesByRegion } from '@/lib/constants'
 
 // Helper to render text with clickable links
 function renderTextWithLinks(text: string) {
@@ -49,59 +51,6 @@ function renderTextWithLinks(text: string) {
     // Regular text
     return <span key={i}>{part}</span>
   })
-}
-
-// Regional groupings for countries
-const REGION_MAP: Record<string, string> = {
-  // Europe
-  'AD': 'Europe', 'AL': 'Europe', 'AT': 'Europe', 'BE': 'Europe', 'BG': 'Europe',
-  'BA': 'Europe', 'BY': 'Europe', 'CH': 'Europe', 'CZ': 'Europe', 'DE': 'Europe',
-  'DK': 'Europe', 'EE': 'Europe', 'ES': 'Europe', 'FI': 'Europe', 'FR': 'Europe',
-  'GB': 'Europe', 'GI': 'Europe', 'GR': 'Europe', 'HR': 'Europe', 'HU': 'Europe',
-  'IE': 'Europe', 'IS': 'Europe', 'IT': 'Europe', 'LI': 'Europe', 'LT': 'Europe',
-  'LU': 'Europe', 'LV': 'Europe', 'MC': 'Europe', 'MD': 'Europe', 'ME': 'Europe',
-  'MK': 'Europe', 'MT': 'Europe', 'NL': 'Europe', 'NO': 'Europe', 'PL': 'Europe',
-  'PT': 'Europe', 'RO': 'Europe', 'RS': 'Europe', 'RU': 'Europe', 'SE': 'Europe',
-  'SI': 'Europe', 'SK': 'Europe', 'UA': 'Europe', 'XK': 'Europe',
-
-  // Americas
-  'AR': 'Americas', 'BB': 'Americas', 'BO': 'Americas', 'BR': 'Americas',
-  'CA': 'Americas', 'CL': 'Americas', 'CO': 'Americas', 'CR': 'Americas',
-  'DO': 'Americas', 'EC': 'Americas', 'GT': 'Americas', 'GY': 'Americas',
-  'HN': 'Americas', 'JM': 'Americas', 'MX': 'Americas', 'NI': 'Americas',
-  'PA': 'Americas', 'PE': 'Americas', 'PR': 'Americas', 'PY': 'Americas',
-  'SV': 'Americas', 'TT': 'Americas', 'US': 'Americas', 'UY': 'Americas',
-  'VE': 'Americas',
-
-  // Asia & Pacific
-  'AU': 'Asia & Pacific', 'AZ': 'Asia & Pacific', 'BD': 'Asia & Pacific',
-  'BN': 'Asia & Pacific', 'CN': 'Asia & Pacific', 'GE': 'Asia & Pacific',
-  'HK': 'Asia & Pacific', 'ID': 'Asia & Pacific', 'IN': 'Asia & Pacific',
-  'JP': 'Asia & Pacific', 'KH': 'Asia & Pacific', 'KR': 'Asia & Pacific',
-  'KZ': 'Asia & Pacific', 'LA': 'Asia & Pacific', 'LK': 'Asia & Pacific',
-  'MM': 'Asia & Pacific', 'MN': 'Asia & Pacific', 'MO': 'Asia & Pacific',
-  'MY': 'Asia & Pacific', 'NZ': 'Asia & Pacific', 'PG': 'Asia & Pacific',
-  'PH': 'Asia & Pacific', 'PK': 'Asia & Pacific', 'SG': 'Asia & Pacific',
-  'TH': 'Asia & Pacific', 'TL': 'Asia & Pacific', 'TW': 'Asia & Pacific',
-  'UZ': 'Asia & Pacific', 'VN': 'Asia & Pacific',
-
-  // Middle East & Africa
-  'AE': 'Middle East & Africa', 'AM': 'Middle East & Africa', 'AO': 'Middle East & Africa',
-  'BH': 'Middle East & Africa', 'BW': 'Middle East & Africa', 'CD': 'Middle East & Africa',
-  'CG': 'Middle East & Africa', 'CI': 'Middle East & Africa', 'CM': 'Middle East & Africa',
-  'CV': 'Middle East & Africa', 'DZ': 'Middle East & Africa', 'EG': 'Middle East & Africa',
-  'ET': 'Middle East & Africa', 'GA': 'Middle East & Africa', 'GH': 'Middle East & Africa',
-  'GQ': 'Middle East & Africa', 'IL': 'Middle East & Africa', 'IQ': 'Middle East & Africa',
-  'JO': 'Middle East & Africa', 'KE': 'Middle East & Africa', 'KW': 'Middle East & Africa',
-  'LB': 'Middle East & Africa', 'LR': 'Middle East & Africa', 'LY': 'Middle East & Africa',
-  'MA': 'Middle East & Africa', 'MG': 'Middle East & Africa', 'MR': 'Middle East & Africa',
-  'MU': 'Middle East & Africa', 'MZ': 'Middle East & Africa', 'NA': 'Middle East & Africa',
-  'NG': 'Middle East & Africa', 'OM': 'Middle East & Africa', 'PS': 'Middle East & Africa',
-  'QA': 'Middle East & Africa', 'RW': 'Middle East & Africa', 'SA': 'Middle East & Africa',
-  'SC': 'Middle East & Africa', 'SN': 'Middle East & Africa', 'SZ': 'Middle East & Africa',
-  'TD': 'Middle East & Africa', 'TN': 'Middle East & Africa', 'TR': 'Middle East & Africa',
-  'TZ': 'Middle East & Africa', 'UG': 'Middle East & Africa', 'ZA': 'Middle East & Africa',
-  'ZM': 'Middle East & Africa', 'ZW': 'Middle East & Africa',
 }
 
 interface Country {
@@ -160,26 +109,22 @@ export default function NewSimulationPage() {
 
         setCountries(countryList)
 
-        // Group by region
-        const grouped: Record<string, Country[]> = {}
-        countryList.forEach(country => {
-          const region = REGION_MAP[country.code] || 'Other'
-          if (!grouped[region]) {
-            grouped[region] = []
-          }
-          grouped[region].push(country)
-        })
-
-        // Sort countries within each region
-        Object.keys(grouped).forEach(region => {
-          grouped[region].sort((a, b) => a.name.localeCompare(b.name))
-        })
-
+        // Group by region using shared utility
+        const grouped = groupCountriesByRegion(countryList)
         setCountriesByRegion(grouped)
       }
     } catch (error) {
       console.error('Failed to fetch countries:', error)
     }
+  }
+
+  const handleReset = () => {
+    setCurrentCountry('')
+    setTargetCountry('')
+    setShortTermGains('')
+    setLongTermGains('')
+    setResult(null)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -345,9 +290,10 @@ export default function NewSimulationPage() {
               <div>
                 <label
                   htmlFor="shortTermGains"
-                  className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2"
+                  className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2"
                 >
                   Short-Term Gains (held &lt;1 year)
+                  <Tooltip content="Crypto held less than 12 months before selling. Often taxed as ordinary income at higher rates." />
                 </label>
                 <div className="relative">
                   <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm sm:text-base">$</span>
@@ -367,9 +313,10 @@ export default function NewSimulationPage() {
               <div>
                 <label
                   htmlFor="longTermGains"
-                  className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2"
+                  className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2"
                 >
                   Long-Term Gains (held &gt;1 year)
+                  <Tooltip content="Crypto held more than 12 months before selling. Often taxed at preferential capital gains rates (lower than short-term)." />
                 </label>
                 <div className="relative">
                   <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-500 text-sm sm:text-base">$</span>
@@ -567,13 +514,22 @@ export default function NewSimulationPage() {
                 </motion.div>
               </div>
 
-              {/* Export PDF Button */}
+              {/* Action Buttons */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.7 }}
-                className="flex justify-end mb-6"
+                className="flex flex-col sm:flex-row gap-3 justify-end mb-6"
               >
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={handleReset}
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl shadow-md hover:shadow-lg transition-all font-medium border border-slate-300 dark:border-slate-600"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  New Simulation
+                </motion.button>
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -609,7 +565,7 @@ export default function NewSimulationPage() {
                       showToast(error.message || 'Failed to export PDF', 'error')
                     }
                   }}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all font-medium"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all font-medium"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />

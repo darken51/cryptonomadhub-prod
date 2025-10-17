@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from app.models.regulation import Regulation, RegulationHistory
 from app.models.simulation import Simulation
 from app.services.regulation_history import RegulationHistoryService
+from app.utils.tax_calculator import calculate_tax, calculate_savings, calculate_confidence_score
 from dataclasses import dataclass
 from typing import List, Dict
 from datetime import datetime, date
@@ -61,6 +62,14 @@ class TaxSimulator:
 
         if not reg_current or not reg_target:
             raise ValueError(f"Regulations not found for {current_country} or {target_country}")
+
+        # Check if target country has banned cryptocurrencies
+        if reg_target.crypto_legal_status == 'banned':
+            raise ValueError(
+                f"⚠️ Cryptocurrencies are banned in {reg_target.country_name}. "
+                f"Simulation not applicable for countries where crypto is illegal. "
+                f"Please select another target country."
+            )
 
         # Calculate taxes using crypto-specific rates if available, otherwise fallback to general CGT
         # Current country
@@ -184,11 +193,14 @@ class TaxSimulator:
             f"Regulations current as of {reg_target.updated_at.strftime('%Y-%m-%d') if reg_target.updated_at else 'unknown'}"
         ]
 
-        # Confidence based on data freshness
-        days_old = (datetime.now(reg_target.updated_at.tzinfo) - reg_target.updated_at).days if reg_target.updated_at else 365
-        confidence = max(0.3, 1.0 - (days_old / 365))
+        # Calculate composite confidence score
+        confidence = calculate_confidence_score(reg_target)
 
-        decision = f"Moving from {reg_current.country_code} to {reg_target.country_code} saves ${savings:,.0f}/year"
+        # Use neutral language - present data, not advice
+        if savings > 0:
+            decision = f"Tax difference: {reg_target.country_code} shows ${savings:,.0f} lower annual tax liability than {reg_current.country_code} based on provided gains"
+        else:
+            decision = f"Tax difference: {reg_target.country_code} shows ${abs(savings):,.0f} higher annual tax liability than {reg_current.country_code} based on provided gains"
 
         # Build sources from actual data sources
         sources = []
@@ -238,7 +250,7 @@ class TaxSimulator:
         )
 
     def _generate_considerations(self, reg_current, reg_target, total_gains: float) -> List[str]:
-        """Generate key considerations"""
+        """Generate key considerations (informational only, not tax advice)"""
         items = []
 
         # Treaty check
@@ -252,21 +264,13 @@ class TaxSimulator:
 
         # Exit tax (US specific)
         if reg_current.country_code == "US" and total_gains > 700000:
-            items.append("🚨 US exit tax may apply (net worth >$2M). Consult specialist.")
+            items.append("🚨 US exit tax may apply (net worth >$2M). Consult tax specialist.")
 
         # Reporting
         items.append(f"📋 {reg_target.country_name} DeFi reporting: {reg_target.defi_reporting}")
 
-        # Subtle affiliate recommendations based on context
-
-        # Crypto debit cards - suggest when relocating or with significant gains (always show)
-        if total_gains >= 1000:
-            items.append("💳 Spending abroad? Check out crypto cards for global payments → Visit /tools for recommended cards (RedotPay 5M+ users, Kast 160+ countries with 3-10% rewards)")
-
-        # Digital residency - suggest for low-tax countries or KYC needs
-        target_rate = float(reg_target.crypto_long_rate) if reg_target.crypto_long_rate is not None else float(reg_target.cgt_long_rate)
-        if target_rate <= 0.15:  # 15% or less
-            items.append("🌐 Tax optimization tip: Palau Digital Residency offers 0% tax on digital income + official govt ID for exchange KYC → See /tools for details")
+        # Important reminder
+        items.append("⚠️ This comparison is for informational purposes only. Tax laws are complex and change frequently. Always consult licensed tax professionals before making decisions.")
 
         return items
 

@@ -90,6 +90,7 @@ class CompareRequest(BaseModel):
 class CountryComparison(BaseModel):
     country_code: str
     country_name: str
+    flag_emoji: Optional[str] = None
     tax_amount: float
     savings: float
     savings_percent: float
@@ -210,6 +211,10 @@ async def compare_countries(
             if not target_reg:
                 continue  # Skip invalid countries
 
+            # Skip countries where crypto is banned
+            if target_reg.crypto_legal_status == 'banned':
+                continue  # Silently skip banned countries from comparison
+
             # Calculate target tax
             target_tax_short = compare_request.short_term_gains * float(target_reg.cgt_short_rate)
             target_tax_long = compare_request.long_term_gains * float(target_reg.cgt_long_rate)
@@ -223,6 +228,7 @@ async def compare_countries(
             comparisons.append(CountryComparison(
                 country_code=country_code,
                 country_name=target_reg.country_name,
+                flag_emoji=target_reg.flag_emoji,
                 tax_amount=target_tax,
                 savings=savings,
                 savings_percent=savings_percent,
@@ -235,18 +241,13 @@ async def compare_countries(
     # Sort by savings (highest savings first)
     comparisons.sort(key=lambda x: x.savings, reverse=True)
 
-    # Generate recommendations
+    # Generate informational notes (not recommendations)
     recommendations = []
-    total_gains = compare_request.short_term_gains + compare_request.long_term_gains
 
-    # Crypto cards recommendation
-    if total_gains >= 1000:
-        recommendations.append("💳 Spending abroad? Check out crypto cards for global payments → Visit /tools for recommended cards (RedotPay 5M+ users, Kast 160+ countries with 3-10% rewards)")
-
-    # Digital residency recommendation - check if any target country has low tax
-    has_low_tax_option = any(comp.effective_rate <= 15 for comp in comparisons)
-    if has_low_tax_option:
-        recommendations.append("🌐 Tax optimization tip: Palau Digital Residency offers 0% tax on digital income + official govt ID for exchange KYC → See /tools for details")
+    # General disclaimer
+    if len(comparisons) > 0:
+        recommendations.append("ℹ️ Data provided for informational purposes only. Tax regulations change frequently and vary based on individual circumstances. This is not financial, tax, or legal advice.")
+        recommendations.append("⚠️ Always consult licensed tax professionals and legal advisors in both your current and target jurisdictions before making any residency decisions.")
 
     return CompareResponse(
         current_country=compare_request.current_country,

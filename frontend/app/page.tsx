@@ -6,7 +6,6 @@ import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { LegalDisclaimer } from '@/components/LegalDisclaimer'
 import { AnimatedCounter } from '@/components/AnimatedCounter'
-import { InteractiveTaxCalculator } from '@/components/InteractiveTaxCalculator'
 import { ComparisonTable } from '@/components/ComparisonTable'
 import { TestimonialCarousel } from '@/components/TestimonialCarousel'
 import { FAQAccordion } from '@/components/FAQAccordion'
@@ -268,19 +267,37 @@ export default function Home() {
         </div>
       </section>
 
-      {/* INTERACTIVE TAX CALCULATOR */}
+      {/* TAX SIMULATOR CTA */}
       <section id="calculator" className="py-20 md:py-32 px-4 bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-950">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center">
             <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
-              See Your Potential Savings
+              Compare Tax Regulations Across 167 Countries
             </h2>
-            <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              Real-time tax calculation across 160+ countries
+            <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-8">
+              Access real-time tax data from official sources. Compare capital gains rates, crypto-specific regulations, and residency requirements.
+            </p>
+
+            <div className="flex flex-col sm:flex-row justify-center gap-4 mb-6">
+              <Link
+                href="/simulations/new"
+                className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all"
+              >
+                <Calculator className="w-5 h-5 mr-2" />
+                Launch Tax Simulator
+              </Link>
+              <Link
+                href="/countries"
+                className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-slate-900 dark:text-white bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 hover:border-violet-600 dark:hover:border-fuchsia-400 rounded-xl shadow-lg hover:shadow-xl transition-all"
+              >
+                Browse All Countries
+              </Link>
+            </div>
+
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              ⚠️ For informational purposes only. This is not financial, tax, or legal advice. Consult licensed professionals.
             </p>
           </div>
-
-          <InteractiveTaxCalculator />
         </div>
       </section>
 
