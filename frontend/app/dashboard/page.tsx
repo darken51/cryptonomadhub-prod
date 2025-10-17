@@ -594,27 +594,27 @@ export default function DashboardPage() {
                 </h3>
               </div>
               <div className="grid grid-cols-2 gap-6">
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                  <p className="text-sm text-violet-100 mb-2">Portfolio Value</p>
-                  <p className="text-3xl font-bold">
+                <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                  <p className="text-sm text-white/90 mb-2 font-medium">Portfolio Value</p>
+                  <p className="text-3xl font-extrabold text-white drop-shadow-lg">
                     ${defiStats.totalPortfolioValue.toLocaleString()}
                   </p>
                 </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                  <p className="text-sm text-violet-100 mb-2">Unrealized Gains</p>
-                  <p className="text-3xl font-bold">
+                <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                  <p className="text-sm text-white/90 mb-2 font-medium">Unrealized Gains</p>
+                  <p className="text-3xl font-extrabold text-white drop-shadow-lg">
                     ${defiStats.unrealizedGains.toLocaleString()}
                   </p>
                 </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                  <p className="text-sm text-violet-100 mb-2">Tax Liability</p>
-                  <p className="text-3xl font-bold">
+                <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                  <p className="text-sm text-white/90 mb-2 font-medium">Tax Liability</p>
+                  <p className="text-3xl font-extrabold text-white drop-shadow-lg">
                     ${defiStats.taxLiability.toLocaleString()}
                   </p>
                 </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
-                  <p className="text-sm text-violet-100 mb-2">Cost Basis Lots</p>
-                  <p className="text-3xl font-bold">{defiStats.totalLots}</p>
+                <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+                  <p className="text-sm text-white/90 mb-2 font-medium">Cost Basis Lots</p>
+                  <p className="text-3xl font-extrabold text-white drop-shadow-lg">{defiStats.totalLots}</p>
                 </div>
               </div>
             </div>
