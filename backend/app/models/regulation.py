@@ -21,6 +21,7 @@ class Regulation(Base):
     crypto_short_rate = Column(Numeric(5, 4))  # Short-term crypto gains (<1 year)
     crypto_long_rate = Column(Numeric(5, 4))   # Long-term crypto gains (>1 year)
     crypto_notes = Column(Text)                 # Crypto-specific rules and conditions
+    crypto_legal_status = Column(String(20))   # Legal status: 'legal', 'banned', 'restricted', 'unclear'
 
     staking_rate = Column(Numeric(5, 4))                     # Staking rewards
     mining_rate = Column(Numeric(5, 4))                      # Mining income
@@ -59,6 +60,7 @@ class Regulation(Base):
             "crypto_short_rate": float(self.crypto_short_rate) if self.crypto_short_rate else None,
             "crypto_long_rate": float(self.crypto_long_rate) if self.crypto_long_rate else None,
             "crypto_notes": self.crypto_notes,
+            "crypto_legal_status": self.crypto_legal_status,
             "staking_rate": float(self.staking_rate) if self.staking_rate else None,
             "mining_rate": float(self.mining_rate) if self.mining_rate else None,
             # Structured crypto tax metadata

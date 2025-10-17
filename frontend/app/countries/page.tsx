@@ -17,6 +17,7 @@ interface Country {
   crypto_short_rate?: number
   crypto_long_rate?: number
   crypto_notes?: string
+  crypto_legal_status?: 'legal' | 'banned' | 'restricted' | 'unclear'
   notes?: string
   data_quality?: 'high' | 'medium' | 'low' | 'unknown'
   data_sources?: string[]
@@ -87,6 +88,8 @@ export default function CountriesPage() {
   }
 
   const isCryptoBanned = (country: Country): boolean => {
+    // Check crypto_legal_status first, then fall back to legacy checks
+    if (country.crypto_legal_status === 'banned') return true
     return country.cgt_short_rate < 0 || (country.notes?.includes('🚫 BANNED') ?? false)
   }
 
