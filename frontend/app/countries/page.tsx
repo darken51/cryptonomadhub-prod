@@ -40,6 +40,7 @@ export default function CountriesPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [filterType, setFilterType] = useState<'all' | 'crypto-friendly' | 'has-crypto-data'>('all')
   const [reliableOnly, setReliableOnly] = useState(true)  // Show reliable data by default
+  const [hideBannedCountries, setHideBannedCountries] = useState(false)  // Option to hide banned countries
   const [isLoading, setIsLoading] = useState(true)
 
   const formatDate = (dateStr: string) => {
@@ -68,7 +69,7 @@ export default function CountriesPage() {
 
   useEffect(() => {
     filterCountries()
-  }, [countries, searchQuery, filterType])
+  }, [countries, searchQuery, filterType, hideBannedCountries])
 
   const fetchCountries = async () => {
     try {
@@ -85,8 +86,17 @@ export default function CountriesPage() {
     }
   }
 
+  const isCryptoBanned = (country: Country): boolean => {
+    return country.cgt_short_rate < 0 || (country.notes?.includes('🚫 BANNED') ?? false)
+  }
+
   const filterCountries = () => {
     let filtered = countries
+
+    // Hide banned countries if option enabled
+    if (hideBannedCountries) {
+      filtered = filtered.filter(c => !isCryptoBanned(c))
+    }
 
     // Search filter
     if (searchQuery) {
@@ -98,10 +108,12 @@ export default function CountriesPage() {
 
     // Type filter
     if (filterType === 'crypto-friendly') {
-      // Countries with crypto rates < 10%
+      // Countries with crypto rates < 10% (exclude banned)
       filtered = filtered.filter(c =>
-        (c.crypto_long_rate && c.crypto_long_rate < 0.10) ||
-        (c.cgt_long_rate < 0.10)
+        !isCryptoBanned(c) && (
+          (c.crypto_long_rate && c.crypto_long_rate < 0.10) ||
+          (c.cgt_long_rate < 0.10 && c.cgt_long_rate >= 0)
+        )
       )
     } else if (filterType === 'has-crypto-data') {
       // Countries with crypto-specific data
@@ -111,7 +123,22 @@ export default function CountriesPage() {
     setFilteredCountries(filtered)
   }
 
+  const getCryptoBannedBadge = (country: Country) => {
+    if (isCryptoBanned(country)) {
+      return (
+        <span className="inline-flex items-center gap-1.5 bg-red-600 text-white px-3 py-1.5 rounded-full text-sm font-bold shadow-lg">
+          <span className="text-base">🚫</span>
+          CRYPTO BANNED
+        </span>
+      )
+    }
+    return null
+  }
+
   const getCryptoFriendlyBadge = (country: Country) => {
+    // Don't show friendly badge if crypto is banned
+    if (isCryptoBanned(country)) return null
+
     const cryptoRate = country.crypto_long_rate ?? country.cgt_long_rate
     if (cryptoRate === 0) {
       return <span className="inline-block bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-xs font-bold px-2 py-1 rounded-full">0% Tax</span>
@@ -227,7 +254,7 @@ export default function CountriesPage() {
             </div>
           </div>
 
-          <div className="mt-4 flex items-center gap-4">
+          <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="checkbox"
@@ -237,6 +264,17 @@ export default function CountriesPage() {
               />
               <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
                 Show only countries with verified data
+              </span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={hideBannedCountries}
+                onChange={(e) => setHideBannedCountries(e.target.checked)}
+                className="w-4 h-4 rounded border-slate-300 text-red-600 focus:ring-red-500"
+              />
+              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                Hide countries where crypto is banned
               </span>
             </label>
             <span className="text-sm text-slate-600 dark:text-slate-400">
@@ -300,6 +338,24 @@ export default function CountriesPage() {
                 transition={{ duration: 0.4, delay: index * 0.05 }}
                 whileHover={{ scale: 1.01 }}
               >
+                {/* BANNED Warning Banner */}
+                {isCryptoBanned(country) && (
+                  <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border-2 border-red-500 dark:border-red-700 rounded-lg">
+                    <div className="flex items-start gap-3">
+                      <span className="text-2xl">⚠️</span>
+                      <div>
+                        <h4 className="text-sm font-bold text-red-900 dark:text-red-200 mb-1">
+                          Cryptocurrency is BANNED in this country
+                        </h4>
+                        <p className="text-xs text-red-800 dark:text-red-300">
+                          Trading, holding, or transacting with cryptocurrency may be illegal and subject to penalties.
+                          Tax rates shown are not applicable as crypto activities are prohibited.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2 flex-wrap">
@@ -312,6 +368,7 @@ export default function CountriesPage() {
                       <span className="text-sm text-slate-500 dark:text-slate-400 font-mono">
                         {country.country_code}
                       </span>
+                      {getCryptoBannedBadge(country)}
                       {getCryptoFriendlyBadge(country)}
                       {getDataQualityBadge(country.data_quality)}
                       {country.updated_at && isRecentlyUpdated(country.updated_at) && (
@@ -358,20 +415,31 @@ export default function CountriesPage() {
                       <TrendingDown className="w-4 h-4" />
                       General Capital Gains Tax
                     </h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center py-2 px-3 bg-slate-50 dark:bg-slate-700/50 rounded">
-                        <span className="text-sm text-slate-600 dark:text-slate-400">Short-term (&lt;1 year)</span>
-                        <span className="text-sm font-bold text-slate-900 dark:text-white">
-                          {(country.cgt_short_rate * 100).toFixed(1)}%
-                        </span>
+                    {isCryptoBanned(country) ? (
+                      <div className="py-6 px-3 bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-800 rounded text-center">
+                        <p className="text-sm font-bold text-red-900 dark:text-red-200">
+                          🚫 BANNED - Not Applicable
+                        </p>
+                        <p className="text-xs text-red-700 dark:text-red-300 mt-1">
+                          Crypto is illegal in this country
+                        </p>
                       </div>
-                      <div className="flex justify-between items-center py-2 px-3 bg-slate-50 dark:bg-slate-700/50 rounded">
-                        <span className="text-sm text-slate-600 dark:text-slate-400">Long-term (&gt;1 year)</span>
-                        <span className="text-sm font-bold text-slate-900 dark:text-white">
-                          {(country.cgt_long_rate * 100).toFixed(1)}%
-                        </span>
+                    ) : (
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center py-2 px-3 bg-slate-50 dark:bg-slate-700/50 rounded">
+                          <span className="text-sm text-slate-600 dark:text-slate-400">Short-term (&lt;1 year)</span>
+                          <span className="text-sm font-bold text-slate-900 dark:text-white">
+                            {(country.cgt_short_rate * 100).toFixed(1)}%
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center py-2 px-3 bg-slate-50 dark:bg-slate-700/50 rounded">
+                          <span className="text-sm text-slate-600 dark:text-slate-400">Long-term (&gt;1 year)</span>
+                          <span className="text-sm font-bold text-slate-900 dark:text-white">
+                            {(country.cgt_long_rate * 100).toFixed(1)}%
+                          </span>
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
 
                   {/* Crypto-Specific */}
@@ -380,7 +448,16 @@ export default function CountriesPage() {
                       <span className="text-lg">🪙</span>
                       Crypto-Specific Tax
                     </h4>
-                    {country.crypto_short_rate !== null && country.crypto_short_rate !== undefined ? (
+                    {isCryptoBanned(country) ? (
+                      <div className="py-6 px-3 bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-800 rounded text-center">
+                        <p className="text-sm font-bold text-red-900 dark:text-red-200">
+                          🚫 BANNED - Not Applicable
+                        </p>
+                        <p className="text-xs text-red-700 dark:text-red-300 mt-1">
+                          Cryptocurrency is illegal
+                        </p>
+                      </div>
+                    ) : country.crypto_short_rate !== null && country.crypto_short_rate !== undefined ? (
                       <div className="space-y-2">
                         <div className="flex justify-between items-center py-2 px-3 bg-violet-50 dark:bg-violet-900/20 rounded border border-violet-200 dark:border-violet-800">
                           <span className="text-sm text-violet-700 dark:text-violet-300">Short-term (&lt;1 year)</span>
@@ -465,8 +542,8 @@ export default function CountriesPage() {
 
                 {/* General Notes */}
                 {country.notes && (
-                  <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
-                    <p className="text-xs text-slate-600 dark:text-slate-400">
+                  <div className={`mt-4 pt-4 border-t ${isCryptoBanned(country) ? 'border-red-300 dark:border-red-800' : 'border-slate-200 dark:border-slate-700'}`}>
+                    <p className={`text-xs ${isCryptoBanned(country) ? 'text-red-800 dark:text-red-200' : 'text-slate-600 dark:text-slate-400'}`}>
                       <span className="font-semibold">Note:</span> {country.notes}
                     </p>
                   </div>
