@@ -21,7 +21,7 @@ class EmailService:
     def __init__(self):
         resend.api_key = settings.RESEND_API_KEY
         self.frontend_url = settings.FRONTEND_URL
-        self.from_email = f"CryptoNomadHub <noreply@send.cryptonomadhub.io>"
+        self.from_email = f"CryptoNomadHub <noreply@cryptonomadhub.io>"
 
     def send_email(self, to_email: str, subject: str, html_body: str) -> bool:
         """
