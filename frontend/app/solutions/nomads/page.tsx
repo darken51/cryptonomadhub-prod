@@ -173,7 +173,7 @@ export default function DigitalNomadsPage() {
               {
                 scenario: '🛫 Multi-Country',
                 title: 'Perpetual Traveler Strategy',
-                description: 'Spend <183 days in multiple countries to avoid tax residency. Our dashboard tracks your days per country and alerts you before triggering tax residency.',
+                description: 'Spend less than 183 days in multiple countries to avoid tax residency. Our dashboard tracks your days per country and alerts you before triggering tax residency.',
                 savings: 'Avoid full residency tax'
               }
             ].map((useCase, idx) => (

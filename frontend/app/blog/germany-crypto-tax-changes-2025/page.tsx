@@ -234,7 +234,7 @@ export default function GermanyCryptoTaxBlogPost() {
                   <strong>Crypto Tax:</strong> 0% after 365 days | <strong>AI Score:</strong> 85/100
                 </p>
                 <p className="text-slate-600 dark:text-slate-400 text-sm">
-                  Similar to Germany's current system. 0% on long-term gains (>365 days), 28% on short-term. EU member with excellent quality of life.
+                  Similar to Germany's current system. 0% on long-term gains ({'>'}365 days), 28% on short-term. EU member with excellent quality of life.
                 </p>
               </div>
 

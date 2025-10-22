@@ -309,7 +309,7 @@ export default function CyprusCryptoTaxBlogPost() {
                   </tr>
                   <tr className="bg-slate-50 dark:bg-slate-800/50">
                     <td className="border border-slate-300 dark:border-slate-600 p-3 font-semibold">🇵🇹 Portugal</td>
-                    <td className="border border-slate-300 dark:border-slate-600 p-3">0% >365 days</td>
+                    <td className="border border-slate-300 dark:border-slate-600 p-3">0% {'>'}365 days</td>
                     <td className="border border-slate-300 dark:border-slate-600 p-3">183 days</td>
                     <td className="border border-slate-300 dark:border-slate-600 p-3">Low-Medium</td>
                   </tr>
@@ -321,7 +321,7 @@ export default function CyprusCryptoTaxBlogPost() {
                   </tr>
                   <tr className="bg-slate-50 dark:bg-slate-800/50">
                     <td className="border border-slate-300 dark:border-slate-600 p-3 font-semibold">🇩🇪 Germany</td>
-                    <td className="border border-slate-300 dark:border-slate-600 p-3">0% >1 year*</td>
+                    <td className="border border-slate-300 dark:border-slate-600 p-3">0% {'>'}1 year*</td>
                     <td className="border border-slate-300 dark:border-slate-600 p-3">183 days</td>
                     <td className="border border-slate-300 dark:border-slate-600 p-3">High</td>
                   </tr>
