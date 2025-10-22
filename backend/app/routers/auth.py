@@ -8,7 +8,7 @@ from app.middleware import limiter, get_rate_limit
 from app.services.license_service import LicenseService
 from app.services.email_service import EmailService
 from pydantic import BaseModel, EmailStr, Field, field_validator
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import secrets
 import logging
 import re
@@ -141,7 +141,7 @@ async def register(
         password_hash=hashed,
         email_verified=False,
         verification_token=hashed_verification_token,
-        verification_token_expires=datetime.utcnow() + timedelta(hours=24)
+        verification_token_expires=datetime.now(timezone.utc) + timedelta(hours=24)
     )
 
     db.add(new_user)
@@ -212,7 +212,7 @@ async def login(
     # Generate and store refresh token
     refresh_token = create_refresh_token()
     user.refresh_token = refresh_token
-    user.refresh_token_expires = datetime.utcnow() + timedelta(days=7)
+    user.refresh_token_expires = datetime.now(timezone.utc) + timedelta(days=7)
     db.commit()
 
     return Token(
@@ -261,7 +261,7 @@ async def refresh_access_token(
     # Generate new refresh token (rotation)
     new_refresh_token = create_refresh_token()
     user.refresh_token = new_refresh_token
-    user.refresh_token_expires = datetime.utcnow() + timedelta(days=7)
+    user.refresh_token_expires = datetime.now(timezone.utc) + timedelta(days=7)
     db.commit()
 
     return Token(
@@ -315,7 +315,7 @@ async def forgot_password(
 
     # Set hashed token and expiration (1 hour)
     user.reset_token = hashed_reset_token
-    user.reset_token_expires = datetime.utcnow() + timedelta(hours=1)
+    user.reset_token_expires = datetime.now(timezone.utc) + timedelta(hours=1)
 
     db.commit()
 
@@ -361,7 +361,7 @@ async def reset_password(
         )
 
     # Check if token expired
-    if not user.reset_token_expires or datetime.utcnow() > user.reset_token_expires:
+    if not user.reset_token_expires or datetime.now(timezone.utc) > user.reset_token_expires:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Reset token has expired. Please request a new one"
@@ -412,7 +412,7 @@ async def send_verification_email(
 
     # Update user with hashed token
     current_user.verification_token = hashed_verification_token
-    current_user.verification_token_expires = datetime.utcnow() + timedelta(hours=24)
+    current_user.verification_token_expires = datetime.now(timezone.utc) + timedelta(hours=24)
 
     db.commit()
 
@@ -465,7 +465,7 @@ async def verify_email(
         return {"message": "Email already verified"}
 
     # Check if token expired
-    if not user.verification_token_expires or datetime.utcnow() > user.verification_token_expires:
+    if not user.verification_token_expires or datetime.now(timezone.utc) > user.verification_token_expires:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Verification token has expired. Please request a new one"
