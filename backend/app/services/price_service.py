@@ -85,7 +85,12 @@ class PriceService:
 
         # ✅ PHASE 1.6: Redis cache for price data
         try:
-            self.redis = redis.from_url(settings.REDIS_URL, decode_responses=True)
+            # Support for Upstash Redis with TLS
+            redis_url = settings.REDIS_URL
+            if redis_url.startswith('rediss://'):
+                self.redis = redis.from_url(redis_url, decode_responses=True, ssl_cert_reqs=None)
+            else:
+                self.redis = redis.from_url(redis_url, decode_responses=True)
             self.cache_enabled = True
             logger.info("Redis cache enabled for price service")
         except Exception as e:

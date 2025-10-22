@@ -13,7 +13,16 @@ from app.config import settings
 
 
 # Initialize Redis connection for rate limiting
-redis_client = redis.from_url(settings.REDIS_URL, decode_responses=True)
+# Support for Upstash Redis with TLS
+redis_url = settings.REDIS_URL
+if redis_url.startswith('rediss://'):
+    redis_client = redis.from_url(
+        redis_url,
+        decode_responses=True,
+        ssl_cert_reqs=None  # Disable SSL certificate verification for Upstash
+    )
+else:
+    redis_client = redis.from_url(redis_url, decode_responses=True)
 
 
 def get_user_identifier(request: Request) -> str:

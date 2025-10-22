@@ -164,8 +164,12 @@ async def check_database(db: Session) -> dict:
 async def check_redis() -> dict:
     """Check Redis connectivity"""
     try:
-        # Connect to Redis
-        r = redis.from_url(settings.REDIS_URL, socket_timeout=5)
+        # Connect to Redis - Support for Upstash with TLS
+        redis_url = settings.REDIS_URL
+        if redis_url.startswith('rediss://'):
+            r = redis.from_url(redis_url, socket_timeout=5, ssl_cert_reqs=None)
+        else:
+            r = redis.from_url(redis_url, socket_timeout=5)
 
         # Ping Redis
         r.ping()
