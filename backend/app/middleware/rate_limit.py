@@ -69,7 +69,7 @@ async def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded) 
 RATE_LIMITS = {
     # Authentication endpoints - strict limits
     "auth_login": "5/minute, 20/hour",  # Prevent brute force
-    "auth_register": "3/hour",  # Prevent spam accounts
+    "auth_register": "10/hour",  # Temporarily increased for testing (was 3/hour)
     "auth_password_reset": "3/hour",
     "auth_verify_email": "10/hour",
 
