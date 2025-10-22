@@ -1,0 +1,35 @@
+services:
+  # FastAPI Backend
+  - type: web
+    name: cryptonomadhub-backend
+    runtime: python
+    plan: free
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cryptonomadhub-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          name: cryptonomadhub-redis
+          type: redis
+          property: connectionString
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ENVIRONMENT
+        value: production
+
+databases:
+  # PostgreSQL Database
+  - name: cryptonomadhub-db
+    plan: free
+    databaseName: nomadcrypto
+    user: nomadcrypto
+
+  # Redis Cache
+  - name: cryptonomadhub-redis
+    plan: free
