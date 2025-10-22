@@ -61,8 +61,11 @@ export default function RegisterPage() {
 
     try {
       await register(email, password)
-      showToast('Account created successfully!', 'success')
-      router.push('/dashboard')
+      showToast('Account created! Check your email to verify your account.', 'success')
+      // Redirect to a verification notice page or login
+      setTimeout(() => {
+        router.push('/auth/login')
+      }, 2000)
     } catch (error: any) {
       showToast(error.message || 'Registration failed', 'error')
     } finally {

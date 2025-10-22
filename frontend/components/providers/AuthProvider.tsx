@@ -76,6 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (!response.ok) {
       const error = await response.json()
+      // Show the actual error message from backend (includes email verification warnings)
       throw new Error(error.detail || 'Login failed')
     }
 
@@ -101,8 +102,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error(error.detail || 'Registration failed')
     }
 
-    // Auto-login after registration
-    await login(email, password)
+    // Don't auto-login - user must verify email first
+    // The registration success message will be shown by the calling component
   }
 
   const logout = () => {
