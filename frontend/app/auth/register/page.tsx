@@ -37,6 +37,21 @@ export default function RegisterPage() {
       return
     }
 
+    if (!/[A-Z]/.test(password)) {
+      showToast('Password must contain at least one uppercase letter', 'error')
+      return
+    }
+
+    if (!/[a-z]/.test(password)) {
+      showToast('Password must contain at least one lowercase letter', 'error')
+      return
+    }
+
+    if (!/[0-9]/.test(password)) {
+      showToast('Password must contain at least one digit', 'error')
+      return
+    }
+
     if (!acceptedTerms) {
       setShowDisclaimer(true)
       return
@@ -150,7 +165,7 @@ export default function RegisterPage() {
                   </button>
                 </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Password must be at least 8 characters
+                  Must be 8+ characters with uppercase, lowercase, and a digit
                 </p>
               </div>
 
