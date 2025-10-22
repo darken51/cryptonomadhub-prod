@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -60,7 +60,7 @@ interface Country {
   source_url?: string
 }
 
-export default function NewSimulationPage() {
+function NewSimulationPageContent() {
   const { user, token } = useAuth()
   const { showToast } = useToast()
   const router = useRouter()
@@ -621,5 +621,13 @@ export default function NewSimulationPage() {
       </div>
       <Footer />
     </>
+  )
+}
+
+export default function NewSimulationPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <NewSimulationPageContent />
+    </Suspense>
   )
 }
