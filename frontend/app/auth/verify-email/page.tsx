@@ -102,7 +102,7 @@ function VerifyEmailContent() {
             {/* Title */}
             <h1 className="text-2xl font-bold mb-4 text-slate-900 dark:text-white">
               {status === 'loading' && 'Verifying Your Email...'}
-              {status === 'success' && 'Email Verified!'}
+              {status === 'success' && '✓ Email Verified!'}
               {status === 'error' && 'Verification Failed'}
             </h1>
 
