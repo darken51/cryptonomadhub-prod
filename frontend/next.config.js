@@ -5,9 +5,10 @@ const nextConfig = {
   // Enable standalone output for Docker production builds
   output: 'standalone',
 
-  // Environment variables
+  // Environment variables - force production URL if not set
   env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'https://cryptonomadhub-prod-1.onrender.com',
+    NEXT_PUBLIC_API_URL: (process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL.trim())
+      || 'https://cryptonomadhub-prod-1.onrender.com',
   },
 
   // ✅ Bundle optimization
