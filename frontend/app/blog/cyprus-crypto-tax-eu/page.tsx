@@ -181,7 +181,7 @@ export default function CyprusCryptoTaxBlogPost() {
                 </p>
                 <ul className="text-sm text-slate-700 dark:text-slate-300 space-y-2">
                   <li>✓ Spend at least <strong>60 days</strong> in Cyprus per year</li>
-                  <li>✓ Not tax resident in any other country for >183 days</li>
+                  <li>✓ Not tax resident in any other country for {'>'}183 days</li>
                   <li>✓ Have a residence in Cyprus (own or rent)</li>
                   <li>✓ Maintain business or employment ties to Cyprus</li>
                 </ul>
