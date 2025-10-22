@@ -119,7 +119,7 @@ export default function WashSaleDoc() {
                   <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">3</div>
                   <div>
                     <div className="font-semibold">Mar 20: Buy 1 BTC @ $40,000</div>
-                    <div className="text-sm text-emerald-600 dark:text-emerald-400 font-semibold">✅ No wash sale! 38 days later (> 30 days)</div>
+                    <div className="text-sm text-emerald-600 dark:text-emerald-400 font-semibold">✅ No wash sale! 38 days later ({'>'}30 days)</div>
                   </div>
                 </div>
               </div>

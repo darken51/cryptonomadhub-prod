@@ -70,8 +70,8 @@ export default function USCitizensAbroadBlogPost() {
               <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5">
                 <h4 className="font-bold text-slate-900 dark:text-white mb-2">1. Capital Gains Tax</h4>
                 <p className="text-sm text-slate-700 dark:text-slate-300 mb-2">
-                  <strong>Long-term (>1 year):</strong> 0%, 15%, or 20% depending on income<br/>
-                  <strong>Short-term (<1 year):</strong> 10%-37% (ordinary income rates)
+                  <strong>Long-term ({'>'}1 year):</strong> 0%, 15%, or 20% depending on income<br/>
+                  <strong>Short-term ({'<'}1 year):</strong> 10%-37% (ordinary income rates)
                 </p>
               </div>
 
