@@ -88,7 +88,7 @@ export default function GermanyCryptoTaxBlogPost() {
                 </h4>
                 <div className="space-y-3 text-sm">
                   <div>
-                    <div className="font-semibold text-slate-900 dark:text-white">Long-term (>12 months):</div>
+                    <div className="font-semibold text-slate-900 dark:text-white">Long-term ({'>'}12 months):</div>
                     <div className="text-emerald-700 dark:text-emerald-300">0% tax ✓</div>
                   </div>
                   <div>
@@ -109,7 +109,7 @@ export default function GermanyCryptoTaxBlogPost() {
                 </h4>
                 <div className="space-y-3 text-sm">
                   <div>
-                    <div className="font-semibold text-slate-900 dark:text-white">Long-term (>12 months):</div>
+                    <div className="font-semibold text-slate-900 dark:text-white">Long-term ({'>'}12 months):</div>
                     <div className="text-red-700 dark:text-red-300">30% tax ✗</div>
                   </div>
                   <div>
