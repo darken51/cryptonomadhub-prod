@@ -100,7 +100,7 @@ export default function CountriesPage() {
   // Memoize fetchCountries to prevent unnecessary re-creation
   const fetchCountries = useCallback(async () => {
     try {
-      const url = `${process.env.NEXT_PUBLIC_API_URL}/regulations/?reliable_only=${reliableOnly}&include_analysis=false`
+      const url = `${process.env.NEXT_PUBLIC_API_URL}/regulations/?reliable_only=${reliableOnly}&include_analysis=true`
       const response = await fetch(url)
       if (response.ok) {
         const data = await response.json()
