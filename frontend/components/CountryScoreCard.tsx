@@ -40,6 +40,9 @@ interface CountryScoreCardProps {
 export default function CountryScoreCard({ analysis, className = '', defaultExpanded = false }: CountryScoreCardProps) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded)
 
+  // Calculate overall score if not provided
+  const overallScore = analysis.overall_score || Math.round((analysis.crypto_score + analysis.nomad_score) / 2)
+
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-green-600 dark:text-green-400'
     if (score >= 60) return 'text-blue-600 dark:text-blue-400'
@@ -125,13 +128,13 @@ export default function CountryScoreCard({ analysis, className = '', defaultExpa
         </div>
 
         {/* Overall Score */}
-        <div className={`p-4 rounded-lg border-2 ${getScoreBg(analysis.overall_score)}`}>
+        <div className={`p-4 rounded-lg border-2 ${getScoreBg(overallScore)}`}>
           <div className="flex items-center gap-2 mb-2">
             <Award className="w-4 h-4" />
             <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Overall</span>
           </div>
-          <div className={`text-3xl font-bold ${getScoreColor(analysis.overall_score)}`}>
-            {analysis.overall_score}
+          <div className={`text-3xl font-bold ${getScoreColor(overallScore)}`}>
+            {overallScore}
           </div>
           <div className="text-xs text-slate-600 dark:text-slate-400 mt-1">/ 100</div>
         </div>
