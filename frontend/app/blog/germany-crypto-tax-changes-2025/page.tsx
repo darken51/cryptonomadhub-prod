@@ -92,7 +92,7 @@ export default function GermanyCryptoTaxBlogPost() {
                     <div className="text-emerald-700 dark:text-emerald-300">0% tax ✓</div>
                   </div>
                   <div>
-                    <div className="font-semibold text-slate-900 dark:text-white">Short-term (<12 months):</div>
+                    <div className="font-semibold text-slate-900 dark:text-white">Short-term ({'<'}12 months):</div>
                     <div className="text-slate-700 dark:text-slate-300">14.5%-45% + 5.5% solidarity</div>
                   </div>
                   <div>
@@ -113,7 +113,7 @@ export default function GermanyCryptoTaxBlogPost() {
                     <div className="text-red-700 dark:text-red-300">30% tax ✗</div>
                   </div>
                   <div>
-                    <div className="font-semibold text-slate-900 dark:text-white">Short-term (<12 months):</div>
+                    <div className="font-semibold text-slate-900 dark:text-white">Short-term ({'<'}12 months):</div>
                     <div className="text-red-700 dark:text-red-300">30% tax</div>
                   </div>
                   <div>

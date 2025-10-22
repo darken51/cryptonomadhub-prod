@@ -281,7 +281,7 @@ export default function USCitizensAbroadBlogPost() {
                 <div className="flex items-start gap-3">
                   <input type="checkbox" className="mt-1 w-5 h-5" disabled />
                   <div className="text-sm text-slate-700 dark:text-slate-300">
-                    <strong>FBAR (FinCEN 114):</strong> If foreign accounts > $10k (consider including crypto exchanges)
+                    <strong>FBAR (FinCEN 114):</strong> If foreign accounts {'>'} $10k (consider including crypto exchanges)
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -319,7 +319,7 @@ export default function USCitizensAbroadBlogPost() {
                 <h4 className="font-bold text-slate-900 dark:text-white mb-3">Cons</h4>
                 <ul className="text-sm text-slate-700 dark:text-slate-300 space-y-1">
                   <li>✗ $2,350 renunciation fee</li>
-                  <li>✗ Exit tax on unrealized gains >$866k</li>
+                  <li>✗ Exit tax on unrealized gains {'>'}$866k</li>
                   <li>✗ Lose US passport/travel benefits</li>
                   <li>✗ Difficult to visit US long-term</li>
                   <li>✗ Irreversible decision</li>
