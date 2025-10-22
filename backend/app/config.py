@@ -54,13 +54,16 @@ class Settings(BaseSettings):
     # Monitoring
     SENTRY_DSN: str = ""
 
-    # Email (SMTP)
+    # Email (SMTP) - Legacy
     SMTP_HOST: str = ""
     SMTP_PORT: int = 587
     SMTP_USERNAME: str = ""
     SMTP_PASSWORD: str = ""
     SMTP_FROM_EMAIL: str = "noreply@cryptonomadhub.com"
     SMTP_FROM_NAME: str = "NomadCrypto Hub"
+
+    # Email (Resend API) - Modern
+    RESEND_API_KEY: str = ""
 
     # Blockchain API Keys
     # SECURITY: These MUST be set in .env file, NOT hardcoded here
