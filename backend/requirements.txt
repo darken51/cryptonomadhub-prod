@@ -72,6 +72,6 @@ openpyxl==3.1.2  # Excel export
 reportlab==4.0.7  # Advanced PDF generation
 matplotlib==3.8.2  # Charts in reports
 sendgrid==6.11.0  # Email notifications
-resend==2.5.0  # Modern email API (Resend.com)
+resend==2.17.0  # Modern email API (Resend.com)
 twilio==8.11.1  # SMS alerts
 aiofiles==23.2.1  # Async file operations
