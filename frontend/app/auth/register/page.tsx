@@ -167,9 +167,28 @@ export default function RegisterPage() {
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Must be 8+ characters with uppercase, lowercase, and a digit
-                </p>
+
+                {/* Password Requirements */}
+                {password && (
+                  <div className="mt-3 space-y-2 text-xs">
+                    <div className={`flex items-center gap-2 ${password.length >= 8 ? 'text-green-600 dark:text-green-400' : 'text-slate-500 dark:text-slate-400'}`}>
+                      <span className="font-bold">{password.length >= 8 ? '✓' : '✗'}</span>
+                      <span>At least 8 characters</span>
+                    </div>
+                    <div className={`flex items-center gap-2 ${/[A-Z]/.test(password) ? 'text-green-600 dark:text-green-400' : 'text-slate-500 dark:text-slate-400'}`}>
+                      <span className="font-bold">{/[A-Z]/.test(password) ? '✓' : '✗'}</span>
+                      <span>One uppercase letter</span>
+                    </div>
+                    <div className={`flex items-center gap-2 ${/[a-z]/.test(password) ? 'text-green-600 dark:text-green-400' : 'text-slate-500 dark:text-slate-400'}`}>
+                      <span className="font-bold">{/[a-z]/.test(password) ? '✓' : '✗'}</span>
+                      <span>One lowercase letter</span>
+                    </div>
+                    <div className={`flex items-center gap-2 ${/[0-9]/.test(password) ? 'text-green-600 dark:text-green-400' : 'text-slate-500 dark:text-slate-400'}`}>
+                      <span className="font-bold">{/[0-9]/.test(password) ? '✓' : '✗'}</span>
+                      <span>One digit</span>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Confirm Password Field */}
