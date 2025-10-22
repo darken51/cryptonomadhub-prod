@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo, memo } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { TrendingUp, Users, Award } from 'lucide-react'
@@ -15,30 +16,32 @@ interface TopCountriesPodiumProps {
   countries: any[]
 }
 
-export default function TopCountriesPodium({ countries }: TopCountriesPodiumProps) {
+function TopCountriesPodium({ countries }: TopCountriesPodiumProps) {
   const router = useRouter()
 
-  // Extract top countries by category
-  const getTopCountries = (category: 'crypto' | 'nomad' | 'overall'): CountryScore[] => {
-    return countries
-      .filter(c => c.ai_analysis)
-      .map(c => ({
-        country_code: c.country_code,
-        country_name: c.country_name,
-        flag_emoji: c.flag_emoji,
-        score: category === 'crypto'
-          ? c.ai_analysis.crypto_score
-          : category === 'nomad'
-          ? c.ai_analysis.nomad_score
-          : c.ai_analysis.overall_score
-      }))
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 3)
-  }
+  // Extract top countries by category - MEMOIZED to prevent recalculation on every render
+  const getTopCountries = useMemo(() => {
+    return (category: 'crypto' | 'nomad' | 'overall'): CountryScore[] => {
+      return countries
+        .filter(c => c.ai_analysis)
+        .map(c => ({
+          country_code: c.country_code,
+          country_name: c.country_name,
+          flag_emoji: c.flag_emoji,
+          score: category === 'crypto'
+            ? c.ai_analysis.crypto_score
+            : category === 'nomad'
+            ? c.ai_analysis.nomad_score
+            : c.ai_analysis.overall_score
+        }))
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 3)
+    }
+  }, [countries])
 
-  const topCrypto = getTopCountries('crypto')
-  const topNomad = getTopCountries('nomad')
-  const topOverall = getTopCountries('overall')
+  const topCrypto = useMemo(() => getTopCountries('crypto'), [getTopCountries])
+  const topNomad = useMemo(() => getTopCountries('nomad'), [getTopCountries])
+  const topOverall = useMemo(() => getTopCountries('overall'), [getTopCountries])
 
   // Olympic-style podium component
   const OlympicPodium = ({ countries }: { countries: CountryScore[] }) => {
@@ -233,3 +236,6 @@ export default function TopCountriesPodium({ countries }: TopCountriesPodiumProp
     </div>
   )
 }
+
+// Export memoized component to prevent unnecessary re-renders
+export default memo(TopCountriesPodium)

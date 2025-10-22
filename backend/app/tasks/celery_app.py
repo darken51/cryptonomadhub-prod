@@ -63,6 +63,19 @@ celery_app.conf.beat_schedule = {
         'task': 'send_usage_warning_emails',
         'schedule': crontab(hour='12', minute='0'),
     },
+
+    # Wallet portfolio sync tasks
+    # Schedule daily wallet syncs (every day at 00:00 UTC)
+    'schedule-daily-wallet-syncs': {
+        'task': 'schedule_daily_wallet_syncs',
+        'schedule': crontab(hour='0', minute='0'),  # Daily 00:00 UTC
+    },
+
+    # Cleanup old snapshots (weekly on Monday at 02:00 UTC)
+    'cleanup-old-snapshots': {
+        'task': 'cleanup_old_snapshots',
+        'schedule': crontab(hour='2', minute='0', day_of_week=1),  # Monday 2 AM
+    },
 }
 
 # Auto-discover tasks

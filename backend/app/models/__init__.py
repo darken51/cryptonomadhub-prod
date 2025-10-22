@@ -28,8 +28,12 @@ from .tax_opportunity import (
     OpportunityStatus
 )
 from .user_wallet import UserWallet
+from .wallet_snapshot import WalletSnapshot
+from .wallet_value_history import WalletValueHistory
 from .nft_transaction import NFTTransaction
 from .yield_position import YieldPosition, YieldReward
+from .chat import ChatConversation, ChatMessage
+from .dashboard_activity import DashboardActivity
 
 __all__ = [
     "User",
@@ -61,7 +65,12 @@ __all__ = [
     "OpportunityType",
     "OpportunityStatus",
     "UserWallet",
+    "WalletSnapshot",
+    "WalletValueHistory",
     "NFTTransaction",
     "YieldPosition",
     "YieldReward",
+    "ChatConversation",
+    "ChatMessage",
+    "DashboardActivity",
 ]

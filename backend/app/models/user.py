@@ -46,9 +46,14 @@ class User(Base):
     verification_token = Column(String, nullable=True)
     verification_token_expires = Column(DateTime(timezone=True), nullable=True)
 
+    # ✅ PHASE 1.3: Refresh tokens
+    refresh_token = Column(String, nullable=True)
+    refresh_token_expires = Column(DateTime(timezone=True), nullable=True)
+
     # Relationships
     license = relationship("License", back_populates="user", uselist=False, cascade="all, delete-orphan")
     wallets = relationship("UserWallet", back_populates="user", cascade="all, delete-orphan")
+    wallet_snapshots = relationship("WalletSnapshot", back_populates="user", cascade="all, delete-orphan")
 
     def to_dict(self):
         return {

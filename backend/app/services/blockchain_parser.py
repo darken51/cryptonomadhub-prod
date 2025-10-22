@@ -310,13 +310,26 @@ class BlockchainParser:
                     print(f"[PARSER] Fetched {len(token_txs)} token transfers")
                     logger.info(f"Fetched {len(token_txs)} token transfers")
 
-                    # Parse token transfers as potential staking rewards
+                    # Parse token transfers - both incoming AND outgoing
                     token_parsed_count = 0
                     token_incoming_count = 0
+                    token_outgoing_count = 0
                     for token_tx in token_txs:
-                        # Only process transfers TO the user (incoming)
-                        if token_tx.get("to", "").lower() == wallet_address.lower():
+                        # Check if transfer involves the user (incoming OR outgoing)
+                        from_address = token_tx.get("from", "").lower()
+                        to_address = token_tx.get("to", "").lower()
+                        user_address_lower = wallet_address.lower()
+
+                        is_incoming = to_address == user_address_lower
+                        is_outgoing = from_address == user_address_lower
+
+                        if is_incoming:
                             token_incoming_count += 1
+                        elif is_outgoing:
+                            token_outgoing_count += 1
+
+                        # Process both incoming and outgoing transfers
+                        if is_incoming or is_outgoing:
                             # Filter by date
                             tx_timestamp = datetime.fromtimestamp(int(token_tx.get("timeStamp", 0)))
                             if start_date and tx_timestamp < start_date:
@@ -324,13 +337,13 @@ class BlockchainParser:
                             if end_date and tx_timestamp > end_date:
                                 continue
 
-                            # Parse as potential staking reward
+                            # Parse transfer (will determine if it's reward, purchase, send, etc.)
                             parsed = self._parse_token_transfer(token_tx, chain, wallet_address)
                             if parsed:
                                 transactions.append(parsed)
                                 token_parsed_count += 1
 
-                    print(f"[PARSER] Found {token_incoming_count} incoming token transfers, parsed {token_parsed_count} as potential rewards")
+                    print(f"[PARSER] Found {token_incoming_count} incoming + {token_outgoing_count} outgoing token transfers, parsed {token_parsed_count} transactions")
                 else:
                     print(f"[PARSER] No token transfers or API error for tokentx")
 
@@ -742,21 +755,24 @@ class BlockchainParser:
 
     def _parse_token_transfer(self, token_tx: Dict, chain: str, user_wallet: str) -> Optional[Dict]:
         """
-        Parse ERC20 token transfer to detect staking rewards/income
+        Parse ERC20 token transfer - handles both incoming AND outgoing
 
-        Uses intelligent heuristics to identify legitimate staking rewards:
-        1. Must be incoming (TO user)
-        2. Not from known exchanges
-        3. Not from user's own wallet (self-transfer)
-        4. From a known staking protocol OR small regular amounts (likely rewards)
+        Determines transaction type based on:
+        1. Direction (incoming or outgoing)
+        2. Source/destination address (exchange, protocol, unknown)
+        3. Amount and frequency patterns
         """
         from_address = token_tx.get("from", "").lower()
         to_address = token_tx.get("to", "").lower()
         contract_address = token_tx.get("contractAddress", "").lower()
+        user_wallet_lower = user_wallet.lower()
 
-        # Skip if it's a self-transfer or transfer from user
-        if from_address == user_wallet.lower():
-            print(f"[PARSER] Skipping self-transfer from {from_address[:10]}...")
+        # Determine direction
+        is_incoming = to_address == user_wallet_lower
+        is_outgoing = from_address == user_wallet_lower
+
+        # Skip if neither (shouldn't happen but safety check)
+        if not is_incoming and not is_outgoing:
             return None
 
         # ✅ NOUVEAU: Detect purchases from known exchanges (CEX)
@@ -919,76 +935,165 @@ class BlockchainParser:
         else:
             total_usd_value = None
 
-        # Determine if it's likely a reward/staking income
+        # ============= HANDLE OUTGOING TRANSFERS =============
+        if is_outgoing:
+            print(f"[PARSER] Outgoing transfer: {float(amount)} {token_symbol} to {to_address[:10]}...")
+
+            # Check if sending to known exchange (deposit to CEX)
+            if to_address in self.EXCHANGE_ADDRESSES:
+                print(f"[PARSER] ✅ Detected deposit to exchange")
+                return {
+                    "tx_hash": token_tx.get("hash"),
+                    "chain": chain,
+                    "from_address": from_address,
+                    "to_address": to_address,
+                    "transaction_type": "withdrawal_to_exchange",
+                    "protocol_type": "exchange",
+                    "protocol_name": "Exchange",
+                    "timestamp": timestamp,
+                    "method": "transfer",
+                    "value": "0",
+                    "token_in": token_symbol,  # User is disposing of tokens
+                    "amount_in": float(amount),
+                    "usd_value_in": total_usd_value,
+                    "token_out": None,
+                    "amount_out": None,
+                    "usd_value_out": None,
+                    "gas_fee_usd": 0.0,
+                    "is_defi": False,
+                    "notes": "Deposit to exchange",
+                    "raw_data": token_tx
+                }
+
+            # Regular outgoing transfer (send to another wallet)
+            print(f"[PARSER] ✅ Simple transfer to another wallet")
+            return {
+                "tx_hash": token_tx.get("hash"),
+                "chain": chain,
+                "from_address": from_address,
+                "to_address": to_address,
+                "transaction_type": "transfer",
+                "protocol_type": "transfer",
+                "protocol_name": "Transfer",
+                "timestamp": timestamp,
+                "method": "transfer",
+                "value": "0",
+                "token_in": token_symbol,  # User is disposing of tokens
+                "amount_in": float(amount),
+                "usd_value_in": total_usd_value,
+                "token_out": None,
+                "amount_out": None,
+                "usd_value_out": None,
+                "gas_fee_usd": 0.0,
+                "is_defi": False,
+                "notes": "Token transfer out",
+                "raw_data": token_tx
+            }
+
+        # ============= HANDLE INCOMING TRANSFERS =============
+        # Check if from known staking/yield protocol
         protocol_info = self.PROTOCOL_ADDRESSES.get(from_address)
 
-        # Decision logic
-        is_reward = False
-        protocol_name = "Unknown Staking"
+        if protocol_info and protocol_info["type"] in ["staking", "lending", "yield"]:
+            # Known protocol reward
+            print(f"[PARSER] ✅ Detected reward from known protocol: {protocol_info['name']}")
 
-        if protocol_info:
-            # Known protocol - check if it's staking/lending/yield
-            if protocol_info["type"] in ["staking", "lending", "yield"]:
-                is_reward = True
-                protocol_name = protocol_info["name"]
-                print(f"[PARSER] ✅ Detected reward from known protocol: {protocol_name}")
-            else:
-                # Known protocol but wrong type (e.g., DEX)
-                print(f"[PARSER] Skipping transfer from {protocol_info['name']} (type: {protocol_info['type']})")
-                return None
-        else:
-            # Unknown protocol - use heuristics
-            # Heuristic: Small amounts of stablecoins or tokens coming regularly = likely staking rewards
-            # For now, treat all incoming token transfers as POTENTIAL rewards and let user review
-            # This is more permissive to help identify the actual staking protocol
+            if not total_usd_value:
+                try:
+                    current_price = self.price_service.get_current_price(token_symbol)
+                    if current_price:
+                        total_usd_value = float(amount) * float(current_price)
+                except:
+                    pass
+            if not total_usd_value:
+                total_usd_value = 0.0
 
-            # Check if it's a small amount (< $10,000) - large transfers are likely purchases
-            if total_usd_value and total_usd_value > 10000:
-                print(f"[PARSER] Skipping large transfer (${total_usd_value:.2f}) from {from_address[:10]}...")
-                return None
+            return {
+                "tx_hash": token_tx.get("hash"),
+                "chain": chain,
+                "from_address": from_address,
+                "to_address": to_address,
+                "protocol_name": protocol_info["name"],
+                "protocol_type": "staking",
+                "transaction_type": "claim_rewards",
+                "timestamp": timestamp,
+                "method": "transfer",
+                "value": "0",
+                "token_in": token_symbol,
+                "token_out": token_symbol,
+                "amount_in": 0.0,
+                "amount_out": float(amount),
+                "usd_value_in": 0.0,
+                "usd_value_out": total_usd_value,
+                "gas_fee_usd": 0.0,
+                "is_defi": True,
+                "raw_data": token_tx
+            }
 
-            # This could be a staking reward from an unknown protocol
-            is_reward = True
-            protocol_name = f"Unknown Protocol ({from_address[:10]}...)"
-            usd_display = f"${total_usd_value:.2f}" if total_usd_value else "$0.00"
-            print(f"[PARSER] ⚠️  Potential reward from unknown source: {from_address[:10]}... ({token_symbol}, {usd_display})")
-
-        if not is_reward:
-            return None
-
-        # Even if we don't have USD value, still record the transaction
+        # For incoming transfers from unknown sources, distinguish by amount
         if not total_usd_value:
-            # Try to get current price as fallback
             try:
                 current_price = self.price_service.get_current_price(token_symbol)
                 if current_price:
                     total_usd_value = float(amount) * float(current_price)
             except:
                 pass
-
-        # If still no price, use 0
         if not total_usd_value:
             total_usd_value = 0.0
 
-        # This is a staking reward/income!
+        # Large incoming transfer (> $1000) from unknown address
+        # Likely: transfer between own wallets, OTC purchase, or gift
+        # Should be recorded but flagged for manual review
+        if total_usd_value > 1000:
+            usd_display = f"${total_usd_value:.2f}"
+            print(f"[PARSER] 🔍 Large incoming transfer ({usd_display}) - needs manual review")
+            print(f"[PARSER]    Could be: own wallet transfer, OTC buy, gift, or unknown protocol")
+
+            return {
+                "tx_hash": token_tx.get("hash"),
+                "chain": chain,
+                "from_address": from_address,
+                "to_address": to_address,
+                "protocol_name": f"Manual Review Required",
+                "protocol_type": "transfer",
+                "transaction_type": "transfer",  # Generic transfer, not reward
+                "timestamp": timestamp,
+                "method": "transfer",
+                "value": "0",
+                "token_in": None,
+                "token_out": token_symbol,
+                "amount_in": None,
+                "amount_out": float(amount),
+                "usd_value_in": None,
+                "usd_value_out": total_usd_value,
+                "gas_fee_usd": 0.0,
+                "is_defi": False,
+                "notes": f"⚠️ Large transfer from unknown address {from_address[:10]}... - Please verify: Is this your own wallet? OTC purchase? Gift?",
+                "raw_data": token_tx
+            }
+
+        # Small incoming transfer from unknown source - likely reward
+        usd_display = f"${total_usd_value:.2f}" if total_usd_value else "$0.00"
+        print(f"[PARSER] ⚠️  Small incoming transfer - potential reward: {from_address[:10]}... ({token_symbol}, {usd_display})")
+
         return {
             "tx_hash": token_tx.get("hash"),
             "chain": chain,
             "from_address": from_address,
             "to_address": to_address,
-            "protocol_name": protocol_name,
+            "protocol_name": f"Unknown ({from_address[:10]}...)",
             "protocol_type": "staking",
             "transaction_type": "claim_rewards",
             "timestamp": timestamp,
             "method": "transfer",
             "value": "0",
-            "token_in": token_symbol,  # ✅ Changed from None - show token received
+            "token_in": token_symbol,
             "token_out": token_symbol,
-            "amount_in": 0.0,  # ✅ Changed from None - no cost basis
+            "amount_in": 0.0,
             "amount_out": float(amount),
-            "usd_value_in": 0.0,  # ✅ Changed from None - no cost
+            "usd_value_in": 0.0,
             "usd_value_out": total_usd_value,
-            "gas_fee_usd": 0.0,  # User doesn't pay gas for rewards
+            "gas_fee_usd": 0.0,
             "is_defi": True,
             "raw_data": token_tx
         }

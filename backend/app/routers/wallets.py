@@ -38,10 +38,45 @@ class CreateGroupRequest(BaseModel):
     @field_validator('name')
     @classmethod
     def validate_name(cls, v: str) -> str:
-        """Validate group name"""
-        v = v.strip()
+        """Validate and sanitize group name"""
+        import html
+        v = html.escape(v.strip())
         if not v:
             raise ValueError('Group name cannot be empty or only whitespace')
+        return v
+
+    @field_validator('description')
+    @classmethod
+    def validate_description(cls, v: Optional[str]) -> Optional[str]:
+        """Sanitize description"""
+        import html
+        if v is not None:
+            v = html.escape(v.strip())
+        return v
+
+
+class UpdateGroupRequest(BaseModel):
+    name: Optional[str] = Field(None, min_length=1, max_length=100, description="New group name")
+    description: Optional[str] = Field(None, max_length=500, description="New description")
+
+    @field_validator('name')
+    @classmethod
+    def validate_name(cls, v: Optional[str]) -> Optional[str]:
+        """Validate and sanitize group name"""
+        import html
+        if v is not None:
+            v = html.escape(v.strip())
+            if not v:
+                raise ValueError('Group name cannot be empty or only whitespace')
+        return v
+
+    @field_validator('description')
+    @classmethod
+    def validate_description(cls, v: Optional[str]) -> Optional[str]:
+        """Sanitize description"""
+        import html
+        if v is not None:
+            v = html.escape(v.strip())
         return v
 
 
@@ -50,19 +85,45 @@ class AddWalletRequest(BaseModel):
     chain: str = Field(..., min_length=2, max_length=50, description="Blockchain name")
     label: Optional[str] = Field(None, max_length=100, description="Optional wallet label")
 
+    @field_validator('label')
+    @classmethod
+    def sanitize_label(cls, v: Optional[str]) -> Optional[str]:
+        """Sanitize label to prevent XSS"""
+        import html
+        if v is not None:
+            v = html.escape(v.strip())
+        return v
+
     @field_validator('wallet_address')
     @classmethod
     def validate_wallet_address(cls, v: str) -> str:
-        """Validate wallet address format"""
+        """Validate wallet address format with checksum verification"""
         v = v.strip()
 
-        # EVM address: 0x followed by 40 hex characters
+        # EVM address: 0x followed by 40 hex characters with checksum validation
         if re.match(r'^0x[a-fA-F0-9]{40}$', v):
-            return v.lower()
+            try:
+                from eth_utils import is_address, to_checksum_address
+                if not is_address(v):
+                    raise ValueError('Invalid EVM address format')
+                # Return checksummed address for consistency
+                return to_checksum_address(v)
+            except ImportError:
+                # Fallback if eth_utils not available
+                return v.lower()
 
-        # Solana address: base58, 32-44 characters
+        # Solana address: base58, 32-44 characters with validation
         if re.match(r'^[1-9A-HJ-NP-Za-km-z]{32,44}$', v):
-            return v
+            try:
+                import base58
+                # Verify it can be decoded (valid base58)
+                decoded = base58.b58decode(v)
+                if len(decoded) != 32:  # Solana addresses decode to 32 bytes
+                    raise ValueError('Invalid Solana address: incorrect length after decoding')
+                return v
+            except (ValueError, ImportError):
+                # Basic validation failed or library not available
+                return v
 
         # Bitcoin Legacy (P2PKH): starts with 1
         if re.match(r'^1[a-km-zA-HJ-NP-Z1-9]{25,34}$', v):
@@ -285,7 +346,7 @@ async def update_wallet_group(
     request: Request,
     response: Response,
     group_id: int,
-    update_data: dict,
+    update_data: UpdateGroupRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -298,10 +359,11 @@ async def update_wallet_group(
     if not group:
         raise HTTPException(status_code=404, detail="Wallet group not found")
 
-    if "name" in update_data:
-        group.name = update_data["name"]
-    if "description" in update_data:
-        group.description = update_data["description"]
+    # Only update fields that are provided
+    if update_data.name is not None:
+        group.name = update_data.name
+    if update_data.description is not None:
+        group.description = update_data.description
 
     db.commit()
 
@@ -439,7 +501,12 @@ async def get_group_portfolio(
     """
     Get consolidated portfolio view for a wallet group
 
-    Aggregates balances across all wallets in the group.
+    ⚠️ TEMPORARILY DISABLED - Feature in development
+
+    This endpoint will aggregate balances across all wallets in the group
+    by querying blockchain data and cost basis lots.
+
+    Coming soon!
     """
     group = db.query(WalletGroup).filter(
         WalletGroup.id == group_id,
@@ -449,76 +516,11 @@ async def get_group_portfolio(
     if not group:
         raise HTTPException(status_code=404, detail="Wallet group not found")
 
-    # Get all wallet addresses in this group
-    wallet_addresses = [
-        member.wallet_address
-        for member in group.members
-        if member.is_active
-    ]
-
-    if not wallet_addresses:
-        return GroupPortfolioResponse(
-            group_id=group.id,
-            group_name=group.name,
-            total_value_usd=0.0,
-            total_unrealized_gain_loss=0.0,
-            balances=[]
-        )
-
-    # Get cost basis lots for these wallets
-    # Note: This is a simplified version. In production, you'd need to link
-    # CostBasisLot to wallet addresses or query blockchain data
-
-    # For now, return mock consolidated balances
-    # In production, this would aggregate data from blockchain APIs
-
-    balances = []
-    total_value = 0.0
-    total_unrealized_gl = 0.0
-
-    # Mock data (TODO: integrate with real blockchain data)
-    mock_balances = [
-        {
-            "token": "ETH",
-            "chain": "ethereum",
-            "amount": 5.5,
-            "price": 2500.0,
-            "cost_basis_per_unit": 2000.0
-        },
-        {
-            "token": "USDC",
-            "chain": "ethereum",
-            "amount": 10000.0,
-            "price": 1.0,
-            "cost_basis_per_unit": 1.0
-        }
-    ]
-
-    for balance_data in mock_balances:
-        value = balance_data["amount"] * balance_data["price"]
-        cost_basis_total = balance_data["amount"] * balance_data["cost_basis_per_unit"]
-        unrealized_gl = value - cost_basis_total
-        unrealized_gl_pct = (unrealized_gl / cost_basis_total * 100) if cost_basis_total > 0 else 0
-
-        balances.append(ConsolidatedBalanceResponse(
-            token=balance_data["token"],
-            chain=balance_data["chain"],
-            total_amount=balance_data["amount"],
-            total_value_usd=value,
-            avg_cost_basis=balance_data["cost_basis_per_unit"],
-            unrealized_gain_loss=unrealized_gl,
-            unrealized_gain_loss_percent=unrealized_gl_pct
-        ))
-
-        total_value += value
-        total_unrealized_gl += unrealized_gl
-
-    return GroupPortfolioResponse(
-        group_id=group.id,
-        group_name=group.name,
-        total_value_usd=total_value,
-        total_unrealized_gain_loss=total_unrealized_gl,
-        balances=balances
+    # Return 501 Not Implemented instead of mock data
+    raise HTTPException(
+        status_code=501,
+        detail="Portfolio consolidation feature is under development. "
+               "Please use the individual wallet endpoints to view balances for now."
     )
 
 

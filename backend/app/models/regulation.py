@@ -44,6 +44,14 @@ class Regulation(Base):
     penalties_max = Column(String(200))   # Max penalties
     notes = Column(Text)
 
+    # Currency information (for multi-currency support)
+    currency_code = Column(String(3))  # "EUR", "USD", "GBP", etc.
+    currency_name = Column(String(50))  # "Euro", "US Dollar", etc.
+    currency_symbol = Column(String(5))  # "€", "$", "£", etc.
+    currency_tier = Column(Integer)  # 1=major, 2=emerging, 3=exotic
+    uses_usd_directly = Column(Integer, default=False)  # True for dollarized countries
+    recommended_exchange_source = Column(String(50))  # "ECB", "EXCHANGERATE_API", etc.
+
     # Metadata
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
     source_url = Column(Text)
@@ -72,6 +80,13 @@ class Regulation(Base):
             "long_term_discount_pct": float(self.long_term_discount_pct) if self.long_term_discount_pct else None,
             "exemption_threshold": float(self.exemption_threshold) if self.exemption_threshold else None,
             "exemption_threshold_currency": self.exemption_threshold_currency,
+            # Currency information
+            "currency_code": self.currency_code,
+            "currency_name": self.currency_name,
+            "currency_symbol": self.currency_symbol,
+            "currency_tier": self.currency_tier,
+            "uses_usd_directly": bool(self.uses_usd_directly) if self.uses_usd_directly is not None else None,
+            "recommended_exchange_source": self.recommended_exchange_source,
             "residency_rule": self.residency_rule,
             "treaty_countries": self.treaty_countries,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,

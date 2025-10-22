@@ -18,8 +18,11 @@ import {
   Trash2,
   Save,
   Eye,
-  EyeOff
+  EyeOff,
+  MapPin,
+  Database
 } from 'lucide-react'
+import { JurisdictionSelector } from '@/components/JurisdictionSelector'
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -36,7 +39,7 @@ const staggerContainer = {
 }
 
 export default function SettingsPage() {
-  const { user, logout, isLoading, token } = useAuth()
+  const { user, logout, isLoading, token, refreshUser } = useAuth()
   const router = useRouter()
 
   // Profile state
@@ -55,12 +58,22 @@ export default function SettingsPage() {
   const [passwordSaving, setPasswordSaving] = useState(false)
   const [passwordMessage, setPasswordMessage] = useState('')
 
-  // Preferences state
-  const [defaultCurrency, setDefaultCurrency] = useState('USD')
+  // Display Preferences state
   const [language, setLanguage] = useState('en')
   const [theme, setTheme] = useState('system')
   const [preferencesSaving, setPreferencesSaving] = useState(false)
   const [preferencesMessage, setPreferencesMessage] = useState('')
+
+  // Tax Jurisdiction state
+  const [taxJurisdiction, setTaxJurisdiction] = useState<string | null>(null)
+  const [currencyInfo, setCurrencyInfo] = useState<any>(null)
+
+  // Cost Basis Settings state
+  const [costBasisMethod, setCostBasisMethod] = useState('fifo')
+  const [washSaleTracking, setWashSaleTracking] = useState(false)
+  const [stakingAsIncome, setStakingAsIncome] = useState(true)
+  const [costBasisSaving, setCostBasisSaving] = useState(false)
+  const [costBasisMessage, setCostBasisMessage] = useState('')
 
   // Notifications state
   const [emailNotifications, setEmailNotifications] = useState(true)
@@ -79,8 +92,108 @@ export default function SettingsPage() {
     } else if (user) {
       setEmail(user.email || '')
       setFullName(user.full_name || '')
+
+      // Fetch tax jurisdiction and cost basis settings
+      fetchTaxJurisdiction()
+      fetchCostBasisSettings()
     }
   }, [user, isLoading, router])
+
+  const fetchTaxJurisdiction = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cost-basis/settings`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setTaxJurisdiction(data.tax_jurisdiction)
+
+        // Fetch currency info for this jurisdiction
+        if (data.tax_jurisdiction) {
+          fetchCurrencyInfo(data.tax_jurisdiction)
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch tax jurisdiction:', error)
+    }
+  }
+
+  const fetchCurrencyInfo = async (jurisdictionCode: string) => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/regulations/`)
+      if (response.ok) {
+        const countries = await response.json()
+        const country = countries.find((c: any) => c.country_code === jurisdictionCode)
+        if (country) {
+          setCurrencyInfo({
+            currencyCode: country.currency_code,
+            currencyName: country.currency_name,
+            currencySymbol: country.currency_symbol,
+            countryName: country.country_name,
+            flagEmoji: country.flag_emoji,
+            cryptoShortRate: country.crypto_short_rate,
+            cryptoLongRate: country.crypto_long_rate,
+            cryptoNotes: country.crypto_notes
+          })
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch currency info:', error)
+    }
+  }
+
+  const fetchCostBasisSettings = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cost-basis/settings`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setCostBasisMethod(data.default_method || 'fifo')
+        // Wash sale and staking settings would come from backend if available
+      }
+    } catch (error) {
+      console.error('Failed to fetch cost basis settings:', error)
+    }
+  }
+
+  const handleSaveCostBasisSettings = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setCostBasisSaving(true)
+    setCostBasisMessage('')
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/cost-basis/settings`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          default_method: costBasisMethod,
+          // wash_sale_tracking: washSaleTracking,  // Future backend support
+          // staking_as_income: stakingAsIncome      // Future backend support
+        })
+      })
+
+      if (response.ok) {
+        setCostBasisMessage('Cost basis settings saved successfully')
+      } else {
+        const data = await response.json()
+        setCostBasisMessage(data.detail || 'Failed to save settings')
+      }
+    } catch (error) {
+      setCostBasisMessage('Network error. Please try again.')
+    } finally {
+      setCostBasisSaving(false)
+    }
+  }
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -102,6 +215,8 @@ export default function SettingsPage() {
 
       if (response.ok) {
         setProfileMessage('Profile updated successfully')
+        // Refresh user data to update the name in Dashboard
+        await refreshUser()
       } else {
         const data = await response.json()
         setProfileMessage(data.detail || 'Failed to update profile')
@@ -172,14 +287,13 @@ export default function SettingsPage() {
           Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({
-          default_currency: defaultCurrency,
           language: language,
           theme: theme
         })
       })
 
       if (response.ok) {
-        setPreferencesMessage('Preferences saved successfully')
+        setPreferencesMessage('Display preferences saved successfully')
       } else {
         const data = await response.json()
         setPreferencesMessage(data.detail || 'Failed to save preferences')
@@ -473,7 +587,202 @@ export default function SettingsPage() {
               </form>
             </motion.section>
 
-            {/* Preferences Section */}
+            {/* Tax Jurisdiction Section - NEW! */}
+            <motion.section
+              variants={fadeInUp}
+              className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-xl shadow-emerald-500/5 hover:shadow-emerald-500/10 transition-shadow"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <MapPin className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Tax Jurisdiction</h2>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Set your tax residence for accurate calculations</p>
+                </div>
+              </div>
+
+              <div className="bg-emerald-50 dark:bg-emerald-950/30 rounded-xl p-4 mb-4 border border-emerald-200 dark:border-emerald-800">
+                <p className="text-sm text-emerald-800 dark:text-emerald-300">
+                  <strong>Important:</strong> Your tax jurisdiction determines which tax rates and rules apply to your crypto transactions.
+                  This affects calculations in Tax Optimizer, Cost Basis, and all tax-related features.
+                </p>
+              </div>
+
+              <JurisdictionSelector
+                currentJurisdiction={taxJurisdiction}
+                onJurisdictionChange={(newJurisdiction) => {
+                  setTaxJurisdiction(newJurisdiction)
+                  fetchCurrencyInfo(newJurisdiction)
+                }}
+                showBadgeOnly={false}
+              />
+
+              {/* Currency Info Badge */}
+              {taxJurisdiction && currencyInfo && (
+                <>
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-4 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 rounded-xl border-2 border-emerald-200 dark:border-emerald-800"
+                  >
+                    <div className="flex items-start gap-3">
+                      <span className="text-3xl">{currencyInfo.flagEmoji}</span>
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-100 mb-1">
+                          💱 Detected Currency
+                        </p>
+                        <p className="text-base font-bold text-emerald-800 dark:text-emerald-200">
+                          {currencyInfo.currencySymbol} {currencyInfo.currencyCode} - {currencyInfo.currencyName}
+                        </p>
+                        <p className="text-xs text-emerald-700 dark:text-emerald-300 mt-2">
+                          All financial data will be displayed in <strong>{currencyInfo.currencyName}</strong> with USD reference
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Tax Rates Preview */}
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className="mt-3 p-4 bg-gradient-to-r from-violet-50 to-fuchsia-50 dark:from-violet-950/30 dark:to-fuchsia-950/30 rounded-xl border-2 border-violet-200 dark:border-violet-800"
+                  >
+                    <p className="text-sm font-semibold text-violet-900 dark:text-violet-100 mb-3">
+                      📊 Tax Rates for {currencyInfo.countryName}
+                    </p>
+                    <div className="grid grid-cols-2 gap-3 mb-3">
+                      <div className="p-3 bg-white dark:bg-slate-900 rounded-lg border border-violet-200 dark:border-violet-700">
+                        <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">Short-term (&lt;1 year)</p>
+                        <p className="text-lg font-bold text-violet-600 dark:text-fuchsia-400">
+                          {currencyInfo.cryptoShortRate !== null
+                            ? `${(currencyInfo.cryptoShortRate * 100).toFixed(1)}%`
+                            : 'N/A'}
+                        </p>
+                      </div>
+                      <div className="p-3 bg-white dark:bg-slate-900 rounded-lg border border-violet-200 dark:border-violet-700">
+                        <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">Long-term (&gt;1 year)</p>
+                        <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+                          {currencyInfo.cryptoLongRate !== null
+                            ? `${(currencyInfo.cryptoLongRate * 100).toFixed(1)}%`
+                            : 'N/A'}
+                        </p>
+                      </div>
+                    </div>
+                    {currencyInfo.cryptoNotes && (
+                      <p className="text-xs text-violet-700 dark:text-violet-300 bg-white dark:bg-slate-900 p-2 rounded border border-violet-200 dark:border-violet-700">
+                        ℹ️ {currencyInfo.cryptoNotes}
+                      </p>
+                    )}
+                  </motion.div>
+                </>
+              )}
+            </motion.section>
+
+            {/* Cost Basis Settings Section */}
+            <motion.section
+              variants={fadeInUp}
+              className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-xl shadow-blue-500/5 hover:shadow-blue-500/10 transition-shadow"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg">
+                  <Database className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Cost Basis Settings</h2>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Configure how crypto sales are calculated for tax purposes</p>
+                </div>
+              </div>
+
+              <div className="bg-blue-50 dark:bg-blue-950/30 rounded-xl p-4 mb-4 border border-blue-200 dark:border-blue-800">
+                <p className="text-sm text-blue-800 dark:text-blue-300">
+                  <strong>ℹ️ Info:</strong> Your cost basis method determines which cryptocurrency units are considered sold first when you make a transaction.
+                </p>
+              </div>
+
+              <form onSubmit={handleSaveCostBasisSettings} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    Default Cost Basis Method
+                  </label>
+                  <select
+                    value={costBasisMethod}
+                    onChange={(e) => setCostBasisMethod(e.target.value)}
+                    className="w-full px-4 py-2.5 border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-800 dark:text-white transition-all"
+                  >
+                    <option value="fifo">FIFO - First In First Out (Default)</option>
+                    <option value="lifo">LIFO - Last In First Out</option>
+                    <option value="hifo">HIFO - Highest In First Out</option>
+                    <option value="specific_id">Specific Identification</option>
+                  </select>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                    <strong>FIFO:</strong> Sells oldest units first. <strong>LIFO:</strong> Sells newest units first. <strong>HIFO:</strong> Sells highest cost units first to minimize gains.
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <label className="flex items-start gap-3 p-4 border border-slate-200 dark:border-slate-700 rounded-xl cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all group">
+                    <input
+                      type="checkbox"
+                      checked={washSaleTracking}
+                      onChange={(e) => setWashSaleTracking(e.target.checked)}
+                      className="w-5 h-5 mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 transition-all"
+                    />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        Enable Wash Sale Tracking
+                        <span className="ml-2 px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 text-xs rounded-full">US Only</span>
+                      </p>
+                      <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                        Track and disallow losses from substantially identical securities sold and repurchased within 30 days (US tax rule)
+                      </p>
+                      <p className="text-xs text-slate-500 dark:text-slate-500 mt-1 italic">
+                        Note: Currently not enforced for crypto by IRS, but may change
+                      </p>
+                    </div>
+                  </label>
+
+                  <label className="flex items-start gap-3 p-4 border border-slate-200 dark:border-slate-700 rounded-xl cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all group">
+                    <input
+                      type="checkbox"
+                      checked={stakingAsIncome}
+                      onChange={(e) => setStakingAsIncome(e.target.checked)}
+                      className="w-5 h-5 mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 transition-all"
+                    />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        Treat Staking Rewards as Ordinary Income
+                      </p>
+                      <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                        Staking rewards will be treated as income at the time of receipt (recommended by most tax authorities)
+                      </p>
+                    </div>
+                  </label>
+                </div>
+
+                {costBasisMessage && (
+                  <motion.p
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={`text-sm font-medium ${costBasisMessage.includes('success') ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
+                  >
+                    {costBasisMessage}
+                  </motion.p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={costBasisSaving}
+                  className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
+                >
+                  <Save className="w-4 h-4" />
+                  {costBasisSaving ? 'Saving...' : 'Save Cost Basis Settings'}
+                </button>
+              </form>
+            </motion.section>
+
+            {/* Display Preferences Section */}
             <motion.section
               variants={fadeInUp}
               className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-xl shadow-violet-500/5 hover:shadow-violet-500/10 transition-shadow"
@@ -483,32 +792,12 @@ export default function SettingsPage() {
                   <Globe className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Preferences</h2>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">Customize your experience</p>
+                  <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Display Preferences</h2>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Customize how information is displayed</p>
                 </div>
               </div>
 
               <form onSubmit={handleSavePreferences} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                    Default Currency
-                  </label>
-                  <select
-                    value={defaultCurrency}
-                    onChange={(e) => setDefaultCurrency(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white transition-all"
-                  >
-                    <option value="USD">USD - US Dollar</option>
-                    <option value="EUR">EUR - Euro</option>
-                    <option value="GBP">GBP - British Pound</option>
-                    <option value="JPY">JPY - Japanese Yen</option>
-                    <option value="CHF">CHF - Swiss Franc</option>
-                    <option value="CAD">CAD - Canadian Dollar</option>
-                    <option value="AUD">AUD - Australian Dollar</option>
-                    <option value="BTC">BTC - Bitcoin</option>
-                  </select>
-                </div>
-
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                     Language

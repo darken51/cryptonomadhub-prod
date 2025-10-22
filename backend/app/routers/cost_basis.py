@@ -17,9 +17,12 @@ from app.models.cost_basis import (
     AcquisitionMethod
 )
 from app.routers.auth import get_current_user
+from app.dependencies import get_exchange_rate_service
+from app.data.currency_mapping import get_currency_info
 from pydantic import BaseModel
 from typing import List, Optional, Dict
 from datetime import datetime
+from decimal import Decimal
 import csv
 import io
 import logging
@@ -27,6 +30,90 @@ import logging
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/cost-basis", tags=["Cost Basis"])
+
+
+# Helper functions
+async def enrich_lot_with_local_currency(
+    lot: CostBasisLot,
+    user_id: int,
+    db: Session
+) -> None:
+    """
+    Enrich a cost basis lot with local currency data based on user's tax jurisdiction.
+
+    Fetches historical exchange rate for the acquisition date and stores:
+    - acquisition_price_local (in user's local currency)
+    - local_currency (currency code like EUR, GBP)
+    - exchange_rate (USD to local conversion rate)
+    - exchange_rate_source (API source used)
+    - exchange_rate_date (date of the rate)
+
+    This function modifies the lot object in-place.
+    """
+    try:
+        # Get user's tax jurisdiction from settings
+        settings = db.query(UserCostBasisSettings).filter(
+            UserCostBasisSettings.user_id == user_id
+        ).first()
+
+        if not settings or not settings.tax_jurisdiction:
+            logger.info(f"No tax jurisdiction set for user {user_id}, skipping currency conversion")
+            return
+
+        jurisdiction = settings.tax_jurisdiction
+
+        # Get currency info for jurisdiction
+        currency_info = get_currency_info(jurisdiction)
+
+        if not currency_info:
+            logger.warning(f"No currency mapping found for jurisdiction {jurisdiction}")
+            return
+
+        # Skip if user is in USD jurisdiction (already in USD)
+        if currency_info.uses_usd_directly:
+            logger.info(f"User in USD jurisdiction ({jurisdiction}), no conversion needed")
+            lot.local_currency = "USD"
+            lot.acquisition_price_local = lot.acquisition_price_usd
+            lot.exchange_rate = Decimal("1.0")
+            lot.exchange_rate_source = "SAME_CURRENCY"
+            lot.exchange_rate_date = lot.acquisition_date
+            return
+
+        # Get exchange rate service
+        exchange_service = get_exchange_rate_service()
+
+        # Get historical exchange rate for acquisition date
+        rate, source = await exchange_service.get_exchange_rate(
+            from_currency="USD",
+            to_currency=currency_info.currency_code,
+            target_date=lot.acquisition_date.date()
+        )
+
+        if rate is None:
+            logger.error(f"Failed to get exchange rate USD→{currency_info.currency_code} for {lot.acquisition_date.date()}")
+            return
+
+        # Calculate local price
+        acquisition_price_local = Decimal(str(lot.acquisition_price_usd)) * rate
+
+        # Store currency data
+        lot.local_currency = currency_info.currency_code
+        lot.acquisition_price_local = acquisition_price_local
+        lot.exchange_rate = rate
+        lot.exchange_rate_source = source
+        lot.exchange_rate_date = lot.acquisition_date
+
+        logger.info(
+            f"✓ Enriched lot {lot.id}: ${lot.acquisition_price_usd} = "
+            f"{currency_info.currency_symbol}{acquisition_price_local:.2f} "
+            f"(rate: {rate:.4f}, source: {source})"
+        )
+
+        await exchange_service.close()
+
+    except Exception as e:
+        logger.error(f"Error enriching lot with local currency: {e}", exc_info=True)
+        # Don't fail the lot creation, just log the error
 
 
 # Pydantic models
@@ -56,6 +143,9 @@ class LotResponse(BaseModel):
     unrealized_gain_loss: float
     notes: Optional[str]
     created_at: str
+    source_tx_hash: Optional[str] = None
+    source_audit_id: Optional[int] = None
+    wallet_address: Optional[str] = None
 
 
 class PortfolioSummary(BaseModel):
@@ -110,8 +200,8 @@ async def get_cost_basis_lots(
             # Fallback to acquisition price if current price unavailable
             current_price = lot.acquisition_price_usd
 
-        current_value = lot.remaining_amount * current_price
-        unrealized_gl = current_value - (lot.remaining_amount * lot.acquisition_price_usd)
+        current_value = float(lot.remaining_amount) * float(current_price)
+        unrealized_gl = current_value - (float(lot.remaining_amount) * float(lot.acquisition_price_usd))
 
         result.append(LotResponse(
             id=lot.id,
@@ -126,7 +216,62 @@ async def get_cost_basis_lots(
             current_value_usd=current_value,
             unrealized_gain_loss=unrealized_gl,
             notes=lot.notes,
-            created_at=lot.created_at.isoformat()
+            created_at=lot.created_at.isoformat(),
+            source_tx_hash=lot.source_tx_hash,
+            source_audit_id=lot.source_audit_id,
+            wallet_address=lot.wallet_address
+        ))
+
+    return result
+
+
+@router.get("/lots/from-audit/{audit_id}", response_model=List[LotResponse])
+async def get_lots_from_audit(
+    audit_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get all cost basis lots created from a specific DeFi audit
+
+    Useful to see which acquisitions were automatically imported from an audit.
+    """
+    lots = db.query(CostBasisLot).filter(
+        CostBasisLot.user_id == current_user.id,
+        CostBasisLot.source_audit_id == audit_id
+    ).order_by(desc(CostBasisLot.acquisition_date)).all()
+
+    from app.services.price_service import PriceService
+    price_service = PriceService()
+
+    result = []
+    for lot in lots:
+        current_price_decimal = price_service.get_current_price(lot.token)
+        if current_price_decimal:
+            current_price = float(current_price_decimal)
+        else:
+            current_price = lot.acquisition_price_usd
+
+        current_value = float(lot.remaining_amount) * float(current_price)
+        unrealized_gl = current_value - (float(lot.remaining_amount) * float(lot.acquisition_price_usd))
+
+        result.append(LotResponse(
+            id=lot.id,
+            token=lot.token,
+            chain=lot.chain,
+            acquisition_date=lot.acquisition_date.isoformat(),
+            acquisition_method=lot.acquisition_method.value,
+            acquisition_price_usd=lot.acquisition_price_usd,
+            original_amount=lot.original_amount,
+            remaining_amount=lot.remaining_amount,
+            disposed_amount=lot.disposed_amount,
+            current_value_usd=current_value,
+            unrealized_gain_loss=unrealized_gl,
+            notes=lot.notes,
+            created_at=lot.created_at.isoformat(),
+            source_tx_hash=lot.source_tx_hash,
+            source_audit_id=lot.source_audit_id,
+            wallet_address=lot.wallet_address
         ))
 
     return result
@@ -175,6 +320,11 @@ async def create_cost_basis_lot(
     )
 
     db.add(lot)
+    db.flush()  # Flush to get lot.id before enrichment
+
+    # Enrich with local currency conversion
+    await enrich_lot_with_local_currency(lot, current_user.id, db)
+
     db.commit()
     db.refresh(lot)
 
@@ -274,11 +424,11 @@ async def get_portfolio_summary(
             if current_price_decimal:
                 price_cache[lot.token] = float(current_price_decimal)
             else:
-                price_cache[lot.token] = lot.acquisition_price_usd
+                price_cache[lot.token] = float(lot.acquisition_price_usd)
 
         current_price = price_cache[lot.token]
-        lot_value = lot.remaining_amount * current_price
-        lot_cost_basis = lot.remaining_amount * lot.acquisition_price_usd
+        lot_value = float(lot.remaining_amount) * current_price
+        lot_cost_basis = float(lot.remaining_amount) * float(lot.acquisition_price_usd)
 
         total_value += lot_value
         total_cost_basis += lot_cost_basis
@@ -293,7 +443,7 @@ async def get_portfolio_summary(
                 "current_price": current_price
             }
 
-        tokens_summary[lot.token]["amount"] += lot.remaining_amount
+        tokens_summary[lot.token]["amount"] += float(lot.remaining_amount)
         tokens_summary[lot.token]["value_usd"] += lot_value
         tokens_summary[lot.token]["cost_basis"] += lot_cost_basis
         tokens_summary[lot.token]["gain_loss"] += (lot_value - lot_cost_basis)
@@ -470,6 +620,11 @@ async def import_cost_basis_csv(
                 )
 
                 db.add(lot)
+                db.flush()  # Flush to get lot.id
+
+                # Enrich with local currency conversion
+                await enrich_lot_with_local_currency(lot, current_user.id, db)
+
                 imported_count += 1
 
             except Exception as e:
@@ -502,12 +657,15 @@ async def get_cost_basis_settings(
     ).first()
 
     if not settings:
-        # Create default settings
+        # Create default settings using user's country if available
+        user_country = current_user.current_country if current_user.current_country else None
+        apply_wash_sale = (user_country == "US") if user_country else False
+
         settings = UserCostBasisSettings(
             user_id=current_user.id,
             default_method=CostBasisMethod.FIFO,
-            tax_jurisdiction="US",
-            apply_wash_sale_rule=True
+            tax_jurisdiction=user_country,  # Will be None if not set, forcing user to configure
+            apply_wash_sale_rule=apply_wash_sale
         )
         db.add(settings)
         db.commit()
@@ -548,7 +706,21 @@ async def update_cost_basis_settings(
             )
 
     if request.tax_jurisdiction:
-        settings.tax_jurisdiction = request.tax_jurisdiction.upper()
+        country_code = request.tax_jurisdiction.upper()
+
+        # Validate country code exists in regulations
+        from app.models.regulation import Regulation
+        regulation = db.query(Regulation).filter(
+            Regulation.country_code == country_code
+        ).first()
+
+        if not regulation:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid country code: {country_code}. Tax jurisdiction not supported."
+            )
+
+        settings.tax_jurisdiction = country_code
 
     if request.apply_wash_sale_rule is not None:
         settings.apply_wash_sale_rule = request.apply_wash_sale_rule
@@ -769,8 +941,8 @@ async def get_unverified_lots(
         current_price_decimal = price_service.get_current_price(lot.token)
         current_price = float(current_price_decimal) if current_price_decimal else lot.acquisition_price_usd
         
-        current_value = lot.remaining_amount * current_price
-        unrealized_gl = current_value - (lot.remaining_amount * lot.acquisition_price_usd)
+        current_value = float(lot.remaining_amount) * float(current_price)
+        unrealized_gl = current_value - (float(lot.remaining_amount) * float(lot.acquisition_price_usd))
         
         result.append({
             "id": lot.id,
@@ -817,14 +989,17 @@ async def get_wash_sale_warnings(
     """
     from app.models.cost_basis import CostBasisDisposal
     from datetime import timedelta
-    
+    from sqlalchemy.orm import joinedload
+
     # Get all disposals with losses in last year
     one_year_ago = datetime.utcnow() - timedelta(days=365)
-    
-    disposals = db.query(CostBasisDisposal).filter(
+
+    disposals = db.query(CostBasisDisposal).options(
+        joinedload(CostBasisDisposal.lot)
+    ).filter(
         CostBasisDisposal.user_id == current_user.id,
         CostBasisDisposal.disposal_date >= one_year_ago,
-        CostBasisDisposal.gain_loss_usd < 0  # Only losses
+        CostBasisDisposal.gain_loss < 0  # Only losses
     ).order_by(CostBasisDisposal.disposal_date.desc()).all()
     
     warnings = []
@@ -837,35 +1012,35 @@ async def get_wash_sale_warnings(
         # Find lots acquired in wash sale window
         repurchases = db.query(CostBasisLot).filter(
             CostBasisLot.user_id == current_user.id,
-            CostBasisLot.token == disposal.token,
-            CostBasisLot.chain == disposal.chain,
+            CostBasisLot.token == disposal.lot.token,
+            CostBasisLot.chain == disposal.lot.chain,
             CostBasisLot.acquisition_date >= window_start,
             CostBasisLot.acquisition_date <= window_end,
             CostBasisLot.acquisition_date != disposal.disposal_date  # Not same transaction
         ).all()
         
         if repurchases:
-            repurchase_amounts = sum(lot.original_amount for lot in repurchases)
-            
+            repurchase_amounts = sum(float(lot.original_amount) for lot in repurchases)
+
             # Determine severity
             if disposal.disposal_date < datetime.utcnow() - timedelta(days=days):
                 severity = "info"  # Past wash sale window
-            elif repurchase_amounts >= disposal.amount_disposed:
+            elif repurchase_amounts >= float(disposal.amount_disposed):
                 severity = "high"  # Full repurchase = definite wash sale
             else:
                 severity = "medium"  # Partial repurchase
-            
+
             warnings.append({
                 "disposal_id": disposal.id,
-                "token": disposal.token,
-                "chain": disposal.chain,
+                "token": disposal.lot.token,
+                "chain": disposal.lot.chain,
                 "disposal_date": disposal.disposal_date.isoformat(),
-                "disposal_amount": disposal.amount_disposed,
-                "loss_amount_usd": abs(disposal.gain_loss_usd),
+                "disposal_amount": float(disposal.amount_disposed),
+                "loss_amount_usd": float(abs(disposal.gain_loss)),
                 "repurchase_dates": [lot.acquisition_date.isoformat() for lot in repurchases],
                 "repurchase_amount": repurchase_amounts,
                 "severity": severity,
-                "message": f"Sold {disposal.amount_disposed} {disposal.token} at ${abs(disposal.gain_loss_usd):.2f} loss, "
+                "message": f"Sold {float(disposal.amount_disposed)} {disposal.lot.token} at ${float(abs(disposal.gain_loss)):.2f} loss, "
                           f"then repurchased {repurchase_amounts} within {days} days. "
                           f"Potential wash sale - loss may be disallowed.",
                 "affected_lot_ids": [lot.id for lot in repurchases]

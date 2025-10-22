@@ -150,8 +150,8 @@ class TaxOptimizationSettings(Base):
     min_opportunity_savings = Column(Float, default=100.0)  # Min $ savings to show opportunity
     max_risk_level = Column(String(20), default="medium")  # low, medium, high
 
-    # Tax settings
-    tax_jurisdiction = Column(String(10), default="US")
+    # Tax settings (jurisdiction set from User.current_country on creation)
+    tax_jurisdiction = Column(String(10), nullable=True)  # No default, use User.current_country
     marginal_tax_rate = Column(Float, nullable=True)  # User's marginal tax rate (optional)
     capital_gains_rate_short = Column(Float, nullable=True)
     capital_gains_rate_long = Column(Float, nullable=True)

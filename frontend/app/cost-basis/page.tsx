@@ -12,6 +12,8 @@ import {
   Filter, TrendingUp, TrendingDown, DollarSign,
   Calendar, Database, Info, AlertTriangle, CheckCircle
 } from 'lucide-react'
+import { CurrencyDisplay, ExchangeRateDisplay } from '@/components/CurrencyDisplay'
+import { parseCurrencyData, type CurrencyData } from '@/lib/currency'
 
 interface CostBasisLot {
   id: number
@@ -27,6 +29,11 @@ interface CostBasisLot {
   verified: boolean
   notes?: string
   created_at: string
+  // Multi-currency fields
+  acquisition_price_local?: number | null
+  local_currency?: string | null
+  currency_symbol?: string | null
+  exchange_rate?: number | null
 }
 
 interface PortfolioSummary {
@@ -217,13 +224,20 @@ export default function CostBasisPage() {
     return true
   })
 
-  const totalCostBasis = filteredLots.reduce((sum, lot) => 
+  const totalCostBasis = filteredLots.reduce((sum, lot) =>
     sum + (lot.remaining_amount * lot.acquisition_price_usd), 0
   )
 
-  const totalAmount = filteredLots.reduce((sum, lot) => 
+  const totalCostBasisLocal = filteredLots.reduce((sum, lot) =>
+    sum + (lot.acquisition_price_local ? lot.remaining_amount * lot.acquisition_price_local : 0), 0
+  )
+
+  const totalAmount = filteredLots.reduce((sum, lot) =>
     sum + lot.remaining_amount, 0
   )
+
+  // Get currency data from first lot (all lots should have same currency based on user jurisdiction)
+  const currencyData = filteredLots.length > 0 ? parseCurrencyData(filteredLots[0]) : null
 
   if (isLoading || isLoadingLots) {
     return (
@@ -296,7 +310,14 @@ export default function CostBasisPage() {
                   <DollarSign className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                 </div>
               </div>
-              <p className="text-3xl font-bold text-slate-900 dark:text-white">${totalCostBasis.toLocaleString(undefined, {maximumFractionDigits: 2})}</p>
+              <p className="text-3xl font-bold text-slate-900 dark:text-white">
+                <CurrencyDisplay
+                  amountUsd={totalCostBasis}
+                  amountLocal={totalCostBasisLocal > 0 ? totalCostBasisLocal : null}
+                  currencyData={currencyData || undefined}
+                  mode="dual"
+                />
+              </p>
             </motion.div>
 
             <motion.div
@@ -327,7 +348,14 @@ export default function CostBasisPage() {
                 </div>
               </div>
               <p className="text-3xl font-bold text-slate-900 dark:text-white">
-                ${totalAmount > 0 ? (totalCostBasis / totalAmount).toLocaleString(undefined, {maximumFractionDigits: 2}) : '0'}
+                {totalAmount > 0 ? (
+                  <CurrencyDisplay
+                    amountUsd={totalCostBasis / totalAmount}
+                    amountLocal={totalCostBasisLocal > 0 ? totalCostBasisLocal / totalAmount : null}
+                    currencyData={currencyData || undefined}
+                    mode="dual"
+                  />
+                ) : '$0'}
               </p>
             </motion.div>
           </motion.div>
@@ -532,10 +560,20 @@ export default function CostBasisPage() {
                           <td className="px-6 py-4 text-right">
                             <div>
                               <p className="font-semibold text-slate-900 dark:text-white">
-                                ${(lot.remaining_amount * lot.acquisition_price_usd).toLocaleString(undefined, {maximumFractionDigits: 2})}
+                                <CurrencyDisplay
+                                  amountUsd={lot.remaining_amount * lot.acquisition_price_usd}
+                                  amountLocal={lot.acquisition_price_local ? lot.remaining_amount * lot.acquisition_price_local : null}
+                                  currencyData={parseCurrencyData(lot)}
+                                  mode="dual"
+                                />
                               </p>
                               <p className="text-xs text-slate-500 dark:text-slate-500">
-                                @ ${lot.acquisition_price_usd.toLocaleString(undefined, {maximumFractionDigits: 4})}
+                                @ <CurrencyDisplay
+                                  amountUsd={lot.acquisition_price_usd}
+                                  amountLocal={lot.acquisition_price_local}
+                                  currencyData={parseCurrencyData(lot)}
+                                  mode="dual"
+                                />
                               </p>
                             </div>
                           </td>

@@ -14,7 +14,7 @@ from app.models.defi_protocol import (
 )
 from app.models.user import User
 from app.models.cost_basis import CostBasisLot, CostBasisDisposal
-from app.services.blockchain_parser import BlockchainParser
+from app.services.blockchain_parser_adapter import BlockchainParser  # ✅ Moralis-powered adapter
 from app.services.defi_connectors import DeFiConnectorFactory
 import logging
 import json
@@ -148,7 +148,7 @@ class DeFiAuditService:
             # Categorize and save each transaction
             print(f"Processing {len(txs)} transactions for chain {chain}...")
             for tx in txs:
-                defi_tx = await self._process_transaction(tx, audit.id, audit.user_id)
+                defi_tx = await self._process_transaction(tx, audit.id, audit.user_id, wallet_address)
                 if defi_tx:
                     all_transactions.append(defi_tx)
                     print(f"Transaction added: {tx.get('tx_hash')}")
@@ -195,7 +195,8 @@ class DeFiAuditService:
         self,
         tx_data: Dict,
         audit_id: int,
-        user_id: int
+        user_id: int,
+        wallet_address: str
     ) -> Optional[DeFiTransaction]:
         """
         Process single transaction
@@ -239,7 +240,8 @@ class DeFiAuditService:
                 token_out=tx_data.get("token_out"),
                 amount_out=tx_data.get("amount_out"),
                 usd_value_out=tx_data.get("usd_value_out", 0),
-                timestamp=tx_data.get("timestamp")
+                timestamp=tx_data.get("timestamp"),
+                tx_hash=tx_data.get("tx_hash")  # Added: Pass transaction hash for disposal traceability
             )
 
             if cost_basis_result:
@@ -266,6 +268,23 @@ class DeFiAuditService:
             print(f"[DEBUG] Transaction {tx_hash} already exists, linking to audit {audit_id}...")
             existing_tx.audit_id = audit_id
             self.db.commit()
+
+            # ✅ FIX: Create cost basis lots for existing transactions too
+            # Check if lots already exist for this transaction to avoid duplicates
+            existing_lots_count = self.db.query(CostBasisLot).filter(
+                CostBasisLot.source_tx_hash == tx_hash,
+                CostBasisLot.source_audit_id == audit_id
+            ).count()
+
+            if existing_lots_count == 0:
+                # Create lots for existing transaction
+                await self._create_lots_for_transaction(
+                    tx_data=tx_data,
+                    audit_id=audit_id,
+                    user_id=user_id,
+                    wallet_address=wallet_address
+                )
+
             return existing_tx
 
         print(f"[DEBUG] Creating new transaction {tx_hash}...")
@@ -299,7 +318,35 @@ class DeFiAuditService:
         self.db.add(defi_tx)
         self.db.commit()
 
-        # ✅ NOUVEAU: Créer automatiquement cost basis lot pour acquisitions
+        # ✅ Create cost basis lots for new transaction
+        await self._create_lots_for_transaction(
+            tx_data=tx_data,
+            audit_id=audit_id,
+            user_id=user_id,
+            wallet_address=wallet_address
+        )
+
+        return defi_tx
+
+    async def _create_lots_for_transaction(
+        self,
+        tx_data: Dict,
+        audit_id: int,
+        user_id: int,
+        wallet_address: str
+    ):
+        """
+        Create cost basis lots for a transaction (both new and existing)
+
+        Args:
+            tx_data: Transaction data
+            audit_id: Audit ID
+            user_id: User ID
+            wallet_address: Wallet address
+        """
+        tx_hash = tx_data.get("tx_hash")
+
+        # Créer lot pour token_in (swaps, achats)
         if tx_data.get("token_in") and tx_data.get("amount_in") and tx_data.get("usd_value_in"):
             try:
                 await self._create_acquisition_lot(
@@ -310,14 +357,40 @@ class DeFiAuditService:
                     price_usd=tx_data["usd_value_in"] / tx_data["amount_in"] if tx_data["amount_in"] > 0 else 0,
                     acquisition_date=tx_data["timestamp"],
                     transaction_type=tx_data.get("transaction_type", "unknown"),
-                    tx_hash=tx_hash
+                    tx_hash=tx_hash,
+                    wallet_address=wallet_address,
+                    audit_id=audit_id
                 )
-                print(f"[COST BASIS] Created lot for {tx_data['amount_in']} {tx_data['token_in']} acquired")
+                logger.info(f"[COST BASIS] Created lot for {tx_data['amount_in']} {tx_data['token_in']} acquired (token_in) from audit #{audit_id}")
             except Exception as e:
-                logger.warning(f"Failed to create cost basis lot: {e}")
-                # Don't fail the whole transaction if lot creation fails
+                logger.warning(f"Failed to create cost basis lot for token_in: {e}")
 
-        return defi_tx
+        # Créer lot pour token_out aussi (rewards, airdrops, mining)
+        # Seulement si c'est une acquisition pure (pas un swap où on donne token_in)
+        if tx_data.get("token_out") and tx_data.get("amount_out") and tx_data.get("usd_value_out"):
+            # Créer lot pour token_out si:
+            # - Pas de token_in (pure acquisition: rewards, airdrop, mining, transfer_in)
+            # - OU token_in différent (swap: on reçoit aussi token_out)
+            is_pure_acquisition = not tx_data.get("token_in") or tx_data.get("amount_in", 0) == 0
+            is_swap = tx_data.get("token_in") and tx_data.get("token_in") != tx_data.get("token_out")
+
+            if is_pure_acquisition or is_swap:
+                try:
+                    await self._create_acquisition_lot(
+                        user_id=user_id,
+                        token=tx_data["token_out"],
+                        chain=tx_data["chain"],
+                        amount=tx_data["amount_out"],
+                        price_usd=tx_data["usd_value_out"] / tx_data["amount_out"] if tx_data["amount_out"] > 0 else 0,
+                        acquisition_date=tx_data["timestamp"],
+                        transaction_type=tx_data.get("transaction_type", "unknown"),
+                        tx_hash=tx_hash,
+                        wallet_address=wallet_address,
+                        audit_id=audit_id
+                    )
+                    logger.info(f"[COST BASIS] Created lot for {tx_data['amount_out']} {tx_data['token_out']} received (token_out) from audit #{audit_id}")
+                except Exception as e:
+                    logger.warning(f"Failed to create cost basis lot for token_out: {e}")
 
     def _get_or_create_protocol(
         self,
@@ -461,10 +534,12 @@ class DeFiAuditService:
             }
 
         elif "withdraw" in type_lower and protocol_type == "lending":
+            # Withdrawals include both principal (not taxable) and interest (taxable)
+            # Mark as capital_gains so we can calculate the profit using cost basis
             return {
-                "category": "income",
+                "category": "capital_gains",
                 "taxable": True,
-                "notes": "Interest earned is taxable income"
+                "notes": "Withdrawal: profit from lending interest is taxable"
             }
 
         elif "borrow" in type_lower or "repay" in type_lower:
@@ -495,9 +570,11 @@ class DeFiAuditService:
         protocols_breakdown = {}
 
         for tx in transactions:
-            # Volume
+            # Volume - compter BOTH usd_value_in ET usd_value_out pour inclure rewards/income
             if tx.usd_value_in:
                 total_volume += Decimal(tx.usd_value_in)
+            if tx.usd_value_out:
+                total_volume += Decimal(tx.usd_value_out)
 
             # Fees
             if tx.gas_fee_usd:
@@ -518,14 +595,18 @@ class DeFiAuditService:
                 else:
                     total_losses += abs(gain)
 
-            # Income from staking/rewards - use usd_value_out (tokens received)
+            # Income from staking/rewards - use gain_loss_usd (actual profit)
             elif tx.tax_category == "income":
-                # For income transactions (staking, rewards, interest), use the value of tokens received
+                # For income transactions (staking, rewards, interest), use the gain/profit
                 if tx.gain_loss_usd:
-                    ordinary_income += Decimal(tx.gain_loss_usd)
+                    income_amount = Decimal(tx.gain_loss_usd)
+                    ordinary_income += income_amount
+                    logger.debug(f"[INCOME] Added ${income_amount:.2f} from {tx.transaction_type} (tx: {tx.tx_hash[:16]}...)")
                 elif tx.usd_value_out:
-                    # If gain_loss_usd is not set, use the value of tokens received
-                    ordinary_income += Decimal(tx.usd_value_out)
+                    # Fallback: use the value of tokens received (for rewards/airdrops with no cost basis)
+                    income_amount = Decimal(tx.usd_value_out)
+                    ordinary_income += income_amount
+                    logger.debug(f"[INCOME] Added ${income_amount:.2f} from {tx.transaction_type} using usd_value_out (tx: {tx.tx_hash[:16]}...)")
 
             # Protocol breakdown
             if tx.protocol:
@@ -677,7 +758,8 @@ class DeFiAuditService:
         token_out: str,
         amount_out: float,
         usd_value_out: float,
-        timestamp: datetime
+        timestamp: datetime,
+        tx_hash: str = None
     ) -> Optional[Dict]:
         """
         Calculate gain/loss using cost basis lots (FIFO method)
@@ -688,6 +770,7 @@ class DeFiAuditService:
             amount_out: Amount of token
             usd_value_out: USD value received
             timestamp: Transaction timestamp
+            tx_hash: Transaction hash for traceability
 
         Returns:
             Dict with cost_basis, gain_loss, holding_period_days or None if no lots found
@@ -704,11 +787,16 @@ class DeFiAuditService:
 
         if not lots:
             # No cost basis found - assume $0 cost basis (worst case for taxes)
+            logger.warning(
+                f"⚠️ No cost basis lots found for {token_out}. "
+                f"Assuming $0 cost basis - user {user_id} should import purchase history!"
+            )
             return {
                 "cost_basis": 0.0,
                 "gain_loss": usd_value_out,  # All proceeds are gain
                 "holding_period_days": 0,
-                "method": "assumed_zero"
+                "method": "assumed_zero",
+                "warning": f"⚠️ Pas de lots trouvés pour {token_out}. Importez votre historique d'achat!"
             }
 
         # Calculate using FIFO
@@ -734,12 +822,15 @@ class DeFiAuditService:
             # Update remaining
             remaining_to_sell -= amount_from_lot
 
-            # Calculate disposal price safely (handle None values)
+            # Calculate disposal price safely (handle None values and avoid division by zero)
             disposal_price = 0.0
             proceeds = 0.0
-            if usd_value_out is not None and amount_out and amount_out > 0:
+            if usd_value_out is not None and amount_out and amount_out > 1e-10:
                 disposal_price = usd_value_out / amount_out
                 proceeds = amount_from_lot * disposal_price
+            elif usd_value_out is not None:
+                # If amount is too small but we have a USD value, log warning
+                logger.warning(f"Amount too small for price calculation: {amount_out} {token_out}")
 
             # Calculate holding period
             holding_days = (timestamp - lot.acquisition_date).days if timestamp and lot.acquisition_date else 0
@@ -751,6 +842,7 @@ class DeFiAuditService:
                 user_id=user_id,
                 lot_id=lot.id,
                 disposal_date=timestamp,
+                disposal_tx_hash=tx_hash,  # Added: Transaction hash for traceability
                 amount_disposed=amount_from_lot,
                 disposal_price_usd=disposal_price,
                 cost_basis_per_unit=lot.acquisition_price_usd,
@@ -795,7 +887,9 @@ class DeFiAuditService:
         price_usd: float,
         acquisition_date: datetime,
         transaction_type: str,
-        tx_hash: str
+        tx_hash: str,
+        wallet_address: str,
+        audit_id: Optional[int] = None
     ):
         """
         Créer automatiquement un lot de cost basis pour une acquisition
@@ -809,7 +903,24 @@ class DeFiAuditService:
             acquisition_date: Date d'acquisition
             transaction_type: Type de transaction (swap, claim_rewards, etc.)
             tx_hash: Hash de la transaction
+            wallet_address: Wallet address that acquired the asset
+            audit_id: ID of the DeFi audit creating this lot (optional)
         """
+        # Validation: Token symbol doit être valide
+        if not token or token == "..." or token.startswith("...") or len(token.strip()) == 0:
+            logger.warning(f"⚠️ Invalid token symbol: '{token}' - skipping lot creation")
+            return
+
+        # Validation: Prix doit être strictement positif
+        if price_usd <= 0:
+            logger.error(f"❌ Invalid price ${price_usd} for {token} - skipping lot creation")
+            return
+
+        # Validation: Quantité doit être strictement positive
+        if amount <= 0:
+            logger.error(f"❌ Invalid amount {amount} for {token} - skipping lot creation")
+            return
+
         from app.services.cost_basis_calculator import CostBasisCalculator
 
         # Déterminer la méthode d'acquisition
@@ -826,6 +937,8 @@ class DeFiAuditService:
             acquisition_date=acquisition_date,
             acquisition_method=acquisition_method,
             source_tx_hash=tx_hash,
+            wallet_address=wallet_address,
+            source_audit_id=audit_id,
             notes=f"Auto-created from DeFi audit ({transaction_type})"
         )
 

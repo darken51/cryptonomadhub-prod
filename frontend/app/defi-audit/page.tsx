@@ -9,6 +9,8 @@ import { AppHeader } from '@/components/AppHeader'
 import { Footer } from '@/components/Footer'
 import { ArrowLeft, Plus, ExternalLink, ChevronDown, Activity } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { CurrencyDisplay, CurrencyBadge } from '@/components/CurrencyDisplay'
+import { parseCurrencyData } from '@/lib/currency'
 
 interface Audit {
   id: number
@@ -27,6 +29,14 @@ interface Audit {
   protocols_used: Record<string, any>
   created_at: string
   completed_at: string | null
+  // Multi-currency fields
+  local_currency?: string | null
+  currency_symbol?: string | null
+  total_volume_local?: number | null
+  total_gains_local?: number | null
+  total_losses_local?: number | null
+  total_fees_local?: number | null
+  exchange_rate?: number | null
 }
 
 // Detect blockchain type from wallet address
@@ -427,11 +437,17 @@ export default function DeFiAuditPage() {
                         </p>
                       </div>
                       <div className="p-3 rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/30 dark:to-cyan-950/30 border border-blue-100 dark:border-blue-900/50">
-                        <p className="text-xs text-slate-600 dark:text-slate-400 mb-1 font-medium">
+                        <p className="text-xs text-slate-600 dark:text-slate-400 mb-1 font-medium flex items-center gap-2">
                           Volume
+                          {audit.local_currency && <CurrencyBadge currencyCode={audit.local_currency} currencySymbol={audit.currency_symbol} />}
                         </p>
                         <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                          {formatCurrency(audit.total_volume_usd)}
+                          <CurrencyDisplay
+                            amountUsd={audit.total_volume_usd}
+                            amountLocal={audit.total_volume_local}
+                            currencyData={parseCurrencyData(audit)}
+                            mode="dual"
+                          />
                         </p>
                       </div>
                       <div className="p-3 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 border border-emerald-100 dark:border-emerald-900/50">
@@ -443,7 +459,13 @@ export default function DeFiAuditPage() {
                             ? 'text-green-600 dark:text-green-400'
                             : 'text-red-600 dark:text-red-400'
                         }`}>
-                          {formatCurrency(audit.total_gains_usd - audit.total_losses_usd)}
+                          <CurrencyDisplay
+                            amountUsd={audit.total_gains_usd - audit.total_losses_usd}
+                            amountLocal={audit.total_gains_local && audit.total_losses_local ? audit.total_gains_local - audit.total_losses_local : null}
+                            currencyData={parseCurrencyData(audit)}
+                            mode="dual"
+                            showPlusSign={true}
+                          />
                         </p>
                       </div>
                       <div className="p-3 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/30 border border-amber-100 dark:border-amber-900/50">
@@ -451,7 +473,12 @@ export default function DeFiAuditPage() {
                           Total Fees
                         </p>
                         <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                          {formatCurrency(audit.total_fees_usd)}
+                          <CurrencyDisplay
+                            amountUsd={audit.total_fees_usd}
+                            amountLocal={audit.total_fees_local}
+                            currencyData={parseCurrencyData(audit)}
+                            mode="dual"
+                          />
                         </p>
                       </div>
                     </motion.div>

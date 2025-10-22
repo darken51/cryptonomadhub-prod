@@ -10,7 +10,8 @@ from app.models import (
     CostBasisLot, CostBasisDisposal, UserCostBasisSettings, WashSaleViolation,
     WalletGroup, WalletGroupMember, InterWalletTransfer, ConsolidatedBalance,
     TaxOpportunity, TaxHarvestingTransaction, TaxOptimizationSettings,
-    UserWallet, NFTTransaction, YieldPosition, YieldReward
+    UserWallet, NFTTransaction, YieldPosition, YieldReward,
+    DashboardActivity
 )
 from app.middleware import (
     limiter,
@@ -18,6 +19,7 @@ from app.middleware import (
     setup_security_middleware
 )
 from app.monitoring import init_sentry
+from app.error_handlers import register_error_handlers  # ✅ PHASE 2.7
 import logging
 
 logger = logging.getLogger(__name__)
@@ -37,6 +39,9 @@ setup_security_middleware(app)
 # Add rate limiting
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
+
+# ✅ PHASE 2.7: Register global error handlers
+register_error_handlers(app)
 
 # Create tables on startup
 @app.on_event("startup")
@@ -69,12 +74,14 @@ async def root():
 # Import routers
 from app.routers import (
     auth, simulations, paddle_webhook, chat, admin, regulations,
-    defi_audit, health, users, cost_basis, tax_optimizer, wallets, user_wallets
+    defi_audit, health, users, cost_basis, tax_optimizer, wallets, user_wallets,
+    dashboard, wallet_portfolio
 )
 
 app.include_router(health.router)
 app.include_router(auth.router)
 app.include_router(users.router)
+app.include_router(dashboard.router)
 app.include_router(simulations.router)
 app.include_router(paddle_webhook.router)
 app.include_router(chat.router)
@@ -85,3 +92,4 @@ app.include_router(cost_basis.router)
 app.include_router(tax_optimizer.router)
 app.include_router(wallets.router)
 app.include_router(user_wallets.router)
+app.include_router(wallet_portfolio.router)

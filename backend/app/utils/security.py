@@ -2,6 +2,7 @@ from passlib.context import CryptContext
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from app.config import settings
+import secrets
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -45,3 +46,39 @@ def verify_token(token: str) -> dict:
         return payload
     except JWTError:
         return None
+
+
+# ✅ PHASE 1.3: Refresh tokens
+def create_refresh_token() -> str:
+    """Create a secure random refresh token"""
+    return secrets.token_urlsafe(32)
+
+
+def verify_refresh_token(token: str, stored_token: str, expires: datetime) -> bool:
+    """Verify refresh token is valid and not expired"""
+    if not token or not stored_token:
+        return False
+
+    # Check token matches
+    if token != stored_token:
+        return False
+
+    # Check not expired
+    if not expires or datetime.utcnow() > expires:
+        return False
+
+    return True
+
+
+# ✅ PHASE 1.4: Hash reset and verification tokens
+import hashlib
+
+
+def hash_token(token: str) -> str:
+    """Hash a token using SHA-256 for secure storage"""
+    return hashlib.sha256(token.encode()).hexdigest()
+
+
+def verify_hashed_token(plain_token: str, hashed_token: str) -> bool:
+    """Verify a plain token against its hash"""
+    return hash_token(plain_token) == hashed_token

@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import desc
 from app.database import get_db
 from app.models.user import User
-from app.models.cost_basis import CostBasisLot
+from app.models.cost_basis import CostBasisLot, UserCostBasisSettings
 from app.models.tax_opportunity import (
     TaxOpportunity,
     TaxOptimizationSettings,
@@ -17,14 +17,63 @@ from app.models.tax_opportunity import (
     OpportunityStatus
 )
 from app.routers.auth import get_current_user
+from app.dependencies import get_exchange_rate_service
+from app.data.currency_mapping import get_currency_info
 from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional
 from datetime import datetime, timedelta
+from decimal import Decimal
 import logging
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/tax-optimizer", tags=["Tax Optimizer"])
+
+
+# Helper function to get current exchange rate for user's jurisdiction
+async def get_user_exchange_rate(user_id: int, db: Session) -> tuple[Optional[str], Optional[str], Optional[float]]:
+    """
+    Get user's local currency and current exchange rate.
+
+    Returns:
+        Tuple of (currency_code, currency_symbol, exchange_rate) or (None, None, None)
+    """
+    try:
+        # Get user's tax jurisdiction
+        settings = db.query(UserCostBasisSettings).filter(
+            UserCostBasisSettings.user_id == user_id
+        ).first()
+
+        if not settings or not settings.tax_jurisdiction:
+            return None, None, None
+
+        jurisdiction = settings.tax_jurisdiction
+        currency_info = get_currency_info(jurisdiction)
+
+        if not currency_info:
+            return None, None, None
+
+        # Skip if USD jurisdiction
+        if currency_info.uses_usd_directly:
+            return "USD", "$", 1.0
+
+        # Get current exchange rate
+        exchange_service = get_exchange_rate_service()
+        rate, source = await exchange_service.get_exchange_rate(
+            from_currency="USD",
+            to_currency=currency_info.currency_code
+        )
+
+        if rate is None:
+            return None, None, None
+
+        await exchange_service.close()
+
+        return currency_info.currency_code, currency_info.currency_symbol, float(rate)
+
+    except Exception as e:
+        logger.error(f"Error getting exchange rate for user {user_id}: {e}")
+        return None, None, None
 
 
 # Pydantic models
@@ -35,10 +84,18 @@ class OpportunityResponse(BaseModel):
     token: str
     chain: str
     current_amount: float
+
+    # USD values (original)
     current_value_usd: float
     unrealized_gain_loss: float
     unrealized_gain_loss_percent: float
     potential_savings: float
+
+    # Local currency values (multi-currency support)
+    current_value_local: Optional[float] = None
+    unrealized_gain_loss_local: Optional[float] = None
+    potential_savings_local: Optional[float] = None
+
     recommended_action: str
     action_description: str
     deadline: Optional[str]
@@ -49,7 +106,16 @@ class OpportunityResponse(BaseModel):
 
 class AnalysisResponse(BaseModel):
     total_opportunities: int
+
+    # USD values (original)
     potential_tax_savings: float
+
+    # Local currency values (multi-currency support)
+    local_currency: Optional[str] = None
+    currency_symbol: Optional[str] = None
+    potential_tax_savings_local: Optional[float] = None
+    exchange_rate: Optional[float] = None
+
     opportunities: List[OpportunityResponse]
     portfolio_summary: dict
     recommendations: List[str]
@@ -63,24 +129,38 @@ class ExecuteOpportunityRequest(BaseModel):
 
 @router.get("/analyze", response_model=AnalysisResponse)
 async def analyze_tax_optimization(
+    audit_id: Optional[int] = None,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
     Analyze user's portfolio for tax optimization opportunities
 
+    Args:
+        audit_id: Optional DeFi audit ID to scope analysis to specific audit
+
     Identifies:
     - Tax-loss harvesting opportunities
     - Assets close to long-term capital gains threshold
     - Optimal timing for sales
     - Wash sale risk
+
+    If audit_id is provided, only analyzes cost basis lots from that audit.
+    Otherwise, analyzes all lots (default behavior).
     """
 
     # Get user's cost basis lots
-    lots = db.query(CostBasisLot).filter(
+    lots_query = db.query(CostBasisLot).filter(
         CostBasisLot.user_id == current_user.id,
         CostBasisLot.remaining_amount > 0
-    ).all()
+    )
+
+    # Filter by audit_id if provided
+    if audit_id is not None:
+        lots_query = lots_query.filter(CostBasisLot.source_audit_id == audit_id)
+        logger.info(f"Analyzing tax opportunities for audit #{audit_id}")
+
+    lots = lots_query.all()
 
     if not lots:
         return AnalysisResponse(
@@ -141,8 +221,8 @@ async def analyze_tax_optimization(
                 price_cache[lot.token] = lot.acquisition_price_usd
 
         current_price = price_cache[lot.token]
-        current_value = lot.remaining_amount * current_price
-        cost_basis = lot.remaining_amount * lot.acquisition_price_usd
+        current_value = float(lot.remaining_amount) * float(current_price)
+        cost_basis = float(lot.remaining_amount) * float(lot.acquisition_price_usd)
         unrealized_gl = current_value - cost_basis
         unrealized_gl_percent = (unrealized_gl / cost_basis * 100) if cost_basis > 0 else 0
 
@@ -257,10 +337,23 @@ async def analyze_tax_optimization(
         TaxOpportunity.expires_at > current_time
     ).order_by(desc(TaxOpportunity.potential_savings)).all()
 
+    # Get user's currency and exchange rate
+    local_currency, currency_symbol, exchange_rate = await get_user_exchange_rate(current_user.id, db)
+
     opportunities_list = []
     total_potential_savings = 0.0
 
     for opp in all_opportunities:
+        # Convert to local currency if available
+        current_value_local = None
+        unrealized_gl_local = None
+        potential_savings_local = None
+
+        if exchange_rate:
+            current_value_local = float(opp.current_value_usd) * exchange_rate
+            unrealized_gl_local = float(opp.unrealized_gain_loss) * exchange_rate
+            potential_savings_local = float(opp.potential_savings) * exchange_rate
+
         opportunities_list.append(OpportunityResponse(
             id=opp.id,
             opportunity_type=opp.opportunity_type.value,
@@ -272,6 +365,9 @@ async def analyze_tax_optimization(
             unrealized_gain_loss=opp.unrealized_gain_loss,
             unrealized_gain_loss_percent=opp.unrealized_gain_loss_percent,
             potential_savings=opp.potential_savings,
+            current_value_local=current_value_local,
+            unrealized_gain_loss_local=unrealized_gl_local,
+            potential_savings_local=potential_savings_local,
             recommended_action=opp.recommended_action,
             action_description=opp.action_description,
             deadline=opp.deadline.isoformat() if opp.deadline else None,
@@ -291,14 +387,25 @@ async def analyze_tax_optimization(
         recommendations.append("No immediate tax optimization opportunities found")
         recommendations.append("Continue monitoring - opportunities appear as market conditions change")
 
+    # Calculate local currency values
+    potential_tax_savings_local = None
+    if exchange_rate:
+        potential_tax_savings_local = total_potential_savings * exchange_rate
+
     return AnalysisResponse(
         total_opportunities=len(opportunities_list),
         potential_tax_savings=total_potential_savings,
+        local_currency=local_currency,
+        currency_symbol=currency_symbol,
+        potential_tax_savings_local=potential_tax_savings_local,
+        exchange_rate=exchange_rate,
         opportunities=opportunities_list,
         portfolio_summary={
             "total_lots": len(lots),
             "total_value_usd": total_value,
-            "total_unrealized_gain_loss": total_unrealized_gl
+            "total_unrealized_gain_loss": total_unrealized_gl,
+            "total_value_local": float(total_value * exchange_rate) if exchange_rate else None,
+            "total_unrealized_gain_loss_local": float(total_unrealized_gl * exchange_rate) if exchange_rate else None
         },
         recommendations=recommendations
     )
@@ -428,6 +535,23 @@ async def update_tax_optimizer_settings(
     if not settings:
         settings = TaxOptimizationSettings(user_id=current_user.id)
         db.add(settings)
+
+    # Validate tax_jurisdiction if being updated
+    if "tax_jurisdiction" in settings_update:
+        from app.models.regulation import Regulation
+        country_code = settings_update["tax_jurisdiction"].upper()
+
+        regulation = db.query(Regulation).filter(
+            Regulation.country_code == country_code
+        ).first()
+
+        if not regulation:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid country code: {country_code}. Tax jurisdiction not supported."
+            )
+
+        settings_update["tax_jurisdiction"] = country_code
 
     # Update fields
     for key, value in settings_update.items():

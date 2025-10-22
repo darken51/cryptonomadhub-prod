@@ -10,7 +10,7 @@ Features:
 - Shared cost basis across wallets
 """
 
-from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, ForeignKey, Text, Enum as SQLEnum
+from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, ForeignKey, Text, Enum as SQLEnum, UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
@@ -56,6 +56,12 @@ class WalletGroupMember(Base):
 
     # Relationships
     group = relationship("WalletGroup", back_populates="members")
+
+    # Constraints
+    __table_args__ = (
+        UniqueConstraint('group_id', 'wallet_address', 'chain',
+                        name='uq_group_wallet_chain'),
+    )
 
     def __repr__(self):
         return f"<WalletGroupMember(id={self.id}, wallet='{self.wallet_address[:10]}...', chain='{self.chain}')>"

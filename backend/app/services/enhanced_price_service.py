@@ -313,7 +313,7 @@ class EnhancedPriceService:
         """
         cache_key = f"price:current:{token}:{chain}"
 
-        # Try Redis cache (1 minute TTL for current prices)
+        # Try Redis cache (5 minute TTL for current prices)
         cached = self.redis_client.get(cache_key)
         if cached:
             return float(cached)
@@ -336,8 +336,8 @@ class EnhancedPriceService:
                 if coingecko_id in data and "usd" in data[coingecko_id]:
                     price = float(data[coingecko_id]["usd"])
 
-                    # Cache for 1 minute
-                    self.redis_client.setex(cache_key, 60, str(price))
+                    # Cache for 5 minutes
+                    self.redis_client.setex(cache_key, 300, str(price))
 
                     return price
 

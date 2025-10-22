@@ -9,14 +9,19 @@ class Settings(BaseSettings):
     # Security
     SECRET_KEY: str
     JWT_ALGORITHM: str = "HS256"
-    JWT_EXPIRATION_MINUTES: int = 1440
+    JWT_EXPIRATION_MINUTES: int = 60  # ✅ PHASE 1.3: Réduit de 24h à 1h
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7  # Refresh tokens valides 7 jours
 
     # Redis
     REDIS_URL: str
 
-    # Ollama
-    OLLAMA_HOST: str
-    OLLAMA_MODEL: str = "meta-llama-3.1-8b-instruct:latest"
+    # AI Assistant - Anthropic Claude
+    ANTHROPIC_API_KEY: str
+    ANTHROPIC_MODEL: str = "claude-3-5-haiku-20241022"  # Haiku = 3x cheaper, fast, great for chat
+
+    # Ollama (deprecated - migrated to Claude)
+    # OLLAMA_HOST: str
+    # OLLAMA_MODEL: str = "meta-llama-3.1-8b-instruct:latest"
 
     # Paddle
     PADDLE_VENDOR_ID: str = "12345"
@@ -62,12 +67,23 @@ class Settings(BaseSettings):
     # Single Etherscan API key works for 50+ EVM chains via v2 API
     ETHERSCAN_API_KEY: str = ""
 
+    # Multi-chain providers (support 50+ chains)
+    MORALIS_API_KEY: str = ""  # Moralis (EVM + Solana, best for multi-chain)
+    ALCHEMY_API_KEY: str = ""  # Alchemy (EVM only, best rate limits)
+    INFURA_API_KEY: str = ""  # Infura (EVM backup)
+    QUICKNODE_API_KEY: str = ""  # QuickNode (multi-chain)
+
     # Solana API Keys
     SOLANA_API_KEY: str = ""  # Solscan (fallback)
     HELIUS_API_KEY: str = ""  # Helius (primary, better for transactions)
 
+    # Bitcoin API Keys
+    BLOCKCYPHER_API_KEY: str = ""  # BlockCypher (Bitcoin, Litecoin, Dogecoin)
+    BLOCKCHAIN_INFO_API_KEY: str = ""  # Blockchain.info (Bitcoin)
+
     # Price API Keys
     COINMARKETCAP_API_KEY: str = ""  # CoinMarketCap (fallback for prices)
+    COINGECKO_API_KEY: str = ""  # CoinGecko Pro (optional, free tier works)
 
     class Config:
         env_file = ".env"

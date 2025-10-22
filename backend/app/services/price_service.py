@@ -12,6 +12,9 @@ import logging
 from functools import lru_cache
 import time
 import os
+import json
+import redis
+from app.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -79,6 +82,16 @@ class PriceService:
         # CoinMarketCap API (fallback)
         self.cmc_api_key = os.getenv("COINMARKETCAP_API_KEY", "")
         self.cmc_base_url = "https://pro-api.coinmarketcap.com/v1"
+
+        # ✅ PHASE 1.6: Redis cache for price data
+        try:
+            self.redis = redis.from_url(settings.REDIS_URL, decode_responses=True)
+            self.cache_enabled = True
+            logger.info("Redis cache enabled for price service")
+        except Exception as e:
+            logger.warning(f"Redis cache unavailable, falling back to LRU cache: {e}")
+            self.redis = None
+            self.cache_enabled = False
 
     # Historical average prices (fallback when API fails)
     HISTORICAL_AVERAGES = {
@@ -238,9 +251,32 @@ class PriceService:
 
         return None
 
+    def _get_cache_key(self, key_type: str, *args) -> str:
+        """Generate Redis cache key"""
+        return f"price:{key_type}:{':'.join(str(arg) for arg in args)}"
+
+    def _get_from_cache(self, cache_key: str) -> Optional[str]:
+        """Get value from Redis cache"""
+        if not self.cache_enabled or not self.redis:
+            return None
+        try:
+            return self.redis.get(cache_key)
+        except Exception as e:
+            logger.warning(f"Redis get failed: {e}")
+            return None
+
+    def _set_cache(self, cache_key: str, value: str, ttl_seconds: int = 300):
+        """Set value in Redis cache with TTL (default 5 minutes)"""
+        if not self.cache_enabled or not self.redis:
+            return
+        try:
+            self.redis.setex(cache_key, ttl_seconds, value)
+        except Exception as e:
+            logger.warning(f"Redis set failed: {e}")
+
     def get_current_price(self, token_symbol: str) -> Optional[Decimal]:
         """
-        Get current price for a token
+        Get current price for a token (with Redis caching)
 
         Args:
             token_symbol: Token symbol (e.g., "ETH", "USDC")
@@ -253,6 +289,13 @@ class PriceService:
         # Stablecoins
         if token_symbol in ["USDC", "USDT", "DAI", "BUSD"]:
             return Decimal("1.0")
+
+        # ✅ PHASE 1.6: Check Redis cache first (5 min TTL)
+        cache_key = self._get_cache_key("current", token_symbol)
+        cached_price = self._get_from_cache(cache_key)
+        if cached_price:
+            logger.debug(f"Cache hit for {token_symbol}: ${cached_price}")
+            return Decimal(cached_price)
 
         coingecko_id = self.TOKEN_ID_MAP.get(token_symbol)
         if not coingecko_id:
@@ -272,7 +315,11 @@ class PriceService:
                 price = data.get(coingecko_id, {}).get("usd")
 
                 if price:
-                    return Decimal(str(price))
+                    price_decimal = Decimal(str(price))
+                    # ✅ PHASE 1.6: Cache the result for 5 minutes
+                    self._set_cache(cache_key, str(price_decimal), ttl_seconds=300)
+                    logger.info(f"Fetched and cached price for {token_symbol}: ${price_decimal}")
+                    return price_decimal
 
             return None
 

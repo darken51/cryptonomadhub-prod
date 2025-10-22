@@ -4,7 +4,7 @@ DeFi Protocol Models
 Models for tracking DeFi protocols, transactions, and audit results
 """
 
-from sqlalchemy import Column, Integer, String, Float, DateTime, Text, ForeignKey, Enum, JSON
+from sqlalchemy import Column, Integer, String, Float, DateTime, Text, ForeignKey, Enum, JSON, Boolean
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from app.database import Base

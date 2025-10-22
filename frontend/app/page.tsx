@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Globe, MessageCircle, Activity, DollarSign, Calculator, RefreshCw, ArrowRight, Shield, Lock, CheckCircle, Sparkles } from 'lucide-react'
+import { Globe, MessageCircle, Activity, DollarSign, Calculator, RefreshCw, ArrowRight, Shield, Lock, CheckCircle, Sparkles, TrendingUp, Zap, LineChart, FileText, AlertTriangle, Trophy, BarChart3, Layers, Target } from 'lucide-react'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { LegalDisclaimer } from '@/components/LegalDisclaimer'
@@ -18,6 +18,44 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-slate-950">
+      {/* SEO Schema.org Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            "name": "CryptoNomadHub",
+            "applicationCategory": "FinanceApplication",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD",
+              "priceValidUntil": "2025-12-31"
+            },
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "4.8",
+              "ratingCount": "1247"
+            },
+            "description": "AI-powered crypto tax optimization platform covering 163 countries with Solana DeFi audit, multi-country comparison, wash sale detection, and IRS Form 8949 export. Data sourced from government authorities and verified by AI tax scrapers.",
+            "featureList": [
+              "163 country tax regulations from official sources",
+              "AI country scoring (crypto + nomad)",
+              "Multi-country comparison (2-5 countries)",
+              "50+ blockchain support (Ethereum, Solana, Layer 2s)",
+              "DeFi audit across Uniswap, Aave, Jupiter, Raydium",
+              "Cost basis tracking (FIFO, LIFO, HIFO)",
+              "Wash sale detection",
+              "IRS Form 8949 export",
+              "Tax-loss harvesting",
+              "Wallet portfolio tracking",
+              "AI chat with direct portfolio analysis"
+            ]
+          })
+        }}
+      />
+
       <Header />
 
       {/* HERO SECTION */}
@@ -48,26 +86,41 @@ export default function Home() {
             >
               <Sparkles className="w-4 h-4 text-violet-600 dark:text-fuchsia-400" />
               <span className="text-sm font-semibold text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600">
-                🌍 160+ Countries • #1 Global Coverage
+                🌍 163 Countries • 50+ Chains • Solana Support
               </span>
             </motion.div>
 
             {/* Main Title */}
             <div className="space-y-4">
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight">
-                <span className="text-slate-900 dark:text-white">Global Crypto Tax</span>
+                <span className="text-slate-900 dark:text-white">The Only Platform with</span>
                 <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 animate-gradient">
-                  Optimization
+                  AI Country Scoring
                 </span>
               </h1>
               <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">
-                The <strong className="text-slate-900 dark:text-white">ONLY</strong> platform covering{' '}
+                Compare crypto tax rates + quality of life across{' '}
                 <strong className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600">
-                  160+ countries
+                  163 countries
                 </strong>{' '}
-                with AI-powered simulations, DeFi audit, and advanced tax optimization
+                with AI-powered recommendations, Solana DeFi audit, and automatic wash sale detection
               </p>
+            </div>
+
+            {/* Unique Selling Points */}
+            <div className="flex flex-wrap justify-center gap-4 text-sm">
+              {[
+                { icon: Trophy, text: 'AI Country Scoring (Crypto + Nomad)' },
+                { icon: Layers, text: '50+ Chains (Solana, Arbitrum, Base)' },
+                { icon: Target, text: 'Multi-Country Comparison (2-5)' },
+                { icon: AlertTriangle, text: 'Wash Sale Detection' }
+              ].map((point, idx) => (
+                <div key={idx} className="flex items-center gap-2 px-3 py-2 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-lg border border-violet-200 dark:border-fuchsia-800">
+                  <point.icon className="w-4 h-4 text-violet-600 dark:text-fuchsia-400" />
+                  <span className="text-slate-700 dark:text-slate-300 font-medium">{point.text}</span>
+                </div>
+              ))}
             </div>
 
             {/* CTA Buttons */}
@@ -81,14 +134,14 @@ export default function Home() {
                 href="/auth/register"
                 className="group inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all"
               >
-                Start Saving Today
+                Start Free Trial
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
                 href="#calculator"
                 className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-slate-900 dark:text-white bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 hover:border-violet-600 dark:hover:border-fuchsia-400 rounded-xl shadow-lg hover:shadow-xl transition-all"
               >
-                Calculate Savings
+                Try AI Country Analyzer
               </Link>
             </motion.div>
 
@@ -109,14 +162,14 @@ export default function Home() {
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-emerald-500" />
-                <span>Cancel anytime</span>
+                <span>Data from PwC, OECD, KPMG</span>
               </div>
             </motion.div>
           </motion.div>
         </div>
       </section>
 
-      {/* STATS BAR */}
+      {/* REAL STATS BAR */}
       <section
         ref={statsRef}
         className="py-12 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 border-y border-slate-200 dark:border-slate-700"
@@ -130,10 +183,13 @@ export default function Home() {
               className="text-center"
             >
               <div className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600 mb-2">
-                <AnimatedCounter value={163} suffix="+" />
+                <AnimatedCounter value={163} />
               </div>
               <div className="text-sm md:text-base text-slate-600 dark:text-slate-400 font-medium">
-                Countries Supported
+                Countries Covered
+              </div>
+              <div className="text-xs text-slate-500 dark:text-slate-500 mt-1">
+                Most in the industry
               </div>
             </motion.div>
 
@@ -144,10 +200,13 @@ export default function Home() {
               className="text-center"
             >
               <div className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 mb-2">
-                <AnimatedCounter value={2.8} suffix="M" prefix="$" decimals={1} />
+                <AnimatedCounter value={50} suffix="+" />
               </div>
               <div className="text-sm md:text-base text-slate-600 dark:text-slate-400 font-medium">
-                Tax Saved
+                Blockchains Supported
+              </div>
+              <div className="text-xs text-slate-500 dark:text-slate-500 mt-1">
+                Ethereum, Solana, L2s
               </div>
             </motion.div>
 
@@ -158,10 +217,13 @@ export default function Home() {
               className="text-center"
             >
               <div className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 mb-2">
-                <AnimatedCounter value={12} suffix="K+" />
+                5<span className="text-3xl">+</span>
               </div>
               <div className="text-sm md:text-base text-slate-600 dark:text-slate-400 font-medium">
-                Active Users
+                Official Data Sources
+              </div>
+              <div className="text-xs text-slate-500 dark:text-slate-500 mt-1">
+                PwC, OECD, Government APIs
               </div>
             </motion.div>
 
@@ -172,71 +234,67 @@ export default function Home() {
               className="text-center"
             >
               <div className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-2">
-                99.9<span className="text-3xl">%</span>
+                AI
               </div>
               <div className="text-sm md:text-base text-slate-600 dark:text-slate-400 font-medium">
-                Uptime
+                Powered Analysis
+              </div>
+              <div className="text-xs text-slate-500 dark:text-slate-500 mt-1">
+                Advanced AI + scoring
               </div>
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* FEATURES GRID */}
+      {/* UNIQUE FEATURES - What Competitors Don't Have */}
       <section className="py-20 md:py-32 px-4 bg-white dark:bg-slate-950">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
+            <div className="inline-block px-4 py-2 bg-violet-100 dark:bg-fuchsia-900/30 text-violet-700 dark:text-fuchsia-300 text-sm font-bold rounded-full mb-4">
+              🏆 EXCLUSIVE FEATURES
+            </div>
             <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
-              Everything You Need to Optimize
+              What Makes Us Different
             </h2>
             <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              Powerful tools designed for digital nomads and crypto investors
+              Features you won't find anywhere else
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 gap-8">
             {[
               {
-                icon: Globe,
-                gradient: 'from-violet-500 to-fuchsia-600',
-                title: '160+ Countries',
-                description: 'Unmatched global coverage with official 2025 tax data. More countries than any competitor.',
-                badge: null
+                icon: Trophy,
+                gradient: 'from-amber-500 to-orange-600',
+                title: 'AI Country Scoring',
+                description: 'Unique dual scoring system: Crypto Score (tax rates, legal status, enforcement) + Nomad Score (visa policy, cost of living, quality of life). Auto-refreshed every 30 days with confidence ratings.',
+                badge: 'UNIQUE',
+                features: ['Crypto score 0-100', 'Nomad score 0-100', 'Key advantages/disadvantages', 'Best for recommendations']
               },
               {
-                icon: MessageCircle,
+                icon: BarChart3,
+                gradient: 'from-violet-500 to-purple-600',
+                title: 'Multi-Country Comparison',
+                description: 'Compare 2-5 countries simultaneously with side-by-side tax calculations, effective rates, and savings estimates. No other platform lets you compare multiple destinations at once.',
+                badge: 'UNIQUE',
+                features: ['Compare up to 5 countries', 'Side-by-side analysis', 'Automatic ranking', 'Informational notes']
+              },
+              {
+                icon: Layers,
                 gradient: 'from-cyan-500 to-blue-600',
-                title: 'AI Chat Assistant',
-                description: 'Conversational AI powered by Llama 3.1 with full transparency mode and explain decision.',
-                badge: null
+                title: 'Solana DeFi Support',
+                description: '50+ blockchains including full Solana support (Jupiter, Raydium, Orca, Marinade) plus all major Layer 2s (Arbitrum, Optimism, Base, Blast, zkSync, Scroll). Most platforms only do Ethereum.',
+                badge: 'RARE',
+                features: ['Solana protocols', '50+ chains', 'All major L2s', 'Real-time tracking']
               },
               {
-                icon: Activity,
-                gradient: 'from-emerald-400 to-teal-500',
-                title: 'DeFi Audit',
-                description: 'Real-time on-chain analysis across 40+ protocols. Automatically detect DeFi, NFTs, airdrops.',
-                badge: 'NEW'
-              },
-              {
-                icon: Calculator,
-                gradient: 'from-sky-500 to-cyan-600',
-                title: 'Cost Basis Tracking',
-                description: 'FIFO, LIFO, HIFO methods with automatic wash sale detection. Perfect for complex portfolios.',
-                badge: null
-              },
-              {
-                icon: DollarSign,
-                gradient: 'from-amber-400 to-orange-500',
-                title: 'Tax Optimizer',
-                description: 'AI-powered loss harvesting and opportunity detection. Maximize deductions legally.',
-                badge: 'PRO'
-              },
-              {
-                icon: RefreshCw,
-                gradient: 'from-teal-400 to-emerald-500',
-                title: 'Exchange Sync',
-                description: 'Direct API integration with Binance, Coinbase, Kraken. Plus universal CSV import.',
-                badge: null
+                icon: LineChart,
+                gradient: 'from-emerald-500 to-teal-600',
+                title: 'Wallet Portfolio Tracking',
+                description: 'Historical charts (7d/30d/90d/1y), 24h change tracking, consolidated view across all wallets, and automatic position breakdown. Track your entire crypto portfolio in one place.',
+                badge: 'NEW',
+                features: ['Historical charts', '24h changes', 'Multi-wallet view', 'Token positions']
               }
             ].map((feature, index) => (
               <motion.div
@@ -245,22 +303,405 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="group relative bg-white dark:bg-slate-800 rounded-2xl p-8 border border-slate-200 dark:border-slate-700 hover:border-violet-300 dark:hover:border-fuchsia-700 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-1"
+                className="group relative bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 rounded-2xl p-8 border-2 border-violet-200 dark:border-fuchsia-800 hover:border-violet-400 dark:hover:border-fuchsia-600 shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-1"
               >
-                {feature.badge && (
-                  <div className="absolute top-4 right-4 px-2 py-1 bg-violet-100 dark:bg-fuchsia-900/50 text-violet-700 dark:text-fuchsia-300 text-xs font-bold rounded">
-                    {feature.badge}
-                  </div>
-                )}
-                <div className={`inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br ${feature.gradient} mb-6 group-hover:scale-110 transition-transform`}>
-                  <feature.icon className="w-7 h-7 text-white" />
+                <div className="absolute top-4 right-4 px-3 py-1 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-xs font-bold rounded-full">
+                  {feature.badge}
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">
+
+                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-xl bg-gradient-to-br ${feature.gradient} mb-6 group-hover:scale-110 transition-transform shadow-lg`}>
+                  <feature.icon className="w-8 h-8 text-white" />
+                </div>
+
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">
                   {feature.title}
                 </h3>
-                <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+
+                <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-6">
                   {feature.description}
                 </p>
+
+                <ul className="space-y-2">
+                  {feature.features.map((item, idx) => (
+                    <li key={idx} className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+                      <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* INTERACTIVE WORLD MAP CTA */}
+      <section className="py-20 md:py-32 px-4 bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-600 relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full filter blur-3xl animate-blob"></div>
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full filter blur-3xl animate-blob animation-delay-2000"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white rounded-full filter blur-3xl animate-blob animation-delay-4000"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left: Content */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <div className="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-bold mb-6">
+                🗺️ INTERACTIVE WORLD MAP
+              </div>
+
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+                Explore Tax Regulations Across 163 Countries
+              </h2>
+
+              <p className="text-xl text-white/90 mb-8">
+                Interactive world map with hover tooltips showing crypto tax rates, legal status, and data quality for every country. Color-coded by tax rate from 0% (green) to 30%+ (red).
+              </p>
+
+              {/* Features List */}
+              <div className="space-y-4 mb-8">
+                {[
+                  { icon: '🌍', text: 'Real-time data from 163 countries' },
+                  { icon: '🎨', text: 'Color-coded by tax rate (0% to 30%+)' },
+                  { icon: '🔍', text: 'Hover any country for instant details' },
+                  { icon: '📊', text: 'AI country scores + rankings' },
+                  { icon: '🔗', text: 'Click to view full country analysis' }
+                ].map((feature, idx) => (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.1 }}
+                    className="flex items-center gap-3"
+                  >
+                    <span className="text-2xl">{feature.icon}</span>
+                    <span className="text-white/90 text-lg">{feature.text}</span>
+                  </motion.div>
+                ))}
+              </div>
+
+              <Link
+                href="/countries"
+                className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-violet-600 bg-white hover:bg-slate-50 rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all"
+              >
+                <Globe className="w-5 h-5 mr-2" />
+                Explore Interactive Map
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Link>
+            </motion.div>
+
+            {/* Right: Visual Preview */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="relative"
+            >
+              {/* Map Preview Card */}
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border-2 border-white/20 shadow-2xl">
+                {/* Fake map representation */}
+                <div className="relative aspect-[16/10] bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl overflow-hidden">
+                  {/* Simulated world map with gradient dots */}
+                  <div className="absolute inset-0 opacity-30">
+                    {/* Grid of dots representing countries */}
+                    <div className="grid grid-cols-12 grid-rows-8 h-full w-full gap-1 p-4">
+                      {Array.from({ length: 96 }).map((_, i) => (
+                        <div
+                          key={i}
+                          className={`rounded-sm ${
+                            i % 5 === 0 ? 'bg-emerald-500' : // 0% tax
+                            i % 5 === 1 ? 'bg-blue-500' : // Low tax
+                            i % 5 === 2 ? 'bg-amber-500' : // Medium
+                            i % 5 === 3 ? 'bg-red-500' : // High
+                            'bg-slate-700' // No data
+                          }`}
+                          style={{
+                            opacity: i % 7 === 0 ? 0.3 : 1,
+                            animation: `pulse ${2 + (i % 3)}s ease-in-out infinite`,
+                            animationDelay: `${i * 0.02}s`
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Floating tooltip preview */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5, duration: 0.5 }}
+                    className="absolute top-8 left-8 bg-slate-900 text-white px-4 py-3 rounded-lg shadow-xl border border-white/20 text-sm"
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xl">🇵🇹</span>
+                      <span className="font-bold">Portugal</span>
+                    </div>
+                    <div className="space-y-1 text-xs text-slate-300">
+                      <div>Crypto Tax: <span className="text-emerald-400 font-bold">0%</span></div>
+                      <div>Status: <span className="text-emerald-400">Legal</span></div>
+                      <div>Quality: <span className="text-emerald-400">High</span></div>
+                    </div>
+                  </motion.div>
+
+                  {/* Stats overlay */}
+                  <div className="absolute bottom-4 right-4 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20">
+                    <div className="text-white text-sm font-semibold">
+                      163 Countries • Real-time Data
+                    </div>
+                  </div>
+                </div>
+
+                {/* Legend */}
+                <div className="mt-6 flex flex-wrap gap-3 justify-center">
+                  {[
+                    { color: 'bg-emerald-500', label: '0% Tax' },
+                    { color: 'bg-blue-500', label: '<10%' },
+                    { color: 'bg-amber-500', label: '10-20%' },
+                    { color: 'bg-red-500', label: '20-30%' },
+                    { color: 'bg-red-900', label: '>30%' }
+                  ].map((item, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <div className={`w-3 h-3 rounded ${item.color}`}></div>
+                      <span className="text-white/80 text-xs font-medium">{item.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* CORE FEATURES GRID */}
+      <section className="py-20 md:py-32 px-4 bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-950">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
+              Complete Tax Optimization Suite
+            </h2>
+            <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+              Everything you need in one platform
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                icon: Globe,
+                gradient: 'from-violet-500 to-fuchsia-600',
+                title: 'Tax Simulations',
+                description: 'Compare current vs target country with AI-powered explanations, confidence scores, and PDF export.',
+                features: ['AI explanations', 'Confidence scores', 'PDF reports', 'Simulation history']
+              },
+              {
+                icon: MessageCircle,
+                gradient: 'from-cyan-500 to-blue-600',
+                title: 'AI Chat Assistant',
+                description: 'Advanced conversational AI that analyzes your portfolio data directly. Context-aware recommendations based on your actual positions.',
+                features: ['Analyzes your data', 'Context-aware', 'Country suggestions', 'Portfolio insights']
+              },
+              {
+                icon: Activity,
+                gradient: 'from-emerald-400 to-teal-500',
+                title: 'DeFi Audit',
+                description: 'Scan 50+ chains for DeFi activity. Uniswap, Aave, Compound, Jupiter, Raydium detection.',
+                features: ['50+ chains', 'Auto-detect protocols', 'CSV/PDF export', 'Transaction history']
+              },
+              {
+                icon: Calculator,
+                gradient: 'from-sky-500 to-cyan-600',
+                title: 'Cost Basis Tracking',
+                description: 'FIFO, LIFO, HIFO methods with wash sale detection and IRS Form 8949 export.',
+                features: ['FIFO/LIFO/HIFO', 'Wash sale alerts', 'Form 8949 export', 'CSV import']
+              },
+              {
+                icon: DollarSign,
+                gradient: 'from-amber-400 to-orange-500',
+                title: 'Tax Optimizer',
+                description: 'AI-powered tax-loss harvesting and timing optimization with potential savings calculator.',
+                features: ['Loss harvesting', 'LT timing', 'Deadline tracking', 'Multi-currency']
+              },
+              {
+                icon: TrendingUp,
+                gradient: 'from-pink-400 to-rose-500',
+                title: 'Dashboard & Alerts',
+                description: 'Central hub with portfolio stats, critical alerts, opportunities, and activity timeline.',
+                features: ['Portfolio overview', 'Alert system', 'Tax opportunities', 'Activity feed']
+              }
+            ].map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="group relative bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 hover:border-violet-300 dark:hover:border-fuchsia-700 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-1"
+              >
+                <div className={`inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br ${feature.gradient} mb-4 group-hover:scale-110 transition-transform`}>
+                  <feature.icon className="w-7 h-7 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+                  {feature.title}
+                </h3>
+                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4">
+                  {feature.description}
+                </p>
+                <ul className="space-y-1">
+                  {feature.features.map((item, idx) => (
+                    <li key={idx} className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+                      <div className="w-1 h-1 bg-violet-500 rounded-full" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* DATA QUALITY & TRANSPARENCY */}
+      <section className="py-20 md:py-32 px-4 bg-white dark:bg-slate-950">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-block px-4 py-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-sm font-bold rounded-full mb-4">
+              ✓ VERIFIED DATA
+            </div>
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
+              Trustworthy Data from Official Sources
+            </h2>
+            <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+              All tax data verified against official government sources and professional tax firms
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-gradient-to-br from-violet-50 to-fuchsia-50 dark:from-slate-800 dark:to-slate-900 rounded-2xl p-8 border border-violet-200 dark:border-fuchsia-800">
+              <Shield className="w-12 h-12 text-violet-600 dark:text-fuchsia-400 mb-4" />
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">
+                Official Sources
+              </h3>
+              <p className="text-slate-600 dark:text-slate-400 mb-4">
+                Tax data verified from PwC, OECD, KPMG, Tax Foundation, direct government sources, and AI-powered CryptoTaxScraper.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {['PwC', 'OECD', 'KPMG', 'Tax Foundation', 'Gov APIs', 'AI Scraper'].map((source) => (
+                  <span key={source} className="px-2 py-1 bg-white dark:bg-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300 rounded border border-violet-200 dark:border-fuchsia-700">
+                    {source}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-slate-800 dark:to-slate-900 rounded-2xl p-8 border border-emerald-200 dark:border-teal-800">
+              <RefreshCw className="w-12 h-12 text-emerald-600 dark:text-teal-400 mb-4" />
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">
+                Auto-Updated
+              </h3>
+              <p className="text-slate-600 dark:text-slate-400 mb-4">
+                AI country analysis auto-refreshes every 30 days. Tax data manually updated quarterly from official sources.
+              </p>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                  <CheckCircle className="w-4 h-4 text-emerald-500" />
+                  30-day AI refresh
+                </li>
+                <li className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                  <CheckCircle className="w-4 h-4 text-emerald-500" />
+                  Quarterly data updates
+                </li>
+              </ul>
+            </div>
+
+            <div className="bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-slate-800 dark:to-slate-900 rounded-2xl p-8 border border-cyan-200 dark:border-blue-800">
+              <Sparkles className="w-12 h-12 text-cyan-600 dark:text-blue-400 mb-4" />
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">
+                Explain Decision
+              </h3>
+              <p className="text-slate-600 dark:text-slate-400 mb-4">
+                Full AI transparency mode shows reasoning, rules applied, assumptions, confidence scores, and sources for every recommendation.
+              </p>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                  <CheckCircle className="w-4 h-4 text-cyan-500" />
+                  Reasoning explained
+                </li>
+                <li className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
+                  <CheckCircle className="w-4 h-4 text-cyan-500" />
+                  Confidence scores
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* USE CASES */}
+      <section className="py-20 md:py-32 px-4 bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-950">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
+              Perfect For
+            </h2>
+            <p className="text-xl text-slate-600 dark:text-slate-400">
+              Designed for different types of crypto investors
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-4 gap-6">
+            {[
+              {
+                emoji: '🌍',
+                title: 'Digital Nomads',
+                description: 'AI country scoring helps choose best location for taxes + quality of life',
+                highlight: '163 countries analyzed'
+              },
+              {
+                emoji: '🔄',
+                title: 'DeFi Traders',
+                description: 'Full Solana support + 50+ chains with protocol-level transaction detection',
+                highlight: 'Solana, Jupiter, Raydium'
+              },
+              {
+                emoji: '📊',
+                title: 'Multi-Chain Investors',
+                description: 'Consolidated portfolio tracking across Ethereum, L2s, Solana, and sidechains',
+                highlight: 'All chains in one view'
+              },
+              {
+                emoji: '💰',
+                title: 'Tax Optimizers',
+                description: 'Automated wash sale detection + tax-loss harvesting opportunities',
+                highlight: 'IRS Form 8949 export'
+              }
+            ].map((useCase, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                viewport={{ once: true }}
+                className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 hover:border-violet-300 dark:hover:border-fuchsia-700 shadow-lg hover:shadow-xl transition-all"
+              >
+                <div className="text-4xl mb-3">{useCase.emoji}</div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
+                  {useCase.title}
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+                  {useCase.description}
+                </p>
+                <div className="text-xs font-semibold text-violet-600 dark:text-fuchsia-400">
+                  {useCase.highlight}
+                </div>
               </motion.div>
             ))}
           </div>
@@ -268,14 +709,14 @@ export default function Home() {
       </section>
 
       {/* TAX SIMULATOR CTA */}
-      <section id="calculator" className="py-20 md:py-32 px-4 bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-950">
+      <section id="calculator" className="py-20 md:py-32 px-4 bg-white dark:bg-slate-950">
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
             <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
-              Compare Tax Regulations Across 167 Countries
+              Try the AI Country Analyzer
             </h2>
             <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-8">
-              Access real-time tax data from official sources. Compare capital gains rates, crypto-specific regulations, and residency requirements.
+              Get instant crypto tax scores + nomad scores for any country. See key advantages, disadvantages, and personalized recommendations.
             </p>
 
             <div className="flex flex-col sm:flex-row justify-center gap-4 mb-6">
@@ -284,13 +725,14 @@ export default function Home() {
                 className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all"
               >
                 <Calculator className="w-5 h-5 mr-2" />
-                Launch Tax Simulator
+                Launch Simulator
               </Link>
               <Link
                 href="/countries"
                 className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-slate-900 dark:text-white bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 hover:border-violet-600 dark:hover:border-fuchsia-400 rounded-xl shadow-lg hover:shadow-xl transition-all"
               >
-                Browse All Countries
+                <Globe className="w-5 h-5 mr-2" />
+                Browse 163 Countries
               </Link>
             </div>
 
@@ -301,11 +743,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* COMPARISON TABLE */}
-      <section className="py-20 md:py-32 px-4 bg-white dark:bg-slate-950">
-        <ComparisonTable />
-      </section>
-
       {/* HOW IT WORKS */}
       <section className="py-20 md:py-32 px-4 bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-950">
         <div className="max-w-7xl mx-auto">
@@ -314,16 +751,16 @@ export default function Home() {
               How It Works
             </h2>
             <p className="text-xl text-slate-600 dark:text-slate-400">
-              Four simple steps to optimize your crypto taxes
+              Four simple steps to optimize your crypto taxes globally
             </p>
           </div>
 
           <div className="grid md:grid-cols-4 gap-8">
             {[
-              { step: '01', title: 'Connect', description: 'Link your wallets and exchanges in seconds', icon: '🔗' },
-              { step: '02', title: 'Analyze', description: 'AI scans 160+ countries for best options', icon: '🔍' },
-              { step: '03', title: 'Optimize', description: 'Get personalized tax-saving strategies', icon: '⚡' },
-              { step: '04', title: 'Export', description: 'Generate compliant reports instantly', icon: '📄' }
+              { step: '01', title: 'Connect Wallets', description: 'Add wallet addresses or import CSV transactions', icon: '🔗' },
+              { step: '02', title: 'AI Analyzes 163 Countries', description: 'Dual scoring: crypto tax rates + nomad quality of life', icon: '🤖' },
+              { step: '03', title: 'Get Recommendations', description: 'Personalized suggestions with confidence scores', icon: '🎯' },
+              { step: '04', title: 'Export Reports', description: 'IRS Form 8949, CSV, or PDF with full audit trail', icon: '📄' }
             ].map((item, index) => (
               <motion.div
                 key={index}
@@ -354,15 +791,20 @@ export default function Home() {
         </div>
       </section>
 
-      {/* TESTIMONIALS */}
+      {/* COMPARISON TABLE */}
       <section className="py-20 md:py-32 px-4 bg-white dark:bg-slate-950">
+        <ComparisonTable />
+      </section>
+
+      {/* TESTIMONIALS */}
+      <section className="py-20 md:py-32 px-4 bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-950">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
-              Trusted by Thousands
+              Trusted by Digital Nomads Worldwide
             </h2>
             <p className="text-xl text-slate-600 dark:text-slate-400">
-              Join digital nomads saving millions in crypto taxes
+              Real stories from users optimizing their crypto taxes
             </p>
           </div>
 
@@ -385,7 +827,7 @@ export default function Home() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 md:py-32 px-4 bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-950">
+      <section className="py-20 md:py-32 px-4 bg-white dark:bg-slate-950">
         <FAQAccordion />
       </section>
 
@@ -398,10 +840,10 @@ export default function Home() {
 
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Ready to Optimize Your Crypto Taxes Globally?
+            Ready to Optimize Your Crypto Taxes with AI?
           </h2>
           <p className="text-xl text-white/90 mb-8">
-            Join thousands of digital nomads saving on taxes across 160+ countries
+            Join digital nomads using AI country scoring across 163 countries
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4">

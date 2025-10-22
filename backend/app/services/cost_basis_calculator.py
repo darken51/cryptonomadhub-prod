@@ -324,6 +324,8 @@ class CostBasisCalculator:
         acquisition_date: datetime,
         acquisition_method: AcquisitionMethod = AcquisitionMethod.PURCHASE,
         source_tx_hash: Optional[str] = None,
+        wallet_address: Optional[str] = None,
+        source_audit_id: Optional[int] = None,
         notes: Optional[str] = None
     ) -> CostBasisLot:
         """
@@ -337,6 +339,8 @@ class CostBasisCalculator:
             acquisition_date: Date acquired
             acquisition_method: How acquired
             source_tx_hash: Source transaction
+            wallet_address: Wallet that acquired the asset
+            source_audit_id: ID of DeFi audit that created this lot (optional)
             notes: Optional notes
 
         Returns:
@@ -346,10 +350,12 @@ class CostBasisCalculator:
             user_id=self.user_id,
             token=token,
             chain=chain,
+            wallet_address=wallet_address,
             acquisition_date=acquisition_date,
             acquisition_method=acquisition_method,
             acquisition_price_usd=acquisition_price_usd,
             source_tx_hash=source_tx_hash,
+            source_audit_id=source_audit_id,
             original_amount=amount,
             remaining_amount=amount,
             disposed_amount=0.0,
@@ -408,8 +414,8 @@ class CostBasisCalculator:
                     "lots_count": 0
                 }
 
-            portfolio[key]["total_amount"] += lot.remaining_amount
-            portfolio[key]["total_cost_basis"] += lot.remaining_amount * lot.acquisition_price_usd
+            portfolio[key]["total_amount"] += float(lot.remaining_amount)
+            portfolio[key]["total_cost_basis"] += float(lot.remaining_amount) * float(lot.acquisition_price_usd)
             portfolio[key]["lots_count"] += 1
 
         # Calculate averages

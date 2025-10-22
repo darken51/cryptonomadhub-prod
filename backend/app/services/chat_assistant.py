@@ -1,29 +1,30 @@
 """
-Chat Assistant - AI-powered tax guidance using Ollama
+Chat Assistant - AI-powered tax guidance using Claude (Anthropic)
 
 Features:
 - Conversational tax questions
+- Complete site navigation guidance
 - Country comparison guidance
 - Simulation parameter extraction
 - Educational explanations
+- Step-by-step workflows
 """
 
-import httpx
 import json
-import re
 from typing import List, Dict, Any
 from sqlalchemy.orm import Session
 from app.models.regulation import Regulation
 from app.models.defi_protocol import DeFiAudit, DeFiTransaction
 from app.config import settings
 from sqlalchemy import desc
+from anthropic import AsyncAnthropic
 
 
 class ChatAssistant:
     def __init__(self, db: Session):
         self.db = db
-        self.ollama_url = f"{settings.OLLAMA_HOST}/api/generate"
-        self.model = settings.OLLAMA_MODEL
+        self.client = AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
+        self.model = settings.ANTHROPIC_MODEL
 
     async def process_message(
         self,
@@ -32,7 +33,7 @@ class ChatAssistant:
         conversation_history: List[Dict] = None
     ) -> Dict[str, Any]:
         """
-        Process user message and generate AI response
+        Process user message and generate AI response using Claude
 
         Returns:
             {
@@ -43,187 +44,57 @@ class ChatAssistant:
             }
         """
 
-        # Get all available countries
-        countries = self.db.query(Regulation).all()
-        countries_info = "\n".join([
-            f"- {c.country_code} ({c.country_name}): Short-term CGT {c.cgt_short_rate*100}%, Long-term {c.cgt_long_rate*100}%"
-            for c in countries
-        ])
+        # Build comprehensive system prompt with full site documentation
+        system_prompt = self._build_comprehensive_system_prompt(user_id)
 
-        # Get user's DeFi audit data
-        defi_context = self._get_defi_context(user_id)
+        # Build conversation messages for Claude
+        messages = []
 
-        # Get cost basis context
-        cost_basis_context = self._get_cost_basis_context(user_id)
-
-        # Get tax optimizer context
-        tax_optimizer_context = self._get_tax_optimizer_context(user_id)
-
-        # Get wallet groups context
-        wallet_groups_context = self._get_wallet_groups_context(user_id)
-
-        # Build system prompt
-        system_prompt = f"""You are a helpful crypto tax assistant for digital nomads.
-
-IMPORTANT DISCLAIMERS (include in EVERY response):
-- You provide general information only
-- This is NOT financial or legal advice
-- Users should consult licensed professionals
-
-Available countries in our system:
-{countries_info}
-
-{defi_context}
-
-{cost_basis_context}
-
-{tax_optimizer_context}
-
-{wallet_groups_context}
-
-PLATFORM FEATURES - You can help users with these tools:
-
-1. **DeFi AUDIT** (/defi-audit):
-   - Scan wallet addresses across 50+ blockchains (Ethereum, Polygon, Arbitrum, Base, Solana, etc.)
-   - Detect DeFi transactions from protocols like Uniswap, Aave, Compound, Jupiter, Raydium
-   - Generate tax reports with capital gains breakdown (short-term vs long-term)
-   - Export PDF reports for tax filing
-   - When user asks: "audit my wallet" or "analyze my DeFi" → Suggest visiting /defi-audit
-
-2. **COST BASIS TRACKER** (/cost-basis):
-   - Track purchase lots with FIFO/LIFO/HIFO methods
-   - Calculate realized and unrealized gains/losses
-   - Import transaction history from exchanges via CSV
-   - View detailed portfolio performance by token/chain
-   - When user asks: "track my purchases" or "cost basis" → Suggest /cost-basis
-
-3. **TAX OPTIMIZER** (/tax-optimizer):
-   - Tax-loss harvesting opportunities detection
-   - Optimal timing suggestions for selling assets
-   - Potential tax savings calculator
-   - Strategies to minimize tax liability
-   - Wash sale rule compliance alerts
-   - When user asks: "reduce taxes" or "tax optimization" → Suggest /tax-optimizer
-
-4. **MULTI-WALLET MANAGER** (/wallets):
-   - Group multiple wallet addresses into portfolios
-   - Consolidated view across all your wallets
-   - Track inter-wallet transfers to avoid double-counting
-   - Assign wallets to legal entities or trading strategies
-   - When user asks: "multiple wallets" or "portfolio groups" → Suggest /wallets
-
-5. **TAX SIMULATIONS** (/simulations):
-   - Compare countries for tax optimization
-   - Calculate savings by relocating as digital nomad
-   - View simulation history and comparisons
-   - When user asks: "compare countries" or "move to [country]" → Suggest /simulations
-
-6. **EXCHANGE INTEGRATION** (Coming):
-   - Connect Binance, Coinbase, Kraken
-   - Auto-import transactions
-   - Real-time portfolio sync
-
-7. **REPORT GENERATION**:
-   - TurboTax compatible exports
-   - PDF tax reports from DeFi audits
-   - CSV exports for accountants
-
-Your role:
-1. Answer questions about crypto taxes in different countries
-2. Explain regulations clearly and simply
-3. Help users understand which country might suit them
-4. Analyze their DeFi activity and provide personalized insights
-5. Guide them toward the RIGHT TOOL for their needs
-6. Extract simulation parameters from conversation
-7. Suggest appropriate platform features based on user questions
-
-When discussing the user's DeFi gains:
-- Reference their actual data when available
-- Explain tax implications of their gains/losses
-- Suggest optimal countries based on their specific situation
-- Calculate potential tax savings with different countries
-
-If the user mentions:
-- Current country
-- Target country
-- Gains amounts (or you can use their real DeFi gains)
-→ Suggest running a simulation and extract params
-
-When appropriate, suggest crypto tools:
-- After successful tax optimization: "Consider a crypto debit card like RedotPay or Kast to spend your crypto in your new country"
-- When user mentions spending/travel: "Check out our crypto cards at /tools for global spending"
-- After country recommendation: "You'll need a way to spend crypto in [country] - check our recommended cards"
-
-Crypto card details:
-- RedotPay: https://url.hk/i/en/14vas
-  → Stablecoin platform, 5M+ users, $2B volume, P2P/Earn/Credit features
-  → Partners: Binance, Circle, Polygon, Solana
-- Kast: https://go.kast.xyz/VqVO/DIKW8Q25
-  → 160+ countries, 150M+ merchants, 3-10% rewards
-  → 4 tiers: Free to $10k/year, USD accounts, Solana/Bitcoin themed cards
-- Ultimo: https://ultimopay.io/?rid=661d543e582fc
-  → Offshore bank + Platinum Visa, 40M+ merchants
-  → UltimoLoan (borrow against crypto), $450 issuance + fees
-
-Digital residency recommendation:
-When appropriate, suggest Palau Digital Residency:
-- After successful tax optimization or country comparison
-- When user mentions KYC issues with crypto exchanges
-- When discussing long-term digital nomad strategies
-- When user optimizes to a low-tax country
-
-Palau Digital Residency: https://rns.id/?rc_by=Oswa5kTT
-→ Official government ID (physical + NFT), $248
-→ 0% tax on digital income from Palau
-→ Valid KYC for crypto exchanges (Binance, etc.)
-→ Visa extensions +180 days per entry
-→ 19,189+ issued, 138 countries eligible
-→ Perfect complement after tax optimization
-
-Be friendly, educational, and conversational. Keep responses concise (2-3 paragraphs max).
-"""
-
-        # Build conversation context
-        context = system_prompt + "\n\n"
+        # Add conversation history (last 8 messages for context)
         if conversation_history:
-            for msg in conversation_history[-4:]:  # Last 4 messages
-                role = "User" if msg["role"] == "user" else "Assistant"
-                context += f"{role}: {msg['content']}\n"
+            for msg in conversation_history[-8:]:
+                messages.append({
+                    "role": msg["role"],
+                    "content": msg["content"]
+                })
 
-        context += f"User: {message}\nAssistant:"
+        # Add current user message
+        messages.append({
+            "role": "user",
+            "content": message
+        })
 
-        # Call Ollama
+        # Call Claude API with Prompt Caching
+        # Cache the system prompt for 5 minutes to save costs
         try:
-            async with httpx.AsyncClient(timeout=30.0) as client:
-                response = await client.post(
-                    self.ollama_url,
-                    json={
-                        "model": self.model,
-                        "prompt": context,
-                        "stream": False,
-                        "options": {
-                            "temperature": 0.7,
-                            "top_p": 0.9,
-                        }
-                    }
-                )
+            response = await self.client.messages.create(
+                model=self.model,
+                max_tokens=2048,
+                temperature=0.7,
+                system=[{
+                    "type": "text",
+                    "text": system_prompt,
+                    "cache_control": {"type": "ephemeral"}  # Cache for 5 min
+                }],
+                messages=messages
+            )
 
-                if response.status_code != 200:
-                    raise Exception(f"Ollama error: {response.status_code}")
-
-                result = response.json()
-                ai_message = result.get("response", "").strip()
+            # Extract AI response
+            ai_message = response.content[0].text.strip()
 
         except Exception as e:
-            # Fallback response if Ollama fails
+            # Fallback response if Claude API fails
             ai_message = (
                 "I'm having trouble connecting to the AI service right now. "
                 "However, I can still help! You can:\n"
-                "1. Run a simulation to compare countries\n"
-                "2. Browse available countries\n"
-                "3. View your simulation history\n\n"
+                "1. Visit /defi-audit to scan your wallet\n"
+                "2. Check /tax-optimizer for tax-loss harvesting opportunities\n"
+                "3. Go to /cost-basis to track your purchase lots\n"
+                "4. Browse /countries to compare tax jurisdictions\n"
+                "5. Run a simulation at /simulations\n\n"
                 "⚠️ Remember: This is general information only, not financial advice."
             )
+            print(f"Claude API Error: {e}")
 
         # Extract simulation parameters
         can_simulate, sim_params = self._extract_simulation_params(
@@ -233,7 +104,7 @@ Be friendly, educational, and conversational. Keep responses concise (2-3 paragr
             user_id
         )
 
-        # Generate suggestions
+        # Generate context-aware suggestions
         suggestions = self._generate_suggestions(message, can_simulate)
 
         return {
@@ -242,6 +113,447 @@ Be friendly, educational, and conversational. Keep responses concise (2-3 paragr
             "can_simulate": can_simulate,
             "simulation_params": sim_params
         }
+
+    def _build_comprehensive_system_prompt(self, user_id: int) -> str:
+        """
+        Build comprehensive system prompt with FULL site documentation
+
+        This makes Claude an expert guide who knows EVERYTHING about the site
+        """
+
+        # Get all available countries
+        countries = self.db.query(Regulation).all()
+        countries_info = "\n".join([
+            f"- {c.country_code} ({c.country_name}): Short-term CGT {float(c.cgt_short_rate)*100:.1f}%, Long-term {float(c.cgt_long_rate)*100:.1f}%"
+            for c in countries[:50]  # Limit to first 50 to save tokens
+        ])
+
+        # Get user's personalized context
+        defi_context = self._get_defi_context(user_id)
+        cost_basis_context = self._get_cost_basis_context(user_id)
+        tax_optimizer_context = self._get_tax_optimizer_context(user_id)
+
+        return f"""You are the AI assistant for CryptoNomadHub, a comprehensive crypto tax optimization platform for digital nomads.
+
+═══════════════════════════════════════════════════════════════════════
+CRITICAL DISCLAIMERS (MUST include in EVERY response):
+═══════════════════════════════════════════════════════════════════════
+⚠️ This is GENERAL INFORMATION ONLY, not financial, legal, or tax advice
+⚠️ Tax laws change frequently - verify current regulations
+⚠️ Consult licensed tax professionals for your specific situation
+⚠️ I cannot guarantee accuracy - use as educational guidance only
+
+═══════════════════════════════════════════════════════════════════════
+COMPLETE PLATFORM DOCUMENTATION - KNOW THIS PERFECTLY
+═══════════════════════════════════════════════════════════════════════
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 1. DEFI AUDIT (/defi-audit)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PURPOSE: Automatically scan wallet addresses and generate complete tax reports
+
+SUPPORTED BLOCKCHAINS (50+):
+- EVM Chains: Ethereum, Polygon, BSC, Arbitrum, Optimism, Base, Avalanche, Fantom, Gnosis Chain
+- Solana Ecosystem: Full support for SPL tokens, Jupiter, Raydium, Orca
+- And 40+ more chains
+
+WORKFLOW - HOW TO USE:
+1. Click "Start New Audit" button
+2. Enter wallet address (0x... for EVM, base58 for Solana)
+3. Select blockchain(s) to scan
+4. Choose date range (default: current tax year)
+5. Click "Start Audit" → Takes 1-5 minutes
+6. View results:
+   - Total transactions found
+   - Protocols detected (Uniswap, Aave, Compound, etc.)
+   - Capital gains breakdown (short-term vs long-term)
+   - Ordinary income (staking rewards, airdrops)
+   - Total fees paid
+7. Export as PDF tax report
+
+WHAT IT DETECTS:
+- Swaps (DEX trades on Uniswap, SushiSwap, PancakeSwap, Jupiter, etc.)
+- Liquidity provision (adding/removing from pools)
+- Staking rewards (liquid staking, validator rewards)
+- Lending/borrowing (Aave, Compound, Anchor)
+- Yield farming rewards
+- NFT transactions
+- Token transfers
+- Gas fees
+
+AUTOMATIC COST BASIS CREATION:
+✨ When audit completes, it AUTOMATICALLY creates cost basis lots for all acquisitions
+- Each token received = new lot with acquisition date, price, amount
+- Linked to the audit via source_audit_id
+- Ready for tax optimization analysis
+
+COMMON QUESTIONS:
+Q: "How long does an audit take?"
+A: 1-5 minutes depending on transaction volume. You'll see progress in real-time.
+
+Q: "Can I audit multiple wallets?"
+A: Yes! Run separate audits for each wallet, or use Multi-Wallet Manager to group them.
+
+Q: "What if my protocol isn't detected?"
+A: We support 100+ protocols. If missed, transactions still show as "Unknown" - you can manually categorize.
+
+Q: "How accurate is the tax calculation?"
+A: Very accurate for DeFi. We use real historical prices from CoinGecko. Always verify with your accountant.
+
+TROUBLESHOOTING:
+- "No transactions found" → Wrong network selected, or wallet has no DeFi activity
+- "Audit failed" → Invalid wallet address format, or API rate limit (try again in 1 min)
+- "Some transactions missing" → Blockchain API limitations, run audit again for missed periods
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💼 2. COST BASIS TRACKER (/cost-basis)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PURPOSE: Track every crypto purchase (lot) and calculate gains/losses using FIFO/LIFO/HIFO
+
+WHAT IS A "LOT"?
+A lot = one purchase/acquisition of crypto with:
+- Token symbol (BTC, ETH, SOL, etc.)
+- Amount purchased
+- Purchase price (USD)
+- Acquisition date
+- Chain (ethereum, solana, etc.)
+- Acquisition method (purchase, airdrop, staking, mining)
+
+WORKFLOW - HOW TO USE:
+
+AUTOMATIC (Recommended):
+1. Run DeFi Audit → Lots created automatically ✅
+2. Go to /cost-basis → See all your lots
+3. Click on any lot to see details
+4. Filter by token, chain, date range
+
+MANUAL:
+1. Click "Add Lot Manually"
+2. Fill in form:
+   - Token symbol (e.g., "ETH")
+   - Chain (e.g., "ethereum")
+   - Amount (e.g., 1.5)
+   - Purchase price in USD (e.g., 3000)
+   - Acquisition date
+   - Method (Purchase/Airdrop/Staking/Mining)
+3. Click "Save"
+
+VIEW OPTIONS:
+- Portfolio Summary: Total value, cost basis, unrealized P&L
+- By Token: Group by cryptocurrency
+- By Chain: Group by blockchain
+- By Date: Chronological view
+- Filter by audit: See lots from specific DeFi audit
+
+COST BASIS METHODS:
+1. FIFO (First-In-First-Out) ← Default for most countries
+   - Sell oldest lots first
+   - Example: Buy ETH in Jan, Feb, Mar → Sell = uses Jan lot
+
+2. LIFO (Last-In-First-Out)
+   - Sell newest lots first
+   - Can minimize short-term gains
+
+3. HIFO (Highest-In-First-Out)
+   - Sell most expensive lots first
+   - Maximizes tax-loss harvesting
+
+COMMON QUESTIONS:
+Q: "Do I need to add lots manually if I did DeFi audit?"
+A: No! DeFi audit creates them automatically. Manual is for:
+   - CEX purchases (Binance, Coinbase)
+   - OTC purchases
+   - Gifts received
+   - Non-DeFi transactions
+
+Q: "What's unrealized vs realized gain/loss?"
+A:
+- Unrealized = Profit/loss on lots you STILL OWN (not taxable yet)
+- Realized = Profit/loss on lots you SOLD (taxable!)
+
+Q: "How do I know which method to use?"
+A: Your country's tax law determines this. Most require FIFO. Use /tax-optimizer to see which saves more.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 3. TAX OPTIMIZER (/tax-optimizer)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PURPOSE: Find opportunities to REDUCE your tax bill legally
+
+FEATURES:
+
+1. TAX-LOSS HARVESTING
+   - Identifies crypto you own that are DOWN in value
+   - Sell them to realize losses → Offset capital gains
+   - Re-buy later (watch wash sale rules in some countries!)
+   - Example: Bought ETH at $4000, now $3000 → Sell = $1000 loss = tax deduction
+
+2. LONG-TERM HOLDING OPTIMIZATION
+   - Shows assets close to 1-year holding period
+   - Wait a few more days → Pay MUCH less tax (long-term rate)
+   - Example: Bought SOL 360 days ago → Wait 5 more days → Save 20%+ on taxes
+
+3. STRATEGIC TIMING
+   - When to sell for best tax outcome
+   - Which lots to sell (FIFO vs HIFO)
+   - How to minimize wash sales
+
+WORKFLOW - HOW TO USE:
+1. Go to /tax-optimizer
+2. (Optional) Select specific DeFi audit to analyze, or "All Portfolios" for everything
+3. Select your tax jurisdiction (affects calculation)
+4. Click "Analyze Portfolio"
+5. View opportunities:
+   - 🔴 High Priority (urgent, expiring soon)
+   - 🟡 Medium Priority (good opportunities)
+   - 🟢 Low Priority (minor savings)
+6. Each opportunity shows:
+   - Recommended action (e.g., "Sell 0.5 ETH")
+   - Potential tax savings (e.g., "$1,234")
+   - Why it helps
+   - Expiration date (if time-sensitive)
+7. Execute trades on your exchange/DEX
+8. Mark opportunity as "Executed" when done
+
+AUDIT FILTERING:
+NEW FEATURE! You can now:
+- Analyze ALL your portfolio (manual + DeFi audits)
+- OR analyze just ONE specific DeFi audit
+- Useful if you want tax optimization for a specific time period or wallet
+
+Example:
+- Select "Audit #39" → Only sees opportunities from that audit's transactions
+- Select "All Portfolios" → Sees ALL your cost basis lots
+
+COMMON QUESTIONS:
+Q: "What's tax-loss harvesting?"
+A: Selling crypto at a loss to reduce taxable income. The loss offsets gains.
+   Example: Gain of $10k on BTC + Loss of $3k on ETH = Net $7k taxable
+
+Q: "Will you execute trades for me?"
+A: No, we only RECOMMEND. You execute on your exchange/wallet. We're educational only.
+
+Q: "What are wash sales?"
+A: Selling at a loss, then re-buying same asset within 30 days = IRS may disallow the loss.
+   Crypto wash sale rules vary by country (US: not yet applied to crypto as of 2024, but may change).
+
+Q: "How much can I really save?"
+A: Depends on your portfolio and tax rate. Users typically save 15-30% on their tax bill with strategic harvesting.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🌍 4. COUNTRY COMPARISON & SIMULATIONS (/simulations)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PURPOSE: Compare crypto tax across countries and see how much you'd save by relocating
+
+WORKFLOW - HOW TO USE:
+1. Go to /simulations/new
+2. Fill in form:
+   - Current Country: Where you live now
+   - Target Countries: Where you're considering moving (select 1-3)
+   - Short-term Capital Gains: Amount from crypto held <1 year
+   - Long-term Capital Gains: Amount from crypto held ≥1 year
+   - Ordinary Income: Staking/mining rewards (optional)
+3. Click "Run Simulation"
+4. Results show for EACH country:
+   - Total tax owed
+   - Tax savings vs current country
+   - Effective tax rate
+   - Breakdown by short-term, long-term, income
+5. Save simulation to history for later comparison
+
+PRO TIP - USE YOUR REAL DATA:
+Instead of guessing amounts, mention your DeFi audit results in chat!
+Example: "I have $50k in gains from my DeFi audit. Compare Portugal vs UAE."
+→ I'll automatically use your REAL numbers from the audit
+
+COUNTRIES AVAILABLE ({len(countries)} total):
+{countries_info}
+
+TOP TAX-FREE/LOW-TAX DESTINATIONS:
+- 🇦🇪 UAE: 0% capital gains, 0% income tax
+- 🇵🇹 Portugal: 0% crypto tax (for individuals, special NHR regime)
+- 🇸🇬 Singapore: 0% capital gains, income tax depends
+- 🇧🇬 Bulgaria: 10% flat tax
+- 🇧🇭 Bahrain: 0% personal income tax
+- 🇵🇦 Panama: Territorial taxation (foreign income exempt)
+
+COMMON QUESTIONS:
+Q: "Should I move countries just for crypto taxes?"
+A: Tax is ONE factor. Consider: cost of living, visa requirements, healthcare, lifestyle, etc.
+   We help with tax analysis - life decisions are yours!
+
+Q: "Can I change my tax residence easily?"
+A: Depends. Most countries require:
+   - Physical presence (183+ days/year)
+   - Proof of ties (lease, utility bills, etc.)
+   - Exit tax clearance from old country
+   → Consult immigration + tax lawyer
+
+Q: "What about Palau Digital Residency?"
+A: Great for KYC on crypto exchanges, but NOT tax residency. You still pay taxes in your actual country of residence.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🛠️ 5. TOOLS PAGE (/tools)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PURPOSE: Recommended crypto products for digital nomads (affiliate partners)
+
+CRYPTO CARDS - SPEND YOUR CRYPTO:
+1. RedotPay (Recommended)
+   - 5M+ users, $2B+ volume
+   - Stablecoin-focused (USDT, USDC)
+   - P2P trading, Earn features
+   - Partners: Binance, Circle, Polygon
+   - Works in most countries
+
+2. Kast
+   - 160+ countries, 150M+ merchants
+   - 3-10% cashback rewards
+   - 4 tiers (Free to $10k/year limit)
+   - Virtual + physical cards
+   - Solana & Bitcoin themed
+
+3. Ultimo
+   - Offshore bank account + Platinum Visa
+   - UltimoLoan: Borrow against crypto
+   - Premium service ($450+ fees)
+   - Good for high net worth
+
+PALAU DIGITAL RESIDENCY:
+- Official government ID (physical card + NFT)
+- $248 one-time fee
+- Valid for KYC on Binance, Kraken, etc.
+- 0% tax on digital income sourced from Palau
+- Visa extensions: +180 days per entry
+- 19,189+ issued, 138 countries eligible
+- ⚠️ NOT tax residency - just a legal ID
+
+WHEN TO RECOMMEND:
+- After successful tax optimization: "Want a crypto card to spend in your new country?"
+- When user mentions KYC issues: "Palau ID works for exchange verification"
+- Travel/spending questions: "Check /tools for crypto cards"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 6. NAVIGATION & COMMON USER QUESTIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DASHBOARD (/dashboard):
+- Overview of your account
+- Quick access to all features
+- Recent activity summary
+
+COUNTRIES (/countries):
+- Browse all {len(countries)} supported countries
+- Filter by tax rate, region
+- Detailed tax breakdown per country
+
+SETTINGS (/settings):
+- Account management
+- Billing/subscription
+- Privacy settings
+- Export data
+
+═══════════════════════════════════════════════════════════════════════
+USER'S PERSONALIZED DATA
+═══════════════════════════════════════════════════════════════════════
+
+{defi_context}
+
+{cost_basis_context}
+
+{tax_optimizer_context}
+
+═══════════════════════════════════════════════════════════════════════
+HOW TO HELP USERS EFFECTIVELY
+═══════════════════════════════════════════════════════════════════════
+
+1. UNDERSTAND THEIR QUESTION
+   - Are they asking "how to use" a feature? → Give step-by-step guide
+   - Are they asking "which country"? → Analyze their situation, suggest simulation
+   - Are they stuck/confused? → Troubleshoot with compassion
+
+2. REFERENCE THEIR ACTUAL DATA
+   - If they did DeFi audit → Mention their real gains/losses
+   - If they have cost basis lots → Reference actual portfolio
+   - If they have tax opportunities → Point out specific savings
+
+3. BE SPECIFIC & ACTIONABLE
+   ❌ Bad: "You can use our tax optimizer"
+   ✅ Good: "Go to /tax-optimizer, select your jurisdiction, and click 'Analyze Portfolio'. You'll see your $1,234 in potential savings from tax-loss harvesting."
+
+4. GUIDE TO THE RIGHT TOOL
+   - DeFi questions → /defi-audit
+   - Tax reduction → /tax-optimizer
+   - Purchase tracking → /cost-basis
+   - Country comparison → /simulations
+   - Products → /tools
+
+5. ALWAYS INCLUDE DISCLAIMER
+   Every response must have: ⚠️ Disclaimer that this is general info, not financial advice
+
+═══════════════════════════════════════════════════════════════════════
+RESPONSE STYLE
+═══════════════════════════════════════════════════════════════════════
+
+✅ DO:
+- Be friendly, helpful, educational
+- Use emojis sparingly for clarity (📊 ✅ ❌ 💡 🎯)
+- Keep responses 2-4 paragraphs max (concise!)
+- Give specific examples
+- Reference user's data when available
+- End with clear next steps
+
+❌ DON'T:
+- Be overly verbose (no essays!)
+- Give financial/legal advice
+- Guarantee outcomes
+- Make decisions for users
+- Forget disclaimers
+
+═══════════════════════════════════════════════════════════════════════
+EXAMPLE RESPONSES
+═══════════════════════════════════════════════════════════════════════
+
+Q: "How do I start?"
+A: "Welcome! The best first step is to run a **DeFi Audit** (/defi-audit). Enter your wallet address, select your blockchain (Ethereum, Solana, etc.), and we'll scan your transactions to calculate your capital gains automatically. Takes about 2-3 minutes.
+
+Once done, you'll see exactly what you owe in taxes, and we'll create cost basis lots automatically. Then you can use Tax Optimizer to find ways to reduce your bill.
+
+⚠️ This is educational guidance only, not financial advice."
+
+Q: "I have $100k in ETH gains. Where should I move?"
+A: "Great question! With $100k in gains, tax jurisdiction matters A LOT. Let's run a simulation to see your savings:
+
+**Top recommendations to compare:**
+- 🇵🇹 Portugal: 0% crypto tax (NHR regime) = $0 tax
+- 🇦🇪 UAE: 0% capital gains = $0 tax
+- 🇸🇬 Singapore: 0% capital gains = $0 tax
+- vs your current country
+
+Go to /simulations/new and input your $100k. You'll see exact savings for each country. Portugal's NHR regime is especially good for the first 10 years.
+
+⚠️ Tax residence requires physical presence (183+ days). Consult immigration lawyer. This is general info only."
+
+Q: "What's tax-loss harvesting?"
+A: "Tax-loss harvesting = selling crypto that's DOWN in value to create a tax deduction.
+
+**Example:**
+- You bought BTC at $60k, now it's $50k = $10k loss
+- Sell it → Realize the loss → Use it to offset other gains
+- If you have $30k in gains elsewhere, your taxable amount drops to $20k
+- You can re-buy BTC later (watch wash-sale rules!)
+
+Check /tax-optimizer to see your opportunities. We'll show which assets to sell for maximum tax benefit.
+
+⚠️ Educational info only, not financial advice."
+
+═══════════════════════════════════════════════════════════════════════
+
+Now help this user with their question. Be helpful, specific, and always disclaim!
+"""
 
     def _extract_simulation_params(
         self,
@@ -258,6 +570,8 @@ Be friendly, educational, and conversational. Keep responses concise (2-3 paragr
         - Target country
         - Gain amounts (from conversation or user's DeFi data)
         """
+
+        import re
 
         params = {}
         combined_text = user_message.lower()
@@ -359,124 +673,60 @@ Be friendly, educational, and conversational. Keep responses concise (2-3 paragr
         return can_simulate, params
 
     def _generate_suggestions(self, user_message: str, can_simulate: bool) -> List[str]:
-        """Generate follow-up suggestions"""
+        """Generate context-aware follow-up suggestions"""
 
         suggestions = []
         msg_lower = user_message.lower()
 
         if can_simulate:
             suggestions.append("Run simulation now")
-            # Add Palau ID suggestion after optimization
-            if any(word in msg_lower for word in ["portugal", "uae", "singapore", "0%", "tax", "optimize"]):
-                suggestions.append("Tell me about Palau Digital Residency (/tools)")
-            else:
-                suggestions.append("Tell me more about this country")
-            # Add crypto card suggestion after simulation is ready
-            if any(word in msg_lower for word in ["move", "relocate", "live", "spend", "travel"]):
-                suggestions.append("Show crypto cards for spending abroad (/tools)")
+            suggestions.append("Compare with more countries")
+            suggestions.append("How to establish tax residency?")
         else:
-            # Cost basis tracking suggestions
-            if any(word in msg_lower for word in ["purchase", "buy", "bought", "cost basis", "fifo", "lifo", "lot"]):
+            # Contextual suggestions based on keywords
+            if any(word in msg_lower for word in ["audit", "scan", "wallet", "defi", "transaction"]):
+                suggestions.append("Start DeFi Audit (/defi-audit)")
+                suggestions.append("How does DeFi audit work?")
+                suggestions.append("Which blockchains are supported?")
+            elif any(word in msg_lower for word in ["tax loss", "harvest", "reduce tax", "save tax", "optimize"]):
+                suggestions.append("Analyze tax-loss harvesting opportunities (/tax-optimizer)")
+                suggestions.append("Show me potential tax savings")
+                suggestions.append("What is tax-loss harvesting?")
+            elif any(word in msg_lower for word in ["cost basis", "lot", "fifo", "lifo", "purchase"]):
                 suggestions.append("Open Cost Basis Tracker (/cost-basis)")
                 suggestions.append("How does FIFO work?")
-                suggestions.append("Import my exchange history")
-            # Tax optimization suggestions
-            elif any(word in msg_lower for word in ["tax loss", "harvest", "reduce tax", "optimize", "save tax", "minimize"]):
-                suggestions.append("Analyze my tax-loss harvesting opportunities (/tax-optimizer)")
-                suggestions.append("Which assets should I sell for tax benefits?")
-                suggestions.append("Show me potential tax savings")
-            # Wallet management suggestions
-            elif any(word in msg_lower for word in ["multiple wallet", "wallet group", "portfolio group", "consolidat"]):
-                suggestions.append("Open Multi-Wallet Manager (/wallets)")
-                suggestions.append("How to group wallets?")
-                suggestions.append("Track transfers between wallets")
-            # DeFi audit suggestions
-            elif any(word in msg_lower for word in ["audit", "scan", "defi", "uniswap", "aave", "protocol", "transaction"]):
-                suggestions.append("Start DeFi Audit (/defi-audit)")
-                suggestions.append("Which blockchains are supported?")
-                suggestions.append("How much would I save in Portugal?")
-            # General DeFi gains discussion
-            elif any(word in msg_lower for word in ["gains", "losses", "profit", "my portfolio"]):
-                suggestions.append("Analyze my DeFi gains (/defi-audit)")
-                suggestions.append("Find tax-loss harvesting opportunities (/tax-optimizer)")
-                suggestions.append("Which country is best for my gains?")
-            # KYC/Exchange suggestions - suggest Palau ID
-            elif any(word in msg_lower for word in ["kyc", "binance", "exchange", "verify", "identity", "id"]):
-                suggestions.append("Tell me about Palau Digital Residency")
-                suggestions.append("How to pass KYC on exchanges?")
-                suggestions.append("Best crypto cards for verified users")
-            # Spending/travel suggestions
-            elif any(word in msg_lower for word in ["spend", "card", "debit", "pay", "atm", "travel", "abroad"]):
-                suggestions.append("Open crypto cards page (/tools)")
-                suggestions.append("Best cards for digital nomads")
-                suggestions.append("Compare RedotPay vs Kast vs Ultimo")
-            # Digital residency suggestions
-            elif any(word in msg_lower for word in ["residency", "palau", "citizenship", "passport", "visa"]):
+                suggestions.append("Should I use FIFO or LIFO?")
+            elif any(word in msg_lower for word in ["country", "move", "relocate", "compare", "portugal", "uae", "singapore"]):
+                suggestions.append("Compare countries (/simulations)")
+                suggestions.append("Which countries have 0% crypto tax?")
+                suggestions.append("How to change tax residence?")
+            elif any(word in msg_lower for word in ["card", "spend", "pay", "debit", "atm"]):
+                suggestions.append("Best crypto cards (/tools)")
+                suggestions.append("Compare RedotPay vs Kast")
+                suggestions.append("How to spend crypto abroad?")
+            elif any(word in msg_lower for word in ["palau", "id", "kyc", "identity", "verification"]):
                 suggestions.append("What is Palau Digital Residency?")
-                suggestions.append("Benefits of digital residency")
-                suggestions.append("Compare residency programs")
-            # Country-specific suggestions
-            elif "portugal" in msg_lower or "pt" in msg_lower:
-                suggestions.append("What's NHR regime in Portugal?")
-                suggestions.append("Compare Portugal with Spain")
-                suggestions.append("Consider Palau ID for tax optimization")
-            elif "singapore" in msg_lower or "sg" in msg_lower:
-                suggestions.append("How does Singapore tax crypto?")
-                suggestions.append("Compare Singapore with UAE")
-            elif any(word in msg_lower for word in ["move", "relocate", "change"]):
-                suggestions.append("Which country has lowest crypto tax?")
-                suggestions.append("Show me tax-friendly countries")
-                suggestions.append("What about Palau Digital Residency?")
+                suggestions.append("How to pass KYC on exchanges?")
+                suggestions.append("View crypto tools (/tools)")
             else:
-                # Default suggestions showing all features
+                # Default suggestions
                 suggestions.append("Start DeFi Audit (/defi-audit)")
-                suggestions.append("Optimize my taxes (/tax-optimizer)")
+                suggestions.append("Find tax-saving opportunities (/tax-optimizer)")
                 suggestions.append("Which countries have 0% crypto tax?")
 
         return suggestions[:3]  # Max 3 suggestions
 
     def _get_defi_context(self, user_id: int) -> str:
-        """
-        Get user's DeFi audit data and format for AI context
+        """Get user's DeFi audit data for context"""
 
-        Returns formatted string with user's DeFi activity summary
-        """
-
-        # Get most recent completed audit
         latest_audit = self.db.query(DeFiAudit).filter(
             DeFiAudit.user_id == user_id,
             DeFiAudit.status == 'completed'
         ).order_by(desc(DeFiAudit.created_at)).first()
 
         if not latest_audit:
-            return "USER'S DEFI DATA: No DeFi audit available yet."
+            return "USER'S DEFI DATA: No DeFi audit completed yet. Suggest visiting /defi-audit."
 
-        # Get top protocols used
-        transactions = self.db.query(DeFiTransaction).filter(
-            DeFiTransaction.audit_id == latest_audit.id
-        ).all()
-
-        # Count protocols
-        protocol_counts = {}
-        for tx in transactions:
-            if tx.protocol_id:
-                protocol = self.db.query(DeFiTransaction).filter(
-                    DeFiTransaction.id == tx.id
-                ).first()
-                # Get protocol name via join would be better, but this works
-                protocol_name = "Unknown"
-                if hasattr(tx, 'protocol') and tx.protocol:
-                    protocol_name = tx.protocol.name
-
-                if protocol_name not in protocol_counts:
-                    protocol_counts[protocol_name] = 0
-                protocol_counts[protocol_name] += 1
-
-        # Top 3 protocols
-        top_protocols = sorted(protocol_counts.items(), key=lambda x: x[1], reverse=True)[:3]
-        protocols_text = ", ".join([f"{name} ({count} txs)" for name, count in top_protocols]) if top_protocols else "None"
-
-        # Format context
         net_gain_loss = latest_audit.total_gains_usd - latest_audit.total_losses_usd
 
         context = f"""
@@ -487,75 +737,58 @@ Total Volume: ${latest_audit.total_volume_usd:,.2f}
 Net Gain/Loss: ${net_gain_loss:,.2f}
 
 Tax Breakdown:
-- Short-term Capital Gains: ${latest_audit.short_term_gains:,.2f} (held < 1 year)
-- Long-term Capital Gains: ${latest_audit.long_term_gains:,.2f} (held ≥ 1 year)
+- Short-term Capital Gains: ${latest_audit.short_term_gains:,.2f} (<1 year)
+- Long-term Capital Gains: ${latest_audit.long_term_gains:,.2f} (≥1 year)
 - Ordinary Income (staking/rewards): ${latest_audit.ordinary_income:,.2f}
-- Total Fees Paid: ${latest_audit.total_fees_usd:,.2f}
+- Total Fees: ${latest_audit.total_fees_usd:,.2f}
 
-Top Protocols Used: {protocols_text}
 Chains: {', '.join(latest_audit.chains)}
 
-IMPORTANT: When suggesting simulations, you can use these REAL gains from the user's DeFi activity!
+💡 When suggesting simulations, use these REAL numbers from user's DeFi activity!
 """
-
         return context
 
     def _get_cost_basis_context(self, user_id: int) -> str:
-        """
-        Get user's cost basis data and format for AI context
-
-        Returns formatted string with user's cost basis summary
-        """
+        """Get user's cost basis lots for context"""
         from app.models.cost_basis import CostBasisLot
 
-        # Get cost basis lots
         lots = self.db.query(CostBasisLot).filter(
             CostBasisLot.user_id == user_id,
             CostBasisLot.remaining_amount > 0
         ).all()
 
         if not lots:
-            return "COST BASIS TRACKER: No cost basis lots tracked yet. Suggest user to visit /cost-basis to start tracking."
+            return "COST BASIS: No lots tracked yet. Suggest /cost-basis or running a DeFi audit first."
 
-        # Aggregate data
         total_lots = len(lots)
         tokens = set(lot.token for lot in lots)
-        chains = set(lot.chain for lot in lots)
 
-        # Calculate portfolio value (mock prices)
+        # Calculate approximate portfolio value
         total_value = 0.0
         total_cost_basis = 0.0
         for lot in lots:
-            current_price = lot.acquisition_price_usd * 1.1  # Mock
-            total_value += lot.remaining_amount * current_price
-            total_cost_basis += lot.remaining_amount * lot.acquisition_price_usd
+            current_price = float(lot.acquisition_price_usd) * 1.1  # Mock 10% gain
+            total_value += float(lot.remaining_amount) * current_price
+            total_cost_basis += float(lot.remaining_amount) * float(lot.acquisition_price_usd)
 
         unrealized_gl = total_value - total_cost_basis
-        unrealized_gl_percent = (unrealized_gl / total_cost_basis * 100) if total_cost_basis > 0 else 0
 
-        context = f"""
-COST BASIS TRACKER DATA:
+        return f"""
+COST BASIS DATA:
 Total Lots: {total_lots}
-Tokens Tracked: {', '.join(sorted(tokens))}
-Chains: {', '.join(sorted(chains))}
-Total Portfolio Value: ${total_value:,.2f}
+Tokens: {', '.join(sorted(tokens))}
+Estimated Portfolio Value: ${total_value:,.2f}
 Total Cost Basis: ${total_cost_basis:,.2f}
-Unrealized Gain/Loss: ${unrealized_gl:,.2f} ({unrealized_gl_percent:+.1f}%)
+Unrealized P&L: ${unrealized_gl:,.2f}
 
-IMPORTANT: User is already tracking cost basis! Reference this data when discussing tax optimization.
+💡 User is tracking {total_lots} lots! Reference this when discussing tax optimization.
 """
-        return context
 
     def _get_tax_optimizer_context(self, user_id: int) -> str:
-        """
-        Get user's tax optimization opportunities and format for AI context
-
-        Returns formatted string with tax optimization opportunities
-        """
+        """Get user's active tax optimization opportunities"""
         from app.models.tax_opportunity import TaxOpportunity, OpportunityStatus
         from datetime import datetime
 
-        # Get active opportunities
         opportunities = self.db.query(TaxOpportunity).filter(
             TaxOpportunity.user_id == user_id,
             TaxOpportunity.status == OpportunityStatus.ACTIVE,
@@ -563,54 +796,14 @@ IMPORTANT: User is already tracking cost basis! Reference this data when discuss
         ).all()
 
         if not opportunities:
-            return "TAX OPTIMIZER: No active tax optimization opportunities. User should run analysis at /tax-optimizer."
+            return "TAX OPTIMIZER: No active opportunities. User should run analysis at /tax-optimizer."
 
         total_savings = sum(opp.potential_savings for opp in opportunities)
-        tax_loss_harvest_count = sum(1 for opp in opportunities if opp.opportunity_type.value == "tax_loss_harvest")
-        long_term_wait_count = sum(1 for opp in opportunities if opp.opportunity_type.value == "long_term_wait")
 
-        # Top opportunity
-        top_opp = max(opportunities, key=lambda o: o.potential_savings)
-
-        context = f"""
+        return f"""
 TAX OPTIMIZER DATA:
 Active Opportunities: {len(opportunities)}
-- Tax-Loss Harvesting: {tax_loss_harvest_count} opportunities
-- Long-Term Waiting: {long_term_wait_count} opportunities
+Total Potential Savings: ${total_savings:,.2f}
 
-Total Potential Tax Savings: ${total_savings:,.2f}
-
-Top Opportunity: {top_opp.recommended_action}
-→ Potential Savings: ${top_opp.potential_savings:,.2f}
-
-IMPORTANT: User has significant tax optimization opportunities! Encourage them to review at /tax-optimizer.
+💡 User has ${total_savings:,.2f} in potential tax savings! Encourage reviewing at /tax-optimizer.
 """
-        return context
-
-    def _get_wallet_groups_context(self, user_id: int) -> str:
-        """
-        Get user's wallet groups and format for AI context
-
-        Returns formatted string with wallet groups summary
-        """
-        from app.models.wallet_group import WalletGroup
-
-        # Get wallet groups
-        groups = self.db.query(WalletGroup).filter(
-            WalletGroup.user_id == user_id
-        ).all()
-
-        if not groups:
-            return "MULTI-WALLET MANAGER: No wallet groups created yet. Suggest user to visit /wallets to group their wallets."
-
-        total_wallets = sum(len(group.members) for group in groups)
-        group_names = [group.name for group in groups]
-
-        context = f"""
-MULTI-WALLET MANAGER DATA:
-Wallet Groups: {len(groups)} ({', '.join(group_names)})
-Total Wallets Tracked: {total_wallets}
-
-IMPORTANT: User is managing multiple wallets! They can view consolidated portfolio at /wallets.
-"""
-        return context

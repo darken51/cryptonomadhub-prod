@@ -1,18 +1,19 @@
 # FastAPI & Server
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
+# ✅ PHASE 2.1: Updated to latest stable versions
+fastapi==0.119.0  # was 0.104.1 (+15 minor versions)
+uvicorn[standard]==0.34.0  # was 0.24.0 (security + perf)
 python-multipart==0.0.6
 
 # Database
-sqlalchemy==2.0.23
-alembic==1.12.1
-asyncpg==0.29.0
-psycopg2-binary==2.9.9
+sqlalchemy==2.0.44  # was 2.0.23 (21 patch versions, security fixes)
+alembic==1.14.1  # was 1.12.1 (bug fixes)
+asyncpg==0.30.0  # was 0.29.0
+psycopg2-binary==2.9.10  # was 2.9.9
 
 # Pydantic
-pydantic[email]==2.5.0
-pydantic-settings==2.1.0
-email-validator==2.1.0
+pydantic[email]==2.12.3  # was 2.5.0 (+7 minor versions, validation improvements)
+pydantic-settings==2.8.1  # was 2.1.0
+email-validator==2.2.0  # was 2.1.0
 
 # Authentication
 python-jose[cryptography]==3.3.0
@@ -37,10 +38,15 @@ ccxt==4.5.10
 # Blockchain & Web3
 web3==6.15.1
 eth-abi==4.2.1
+base58==2.1.1
+moralis==0.1.49  # Moralis Web3 API for DeFi parsing (updated to fix typing-extensions conflict)
 
 # Utilities
 python-dateutil==2.8.2
 python-dotenv==1.0.0
+
+# AI & LLM
+anthropic==0.71.0  # Claude AI for chat assistant
 
 # Web Scraping & Data Fetching
 beautifulsoup4==4.12.2

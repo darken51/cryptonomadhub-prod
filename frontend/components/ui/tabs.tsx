@@ -40,7 +40,7 @@ Tabs.displayName = "Tabs"
 const TabsList = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & { selectedValue?: string; onValueChange?: (value: string) => void }
->(({ className, selectedValue, onValueChange, ...props }, ref) => (
+>(({ className, selectedValue, onValueChange, children, ...props }, ref) => (
   <div
     ref={ref}
     className={cn(
@@ -48,28 +48,42 @@ const TabsList = React.forwardRef<
       className
     )}
     {...props}
-  />
+  >
+    {React.Children.map(children, child => {
+      if (React.isValidElement(child)) {
+        const childType = (child.type as any)?.displayName || (child.type as any)?.name
+        if (childType === 'TabsTrigger') {
+          return React.cloneElement(child as any, { selectedValue, onValueChange })
+        }
+      }
+      return child
+    })}
+  </div>
 ))
 TabsList.displayName = "TabsList"
 
 const TabsTrigger = React.forwardRef<
   HTMLButtonElement,
   React.ButtonHTMLAttributes<HTMLButtonElement> & { value: string; selectedValue?: string; onValueChange?: (value: string) => void }
->(({ className, value, selectedValue, onValueChange, ...props }, ref) => (
-  <button
-    ref={ref}
-    type="button"
-    className={cn(
-      "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-      selectedValue === value
-        ? "bg-white dark:bg-gray-950 text-gray-950 dark:text-gray-50 shadow-sm"
-        : "hover:bg-gray-200 dark:hover:bg-gray-700",
-      className
-    )}
-    onClick={() => onValueChange?.(value)}
-    {...props}
-  />
-))
+>(({ className, value, selectedValue, onValueChange, ...props }, ref) => {
+  const isActive = selectedValue === value
+  return (
+    <button
+      ref={ref}
+      type="button"
+      data-state={isActive ? "active" : "inactive"}
+      className={cn(
+        "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-white transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-950 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+        isActive
+          ? "bg-white dark:bg-gray-950 text-gray-950 dark:text-gray-50 shadow-sm"
+          : "hover:bg-gray-200 dark:hover:bg-gray-700",
+        className
+      )}
+      onClick={() => onValueChange?.(value)}
+      {...props}
+    />
+  )
+})
 TabsTrigger.displayName = "TabsTrigger"
 
 const TabsContent = React.forwardRef<

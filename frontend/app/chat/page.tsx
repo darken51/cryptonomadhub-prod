@@ -7,7 +7,7 @@ import { useAuth } from '@/components/providers/AuthProvider'
 import { useToast } from '@/components/providers/ToastProvider'
 import { AppHeader } from '@/components/AppHeader'
 import { Footer } from '@/components/Footer'
-import { Send, Bot, User as UserIcon, Sparkles } from 'lucide-react'
+import { Send, Bot, User as UserIcon, Sparkles, Plus, MessageSquare, Trash2, Menu, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 // Helper to render text with clickable links
@@ -53,9 +53,20 @@ function renderTextWithLinks(text: string) {
 interface Message {
   role: 'user' | 'assistant'
   content: string
+  created_at?: string
+}
+
+interface Conversation {
+  id: number
+  title: string
+  created_at: string
+  updated_at: string
+  message_count: number
+  last_message_preview: string | null
 }
 
 interface ChatResponse {
+  conversation_id: number
   message: string
   suggestions: string[]
   can_simulate: boolean
@@ -67,14 +78,12 @@ export default function ChatPage() {
   const { showToast } = useToast()
   const router = useRouter()
 
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: 'assistant',
-      content: 'Hi! I\'m your crypto tax assistant. I can help you understand tax regulations in different countries and guide you through simulations. What would you like to know?\n\n⚠️ Remember: I provide general information only, not financial advice.'
-    }
-  ])
+  const [conversations, setConversations] = useState<Conversation[]>([])
+  const [currentConversationId, setCurrentConversationId] = useState<number | null>(null)
+  const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false)
   const [suggestions, setSuggestions] = useState<string[]>([
     'Which countries have 0% crypto tax?',
     'How does Portugal tax crypto?',
@@ -82,6 +91,7 @@ export default function ChatPage() {
   ])
   const [canSimulate, setCanSimulate] = useState(false)
   const [simulationParams, setSimulationParams] = useState<any>({})
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -95,40 +105,199 @@ export default function ChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
+  // Load conversations on mount
+  useEffect(() => {
+    if (token) {
+      loadConversations()
+    }
+  }, [token])
+
+  // Load messages when conversation changes
+  useEffect(() => {
+    if (currentConversationId && token) {
+      loadMessages(currentConversationId)
+    } else {
+      // No conversation selected, show welcome message
+      setMessages([
+        {
+          role: 'assistant',
+          content: 'Hi! I\'m your crypto tax assistant. I can help you understand tax regulations in different countries and guide you through simulations. What would you like to know?\n\n⚠️ Remember: I provide general information only, not financial advice.'
+        }
+      ])
+    }
+  }, [currentConversationId, token])
+
+  const loadConversations = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/conversations`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to load conversations')
+      }
+
+      const data: Conversation[] = await response.json()
+      setConversations(data)
+    } catch (error: any) {
+      showToast(error.message || 'Failed to load conversations', 'error')
+    }
+  }
+
+  const loadMessages = async (conversationId: number) => {
+    setIsLoadingMessages(true)
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/chat/conversations/${conversationId}/messages`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error('Failed to load messages')
+      }
+
+      const data: Message[] = await response.json()
+      setMessages(data)
+    } catch (error: any) {
+      showToast(error.message || 'Failed to load messages', 'error')
+    } finally {
+      setIsLoadingMessages(false)
+    }
+  }
+
+  const createNewConversation = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/conversations`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to create conversation')
+      }
+
+      const data = await response.json()
+      setCurrentConversationId(data.id)
+      await loadConversations()
+      showToast('New conversation created', 'success')
+    } catch (error: any) {
+      showToast(error.message || 'Failed to create conversation', 'error')
+    }
+  }
+
+  const deleteConversation = async (conversationId: number) => {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/chat/conversations/${conversationId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error('Failed to delete conversation')
+      }
+
+      // If deleted current conversation, clear selection
+      if (conversationId === currentConversationId) {
+        setCurrentConversationId(null)
+        setMessages([])
+      }
+
+      await loadConversations()
+      showToast('Conversation deleted', 'success')
+    } catch (error: any) {
+      showToast(error.message || 'Failed to delete conversation', 'error')
+    }
+  }
+
   const sendMessage = async (messageText: string) => {
     if (!messageText.trim() || !token) return
 
+    // Optimistically add user message to UI
     const userMessage: Message = { role: 'user', content: messageText }
     setMessages(prev => [...prev, userMessage])
     setInput('')
     setIsTyping(true)
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/message`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          message: messageText,
-          conversation_history: messages
+      let conversationId = currentConversationId
+
+      // If no conversation selected, use legacy endpoint that auto-creates
+      if (!conversationId) {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat/message`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            message: messageText
+          })
         })
-      })
 
-      if (!response.ok) {
-        throw new Error('Failed to get response')
+        if (!response.ok) {
+          throw new Error('Failed to get response')
+        }
+
+        const data: ChatResponse = await response.json()
+        conversationId = data.conversation_id
+
+        // Update current conversation
+        setCurrentConversationId(conversationId)
+        await loadConversations()
+
+        const assistantMessage: Message = { role: 'assistant', content: data.message }
+        setMessages(prev => [...prev, assistantMessage])
+        setSuggestions(data.suggestions)
+        setCanSimulate(data.can_simulate)
+        setSimulationParams(data.simulation_params)
+      } else {
+        // Send to existing conversation
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/chat/conversations/${conversationId}/messages`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              message: messageText
+            })
+          }
+        )
+
+        if (!response.ok) {
+          throw new Error('Failed to get response')
+        }
+
+        const data: ChatResponse = await response.json()
+
+        const assistantMessage: Message = { role: 'assistant', content: data.message }
+        setMessages(prev => [...prev, assistantMessage])
+        setSuggestions(data.suggestions)
+        setCanSimulate(data.can_simulate)
+        setSimulationParams(data.simulation_params)
+
+        // Refresh conversations to update timestamp/preview
+        await loadConversations()
       }
-
-      const data: ChatResponse = await response.json()
-
-      const assistantMessage: Message = { role: 'assistant', content: data.message }
-      setMessages(prev => [...prev, assistantMessage])
-      setSuggestions(data.suggestions)
-      setCanSimulate(data.can_simulate)
-      setSimulationParams(data.simulation_params)
     } catch (error: any) {
       showToast(error.message || 'Failed to send message', 'error')
+      // Remove optimistic message on error
+      setMessages(prev => prev.slice(0, -1))
     } finally {
       setIsTyping(false)
     }
@@ -169,30 +338,142 @@ export default function ChatPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-violet-50/20 to-fuchsia-50/20 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 flex flex-col">
       <AppHeader />
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col max-w-5xl mx-auto w-full px-4 py-8">
+      <div className="flex-1 flex overflow-hidden">
+        {/* Sidebar - Conversation List */}
+        <AnimatePresence>
+          {isSidebarOpen && (
+            <motion.div
+              initial={{ x: -300, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -300, opacity: 0 }}
+              transition={{ type: "spring", damping: 20 }}
+              className="w-80 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col"
+            >
+              {/* Sidebar Header */}
+              <div className="p-4 border-b border-slate-200 dark:border-slate-800">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-bold text-slate-900 dark:text-white">Conversations</h2>
+                  <button
+                    onClick={() => setIsSidebarOpen(false)}
+                    className="lg:hidden p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                  >
+                    <X className="w-5 h-5 text-slate-600 dark:text-slate-400" />
+                  </button>
+                </div>
+                <button
+                  onClick={createNewConversation}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white rounded-xl font-semibold hover:from-violet-700 hover:to-fuchsia-700 transition-all shadow-md hover:shadow-lg"
+                >
+                  <Plus className="w-5 h-5" />
+                  New Conversation
+                </button>
+              </div>
+
+              {/* Conversation List */}
+              <div className="flex-1 overflow-y-auto p-2">
+                {conversations.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-center p-4">
+                    <MessageSquare className="w-12 h-12 text-slate-300 dark:text-slate-700 mb-3" />
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                      No conversations yet
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {conversations.map((conv) => (
+                      <motion.div
+                        key={conv.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={`group relative p-3 rounded-xl cursor-pointer transition-all ${
+                          currentConversationId === conv.id
+                            ? 'bg-gradient-to-r from-violet-100 to-fuchsia-100 dark:from-violet-900/20 dark:to-fuchsia-900/20 shadow-md'
+                            : 'hover:bg-slate-50 dark:hover:bg-slate-800'
+                        }`}
+                        onClick={() => setCurrentConversationId(conv.id)}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-sm text-slate-900 dark:text-white truncate">
+                              {conv.title}
+                            </h3>
+                            {conv.last_message_preview && (
+                              <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-1">
+                                {conv.last_message_preview}
+                              </p>
+                            )}
+                            <div className="flex items-center gap-2 mt-2 text-xs text-slate-400 dark:text-slate-600">
+                              <MessageSquare className="w-3 h-3" />
+                              <span>{conv.message_count} messages</span>
+                            </div>
+                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              deleteConversation(conv.id)
+                            }}
+                            className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg transition-all"
+                          >
+                            <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
+                          </button>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Main Chat Area */}
+        <div className="flex-1 flex flex-col max-w-5xl mx-auto w-full px-4 py-8">
         {/* Page Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8 text-center"
+          className="mb-8"
         >
-          <div className="inline-flex items-center justify-center gap-3 mb-4">
-            <div className="bg-gradient-to-br from-violet-500 to-fuchsia-600 p-3 rounded-2xl shadow-lg">
-              <Bot className="w-8 h-8 text-white" />
-            </div>
+          <div className="flex items-center justify-between mb-4">
+            {/* Sidebar Toggle Button */}
+            {!isSidebarOpen && (
+              <button
+                onClick={() => setIsSidebarOpen(true)}
+                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+              >
+                <Menu className="w-6 h-6 text-slate-600 dark:text-slate-400" />
+              </button>
+            )}
+            <div className="flex-1"></div>
           </div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
-            AI Tax Assistant
-          </h1>
-          <p className="text-sm text-slate-600 dark:text-slate-400">
-            Powered by AI • Not financial advice
-          </p>
+
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center gap-3 mb-4">
+              <div className="bg-gradient-to-br from-violet-500 to-fuchsia-600 p-3 rounded-2xl shadow-lg">
+                <Bot className="w-8 h-8 text-white" />
+              </div>
+            </div>
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
+              AI Tax Assistant
+            </h1>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              Powered by Claude AI • Not financial advice
+            </p>
+          </div>
         </motion.div>
 
         {/* Messages Container */}
         <div className="flex-1 overflow-y-auto mb-6 space-y-6">
-          <AnimatePresence mode="popLayout">
+          {isLoadingMessages ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 border-4 border-violet-200 dark:border-violet-900 border-t-violet-600 dark:border-t-fuchsia-500 rounded-full animate-spin"></div>
+                <p className="text-slate-600 dark:text-slate-400">Loading messages...</p>
+              </div>
+            </div>
+          ) : (
+            <>
+            <AnimatePresence mode="popLayout">
             {messages.map((message, index) => (
               <motion.div
                 key={index}
@@ -273,6 +554,8 @@ export default function ChatPage() {
               </motion.div>
             )}
           </AnimatePresence>
+          </>
+          )}
 
           <div ref={messagesEndRef} />
         </div>
@@ -343,6 +626,7 @@ export default function ChatPage() {
             </div>
           </form>
         </motion.div>
+      </div>
       </div>
 
       <Footer />

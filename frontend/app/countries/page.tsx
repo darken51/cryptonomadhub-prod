@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/components/providers/AuthProvider'
@@ -97,15 +97,8 @@ export default function CountriesPage() {
     return diffDays <= 7
   }
 
-  useEffect(() => {
-    fetchCountries()
-  }, [token, reliableOnly])
-
-  useEffect(() => {
-    filterCountries()
-  }, [countries, searchQuery, filterType, hideBannedCountries])
-
-  const fetchCountries = async () => {
+  // Memoize fetchCountries to prevent unnecessary re-creation
+  const fetchCountries = useCallback(async () => {
     try {
       const url = `${process.env.NEXT_PUBLIC_API_URL}/regulations/?reliable_only=${reliableOnly}&include_analysis=true`
       const response = await fetch(url)
@@ -118,15 +111,16 @@ export default function CountriesPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [reliableOnly])
 
-  const isCryptoBanned = (country: Country): boolean => {
+  const isCryptoBanned = useCallback((country: Country): boolean => {
     // Check crypto_legal_status first, then fall back to legacy checks
     if (country.crypto_legal_status === 'banned') return true
     return country.cgt_short_rate < 0 || (country.notes?.includes('🚫 BANNED') ?? false)
-  }
+  }, [])
 
-  const filterCountries = () => {
+  // Memoize filterCountries to prevent unnecessary re-creation
+  const filterCountries = useCallback(() => {
     let filtered = countries
 
     // Hide banned countries if option enabled
@@ -157,7 +151,15 @@ export default function CountriesPage() {
     }
 
     setFilteredCountries(filtered)
-  }
+  }, [countries, searchQuery, filterType, hideBannedCountries, isCryptoBanned])
+
+  useEffect(() => {
+    fetchCountries()
+  }, [fetchCountries])
+
+  useEffect(() => {
+    filterCountries()
+  }, [filterCountries])
 
   const getCryptoBannedBadge = (country: Country) => {
     if (isCryptoBanned(country)) {

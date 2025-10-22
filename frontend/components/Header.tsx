@@ -6,7 +6,7 @@ import {
   Menu, X, ChevronDown,
   Globe, MessageCircle, Activity, Calculator, DollarSign, RefreshCw,
   BookOpen, FileText, HelpCircle, Briefcase, Users, Building,
-  TrendingUp, Shield, Zap
+  TrendingUp, Shield, Zap, Trophy, BarChart3, LineChart, LayoutDashboard
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -28,24 +28,31 @@ const featuresMenu: MegaMenuSection[] = [
     title: 'Core Features',
     items: [
       {
-        title: '160+ Countries',
-        description: 'Worldwide tax coverage with official data',
+        title: '163 Countries',
+        description: 'Worldwide tax coverage with verified data',
         icon: Globe,
-        href: '/countries',
+        href: '/features/countries',
         badge: 'Popular'
       },
       {
-        title: 'AI Tax Assistant',
-        description: 'Conversational AI with transparency mode',
-        icon: MessageCircle,
-        href: '/chat'
+        title: 'AI Country Scoring',
+        description: 'Dual scoring: crypto tax + nomad quality',
+        icon: Trophy,
+        href: '/features/ai-scoring',
+        badge: 'Unique'
       },
       {
-        title: 'DeFi Audit',
-        description: 'On-chain analysis across 40+ protocols',
-        icon: Activity,
-        href: '/defi-audit',
-        badge: 'New'
+        title: 'Multi-Country Compare',
+        description: 'Compare 2-5 countries side-by-side',
+        icon: BarChart3,
+        href: '/features/multi-country-compare',
+        badge: 'Unique'
+      },
+      {
+        title: 'AI Chat Assistant',
+        description: 'Analyzes your portfolio data directly',
+        icon: MessageCircle,
+        href: '/features/ai-chat'
       }
     ]
   },
@@ -53,22 +60,35 @@ const featuresMenu: MegaMenuSection[] = [
     title: 'Advanced Tools',
     items: [
       {
+        title: 'DeFi Audit',
+        description: 'Scan 50+ chains including Solana',
+        icon: Activity,
+        href: '/features/defi-audit',
+        badge: 'Solana'
+      },
+      {
+        title: 'Wallet Portfolio',
+        description: 'Track holdings with historical charts',
+        icon: LineChart,
+        href: '/features/wallet-portfolio'
+      },
+      {
         title: 'Cost Basis Tracking',
-        description: 'FIFO, LIFO, HIFO methods',
+        description: 'FIFO/LIFO/HIFO + wash sale detection',
         icon: Calculator,
-        href: '/cost-basis'
+        href: '/features/cost-basis'
       },
       {
         title: 'Tax Optimizer',
-        description: 'Loss harvesting & opportunities',
+        description: 'Loss harvesting opportunities',
         icon: DollarSign,
-        href: '/tax-optimizer'
+        href: '/features/tax-optimizer'
       },
       {
-        title: 'Exchange Sync',
-        description: 'Binance, Coinbase, Kraken integration',
-        icon: RefreshCw,
-        href: '/wallets'
+        title: 'Dashboard & Alerts',
+        description: 'Overview with smart notifications',
+        icon: LayoutDashboard,
+        href: '/features/dashboard'
       }
     ]
   }

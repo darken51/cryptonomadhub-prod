@@ -20,7 +20,12 @@ from decimal import Decimal
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_
 from app.models.cost_basis import CostBasisLot, UserCostBasisSettings
+from app.models.regulation import Regulation
+from app.models.user import User
 from app.services.enhanced_price_service import EnhancedPriceService
+from app.config import settings
+import redis
+import json
 import logging
 
 logger = logging.getLogger(__name__)
@@ -40,22 +45,40 @@ class TaxOptimizer:
         self.db = db
         self.user_id = user_id
         self.price_service = EnhancedPriceService(db)
+        self.redis_client = redis.Redis.from_url(
+            settings.REDIS_URL,
+            decode_responses=True
+        )
         self.settings = self._get_user_settings()
 
     def _get_user_settings(self) -> UserCostBasisSettings:
-        """Get user's tax settings"""
+        """Get user's tax settings, using User.current_country if not set"""
         settings = self.db.query(UserCostBasisSettings).filter(
             UserCostBasisSettings.user_id == self.user_id
         ).first()
 
         if not settings:
+            # Get user's country from profile
+            user = self.db.query(User).filter(User.id == self.user_id).first()
+            user_country = user.current_country if user and user.current_country else None
+
+            # Default to US only if no country is set
+            # TODO: In production, prompt user to set their jurisdiction instead
+            tax_jurisdiction = user_country if user_country else "US"
+
+            # Check if wash sale rule applies (US only)
+            apply_wash_sale = (tax_jurisdiction == "US")
+
             settings = UserCostBasisSettings(
                 user_id=self.user_id,
                 default_method="fifo",
-                tax_jurisdiction="US"
+                tax_jurisdiction=tax_jurisdiction,
+                apply_wash_sale_rule=apply_wash_sale
             )
             self.db.add(settings)
             self.db.commit()
+
+            logger.info(f"Created tax settings for user {self.user_id} with jurisdiction {tax_jurisdiction}")
 
         return settings
 
@@ -117,6 +140,9 @@ class TaxOptimizer:
         total_losses = 0.0
         lots_with_unrealized = []
 
+        # Get holding period requirement for this jurisdiction
+        required_holding_days = self._get_holding_period_days()
+
         for lot in lots:
             # Get current price
             current_price = await self.price_service.get_current_price(lot.token, lot.chain)
@@ -126,10 +152,12 @@ class TaxOptimizer:
                 continue
 
             # Calculate unrealized
-            cost_basis = lot.remaining_amount * lot.acquisition_price_usd
-            current_value = lot.remaining_amount * current_price
+            cost_basis = float(lot.remaining_amount) * float(lot.acquisition_price_usd)
+            current_value = float(lot.remaining_amount) * float(current_price)
             unrealized = current_value - cost_basis
             unrealized_percent = (unrealized / cost_basis * 100) if cost_basis > 0 else 0
+
+            holding_period_days = (datetime.utcnow() - lot.acquisition_date).days
 
             lot_data = {
                 "lot_id": lot.id,
@@ -143,8 +171,8 @@ class TaxOptimizer:
                 "unrealized_gain_loss": unrealized,
                 "unrealized_percent": unrealized_percent,
                 "acquisition_date": lot.acquisition_date.isoformat(),
-                "holding_period_days": (datetime.utcnow() - lot.acquisition_date).days,
-                "is_long_term": (datetime.utcnow() - lot.acquisition_date).days >= 365
+                "holding_period_days": holding_period_days,
+                "is_long_term": holding_period_days >= required_holding_days
             }
 
             lots_with_unrealized.append(lot_data)
@@ -225,9 +253,12 @@ class TaxOptimizer:
         approaching_long_term = []
         now = datetime.utcnow()
 
+        # Get holding period requirement for this jurisdiction
+        required_holding_days = self._get_holding_period_days()
+
         for lot in lots:
             holding_days = (now - lot.acquisition_date).days
-            days_to_long_term = 365 - holding_days
+            days_to_long_term = required_holding_days - holding_days
 
             if 0 < days_to_long_term <= 30:
                 approaching_long_term.append({
@@ -238,7 +269,7 @@ class TaxOptimizer:
                     "acquisition_date": lot.acquisition_date.isoformat(),
                     "holding_days": holding_days,
                     "days_to_long_term": days_to_long_term,
-                    "long_term_date": (lot.acquisition_date + timedelta(days=365)).isoformat(),
+                    "long_term_date": (lot.acquisition_date + timedelta(days=required_holding_days)).isoformat(),
                     "recommendation": f"Wait {days_to_long_term} days for long-term capital gains rate"
                 })
 
@@ -273,25 +304,80 @@ class TaxOptimizer:
 
         return None
 
+    def _get_holding_period_days(self) -> int:
+        """
+        Get required holding period for long-term classification from database
+
+        Returns number of days required for long-term status based on jurisdiction
+        Defaults to 365 days if not specified in database
+        """
+        jurisdiction = self.settings.tax_jurisdiction or "US"
+
+        # Query regulation from database
+        regulation = self.db.query(Regulation).filter(
+            Regulation.country_code == jurisdiction
+        ).first()
+
+        if regulation and regulation.holding_period_months:
+            # Convert months to days (approximate)
+            days = regulation.holding_period_months * 30
+            logger.debug(f"Using holding period for {jurisdiction}: {days} days ({regulation.holding_period_months} months)")
+            return days
+
+        # Default to 365 days (most common international standard)
+        logger.debug(f"No holding period specified for {jurisdiction}, using default 365 days")
+        return 365
+
     def _get_tax_rates(self) -> Dict[str, float]:
         """
-        Get tax rates based on jurisdiction
+        Get tax rates from database based on jurisdiction
+
+        Uses Redis cache to avoid repeated DB queries (1 hour TTL)
 
         Returns dict with short_term and long_term rates
+        Uses crypto-specific rates if available, otherwise falls back to general CGT rates
         """
-        # Simplified tax rates by jurisdiction
-        rates_by_country = {
-            "US": {"short_term": 0.37, "long_term": 0.20},  # Top federal rates
-            "FR": {"short_term": 0.30, "long_term": 0.30},  # Flat PFU rate
-            "DE": {"short_term": 0.26, "long_term": 0.0},   # Tax-free after 1 year
-            "UK": {"short_term": 0.20, "long_term": 0.20},  # CGT rate
-            "PT": {"short_term": 0.28, "long_term": 0.28},  # Flat rate
-            "CA": {"short_term": 0.50, "long_term": 0.25},  # 50% inclusion rate
-            "AU": {"short_term": 0.45, "long_term": 0.225}, # 50% discount long-term
+        jurisdiction = self.settings.tax_jurisdiction or "US"
+        cache_key = f"tax_rates:{jurisdiction}"
+
+        # Try Redis cache first
+        cached = self.redis_client.get(cache_key)
+        if cached:
+            logger.debug(f"Redis cache hit for tax rates: {jurisdiction}")
+            return json.loads(cached)
+
+        # Query regulation from database
+        regulation = self.db.query(Regulation).filter(
+            Regulation.country_code == jurisdiction
+        ).first()
+
+        if not regulation:
+            logger.warning(f"No regulation found for jurisdiction '{jurisdiction}', defaulting to US rates")
+            # Try to get US rates as fallback
+            regulation = self.db.query(Regulation).filter(
+                Regulation.country_code == "US"
+            ).first()
+
+        if not regulation:
+            # Ultimate fallback - hardcoded US rates
+            logger.error("No regulations found in database, using hardcoded US rates")
+            return {"short_term": 0.37, "long_term": 0.20}
+
+        # Use crypto-specific rates if available, otherwise fall back to general CGT rates
+        short_rate = float(regulation.crypto_short_rate) if regulation.crypto_short_rate is not None else float(regulation.cgt_short_rate)
+        long_rate = float(regulation.crypto_long_rate) if regulation.crypto_long_rate is not None else float(regulation.cgt_long_rate)
+
+        logger.debug(f"Using tax rates for {jurisdiction}: short={short_rate}, long={long_rate}")
+
+        rates = {
+            "short_term": short_rate,
+            "long_term": long_rate
         }
 
-        jurisdiction = self.settings.tax_jurisdiction or "US"
-        return rates_by_country.get(jurisdiction, rates_by_country["US"])
+        # Cache for 1 hour (3600 seconds)
+        self.redis_client.setex(cache_key, 3600, json.dumps(rates))
+
+        return rates
 
     def _calculate_total_savings(self, opportunities: List[Dict]) -> float:
         """Calculate total potential tax savings from all opportunities"""
@@ -333,11 +419,12 @@ class TaxOptimizer:
 
         suggestions = []
         tax_rates = self._get_tax_rates()
+        required_holding_days = self._get_holding_period_days()
 
         for lot in lots:
             holding_days = (datetime.utcnow() - lot.acquisition_date).days
-            is_long_term = holding_days >= 365
-            days_to_long_term = max(0, 365 - holding_days)
+            is_long_term = holding_days >= required_holding_days
+            days_to_long_term = max(0, required_holding_days - holding_days)
 
             unrealized = (current_price - lot.acquisition_price_usd) * lot.remaining_amount
             

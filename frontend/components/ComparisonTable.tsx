@@ -13,7 +13,7 @@ interface Feature {
 const features: Feature[] = [
   {
     name: 'Countries Supported',
-    cryptoNomad: '160+',
+    cryptoNomad: '163',
     koinly: '~100',
     coinTracker: '~20'
   },
@@ -36,19 +36,37 @@ const features: Feature[] = [
     coinTracker: 'Limited'
   },
   {
+    name: 'AI Country Scoring',
+    cryptoNomad: true,
+    koinly: false,
+    coinTracker: false
+  },
+  {
+    name: 'Multi-Country Compare (2-5)',
+    cryptoNomad: true,
+    koinly: false,
+    coinTracker: false
+  },
+  {
+    name: 'Solana DeFi Support',
+    cryptoNomad: true,
+    koinly: false,
+    coinTracker: false
+  },
+  {
     name: 'Cost Basis Tracking',
     cryptoNomad: true,
     koinly: true,
     coinTracker: true
   },
   {
-    name: 'Exchange Sync',
+    name: 'Wash Sale Detection',
     cryptoNomad: true,
-    koinly: true,
-    coinTracker: true
+    koinly: 'Limited',
+    coinTracker: 'Limited'
   },
   {
-    name: 'TurboTax Export',
+    name: 'IRS Form 8949 Export',
     cryptoNomad: true,
     koinly: true,
     coinTracker: true

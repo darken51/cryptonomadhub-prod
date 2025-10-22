@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.user import User
-from app.utils.security import hash_password, verify_password, create_access_token, verify_token
+from app.utils.security import hash_password, verify_password, create_access_token, verify_token, create_refresh_token, verify_refresh_token, hash_token, verify_hashed_token
 from app.middleware import limiter, get_rate_limit
 from app.services.license_service import LicenseService
 from app.services.email_service import EmailService
@@ -43,11 +43,13 @@ class UserResponse(BaseModel):
     id: int
     email: str
     role: str
+    full_name: str | None = None
 
 
 class Token(BaseModel):
     access_token: str
     token_type: str
+    refresh_token: str  # ✅ PHASE 1.3: Ajout refresh token
 
 
 class ForgotPasswordRequest(BaseModel):
@@ -77,6 +79,10 @@ class ResetPasswordRequest(BaseModel):
 
 class VerifyEmailRequest(BaseModel):
     token: str = Field(..., min_length=32, max_length=256, description="Email verification token")
+
+
+class RefreshTokenRequest(BaseModel):
+    refresh_token: str = Field(..., min_length=32, max_length=256, description="Refresh token")
 
 
 async def get_current_user(
@@ -126,14 +132,15 @@ async def register(
     # Create user
     hashed = hash_password(user_data.password)
 
-    # Generate email verification token
+    # ✅ PHASE 1.4: Generate and hash email verification token
     verification_token = secrets.token_urlsafe(32)
+    hashed_verification_token = hash_token(verification_token)
 
     new_user = User(
         email=user_data.email,
         password_hash=hashed,
         email_verified=False,
-        verification_token=verification_token,
+        verification_token=hashed_verification_token,
         verification_token_expires=datetime.utcnow() + timedelta(hours=24)
     )
 
@@ -150,12 +157,12 @@ async def register(
         logger.error(f"Failed to create license for user {new_user.id}: {e}")
         # Don't fail registration if license creation fails
 
-    # Send verification email
+    # Send verification email with plain token
     try:
         email_service = EmailService()
         email_service.send_verification_email(
             to_email=new_user.email,
-            verification_token=verification_token
+            verification_token=verification_token  # Send plain token, not hash
         )
         logger.info(f"Verification email sent to {new_user.email}")
     except Exception as e:
@@ -165,7 +172,8 @@ async def register(
     return UserResponse(
         id=new_user.id,
         email=new_user.email,
-        role=new_user.role.value
+        role=new_user.role.value,
+        full_name=new_user.full_name
     )
 
 
@@ -188,12 +196,79 @@ async def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # Create access token
+    # ✅ PHASE 1.1: Vérifier email vérifié
+    if not user.email_verified:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Please verify your email before logging in. Check your inbox for the verification link.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # ✅ PHASE 1.3: Create access token (60 min) + refresh token (7 days)
     access_token = create_access_token(
         data={"sub": user.email, "user_id": user.id}
     )
 
-    return Token(access_token=access_token, token_type="bearer")
+    # Generate and store refresh token
+    refresh_token = create_refresh_token()
+    user.refresh_token = refresh_token
+    user.refresh_token_expires = datetime.utcnow() + timedelta(days=7)
+    db.commit()
+
+    return Token(
+        access_token=access_token,
+        token_type="bearer",
+        refresh_token=refresh_token
+    )
+
+
+@router.post("/refresh", response_model=Token)
+@limiter.limit(get_rate_limit("auth_login"))
+async def refresh_access_token(
+    request: Request,
+    response: Response,
+    data: RefreshTokenRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Refresh access token using refresh token
+
+    Returns new access token and refresh token if refresh token is valid.
+    """
+    # Find user by refresh token
+    user = db.query(User).filter(User.refresh_token == data.refresh_token).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid refresh token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # Verify refresh token is valid and not expired
+    if not verify_refresh_token(data.refresh_token, user.refresh_token, user.refresh_token_expires):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Refresh token expired or invalid",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # Create new access token
+    access_token = create_access_token(
+        data={"sub": user.email, "user_id": user.id}
+    )
+
+    # Generate new refresh token (rotation)
+    new_refresh_token = create_refresh_token()
+    user.refresh_token = new_refresh_token
+    user.refresh_token_expires = datetime.utcnow() + timedelta(days=7)
+    db.commit()
+
+    return Token(
+        access_token=access_token,
+        token_type="bearer",
+        refresh_token=new_refresh_token
+    )
 
 
 @router.get("/me", response_model=UserResponse)
@@ -207,7 +282,8 @@ async def get_me(
     return UserResponse(
         id=current_user.id,
         email=current_user.email,
-        role=current_user.role.value
+        role=current_user.role.value,
+        full_name=current_user.full_name
     )
 
 
@@ -233,20 +309,21 @@ async def forgot_password(
         logger.info(f"Password reset requested for non-existent email: {data.email}")
         return {"message": "If that email exists, a password reset link has been sent"}
 
-    # Generate reset token (secure random string)
+    # ✅ PHASE 1.4: Generate reset token and hash it
     reset_token = secrets.token_urlsafe(32)
+    hashed_reset_token = hash_token(reset_token)
 
-    # Set token and expiration (1 hour)
-    user.reset_token = reset_token
+    # Set hashed token and expiration (1 hour)
+    user.reset_token = hashed_reset_token
     user.reset_token_expires = datetime.utcnow() + timedelta(hours=1)
 
     db.commit()
 
-    # Send email
+    # Send email with plain token (user needs it to reset)
     email_service = EmailService()
     email_sent = email_service.send_password_reset_email(
         to_email=user.email,
-        reset_token=reset_token
+        reset_token=reset_token  # Send plain token, not hash
     )
 
     if not email_sent:
@@ -271,8 +348,11 @@ async def reset_password(
 
     Verifies reset token and updates password.
     """
-    # Find user by token
-    user = db.query(User).filter(User.reset_token == data.token).first()
+    # ✅ PHASE 1.4: Hash the provided token to compare with stored hash
+    hashed_token = hash_token(data.token)
+
+    # Find user by hashed token
+    user = db.query(User).filter(User.reset_token == hashed_token).first()
 
     if not user:
         raise HTTPException(
@@ -326,20 +406,21 @@ async def send_verification_email(
     if current_user.email_verified:
         return {"message": "Email is already verified"}
 
-    # Generate new verification token
+    # ✅ PHASE 1.4: Generate and hash new verification token
     verification_token = secrets.token_urlsafe(32)
+    hashed_verification_token = hash_token(verification_token)
 
-    # Update user
-    current_user.verification_token = verification_token
+    # Update user with hashed token
+    current_user.verification_token = hashed_verification_token
     current_user.verification_token_expires = datetime.utcnow() + timedelta(hours=24)
 
     db.commit()
 
-    # Send email
+    # Send email with plain token
     email_service = EmailService()
     email_sent = email_service.send_verification_email(
         to_email=current_user.email,
-        verification_token=verification_token
+        verification_token=verification_token  # Send plain token, not hash
     )
 
     if not email_sent:
@@ -367,8 +448,11 @@ async def verify_email(
 
     Marks email as verified after token validation.
     """
-    # Find user by verification token
-    user = db.query(User).filter(User.verification_token == data.token).first()
+    # ✅ PHASE 1.4: Hash the provided token to compare with stored hash
+    hashed_token = hash_token(data.token)
+
+    # Find user by hashed verification token
+    user = db.query(User).filter(User.verification_token == hashed_token).first()
 
     if not user:
         raise HTTPException(

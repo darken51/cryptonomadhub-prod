@@ -7,7 +7,7 @@ services:
     env_file:
       - .env
     environment:
-      - DATABASE_URL=postgresql://nomad:password@postgres:5432/nomadcrypto
+      - DATABASE_URL=postgresql://nomad:KovzZT7GWsORr9_iy44jT42Qct-nKnPQrImPLFq5Yks@postgres:5432/nomadcrypto
       - REDIS_URL=redis://redis:6379
       - OLLAMA_HOST=http://host.docker.internal:11434
       - SECRET_KEY=${SECRET_KEY}
@@ -40,7 +40,7 @@ services:
     build: ./backend
     container_name: nomadcrypto-celery
     environment:
-      - DATABASE_URL=postgresql://nomad:password@postgres:5432/nomadcrypto
+      - DATABASE_URL=postgresql://nomad:KovzZT7GWsORr9_iy44jT42Qct-nKnPQrImPLFq5Yks@postgres:5432/nomadcrypto
       - REDIS_URL=redis://redis:6379
       - SECRET_KEY=${SECRET_KEY}
       - OLLAMA_HOST=http://host.docker.internal:11434
@@ -58,7 +58,7 @@ services:
     build: ./backend
     container_name: nomadcrypto-celery-beat
     environment:
-      - DATABASE_URL=postgresql://nomad:password@postgres:5432/nomadcrypto
+      - DATABASE_URL=postgresql://nomad:KovzZT7GWsORr9_iy44jT42Qct-nKnPQrImPLFq5Yks@postgres:5432/nomadcrypto
       - REDIS_URL=redis://redis:6379
       - SECRET_KEY=${SECRET_KEY}
       - OLLAMA_HOST=http://host.docker.internal:11434
@@ -78,7 +78,7 @@ services:
     ports:
       - "5555:5555"
     environment:
-      - DATABASE_URL=postgresql://nomad:password@postgres:5432/nomadcrypto
+      - DATABASE_URL=postgresql://nomad:KovzZT7GWsORr9_iy44jT42Qct-nKnPQrImPLFq5Yks@postgres:5432/nomadcrypto
       - REDIS_URL=redis://redis:6379
       - SECRET_KEY=${SECRET_KEY}
       - OLLAMA_HOST=http://host.docker.internal:11434
@@ -115,7 +115,7 @@ services:
     container_name: nomadcrypto-postgres
     environment:
       - POSTGRES_USER=nomad
-      - POSTGRES_PASSWORD=password
+      - POSTGRES_PASSWORD=KovzZT7GWsORr9_iy44jT42Qct-nKnPQrImPLFq5Yks
       - POSTGRES_DB=nomadcrypto
     ports:
       - "5432:5432"

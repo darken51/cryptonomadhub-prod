@@ -116,11 +116,48 @@ async def simulate_residency_change(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """
-    Simulate tax impact of residency change
+    """✅ PHASE 3.1: Simulate tax impact of residency change between two countries.
+
+    Calculates crypto capital gains tax liability in current vs target jurisdiction,
+    providing savings estimates, timeline, risks, and AI-powered explanations.
+
+    Args:
+        simulation_request (SimulationRequest): Simulation parameters including:
+            - current_country (str): ISO 3166-1 alpha-2 code (e.g., "US", "FR")
+            - target_country (str): ISO 3166-1 alpha-2 code
+            - short_term_gains (float): Short-term capital gains in USD (0-1B)
+            - long_term_gains (float): Long-term capital gains in USD (0-1B)
+        current_user (User): Authenticated user from JWT token
+        db (Session): Database session
+
+    Returns:
+        SimulationResponse: Tax comparison with fields:
+            - current_tax (float): Tax in current country (USD)
+            - target_tax (float): Tax in target country (USD)
+            - savings (float): Absolute savings (USD)
+            - savings_percent (float): Percentage savings
+            - considerations (List[str]): Important factors to consider
+            - risks (List[str]): Potential risks and drawbacks
+            - timeline (str): Estimated timeline for relocation
+            - explanation (dict): AI-generated explanation of calculation
+
+    Raises:
+        HTTPException: 404 if country not found in database
+        HTTPException: 400 if validation fails
+
+    Example:
+        ```json
+        POST /simulations/residency
+        {
+            "current_country": "US",
+            "target_country": "PT",
+            "short_term_gains": 50000,
+            "long_term_gains": 100000
+        }
+        ```
 
     ⚠️ DISCLAIMER: This is NOT financial or legal advice.
-    Results may contain errors. Consult licensed professionals.
+    Results may contain errors. Consult licensed tax and legal professionals.
     """
 
     # Run simulation

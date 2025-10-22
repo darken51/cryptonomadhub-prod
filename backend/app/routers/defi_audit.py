@@ -9,18 +9,103 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.user import User
 from app.models.defi_protocol import DeFiAudit
+from app.models.cost_basis import UserCostBasisSettings
 from app.routers.auth import get_current_user
 from app.services.defi_audit_service import DeFiAuditService
 from app.middleware import limiter, get_rate_limit
+from app.dependencies import get_exchange_rate_service
+from app.data.currency_mapping import get_currency_info
 from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional
 from datetime import datetime
+from decimal import Decimal
 import logging
 import re
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/defi", tags=["DeFi Audit"])
+
+
+# Helper function to add local currency values to audit response
+async def enrich_audit_with_local_currency(
+    audit: DeFiAudit,
+    user_id: int,
+    db: Session
+) -> dict:
+    """
+    Convert audit USD values to user's local currency.
+
+    Uses the average exchange rate during the audit period (midpoint date).
+    Returns dictionary with local currency fields to add to AuditResponse.
+    """
+    try:
+        # Get user's tax jurisdiction
+        settings = db.query(UserCostBasisSettings).filter(
+            UserCostBasisSettings.user_id == user_id
+        ).first()
+
+        if not settings or not settings.tax_jurisdiction:
+            logger.info(f"No tax jurisdiction for user {user_id}, returning USD only")
+            return {}
+
+        jurisdiction = settings.tax_jurisdiction
+        currency_info = get_currency_info(jurisdiction)
+
+        if not currency_info:
+            logger.warning(f"No currency mapping for jurisdiction {jurisdiction}")
+            return {}
+
+        # Skip if USD jurisdiction
+        if currency_info.uses_usd_directly:
+            return {
+                "local_currency": "USD",
+                "currency_symbol": "$",
+                "exchange_rate": 1.0
+            }
+
+        # Get exchange rate for midpoint of audit period
+        # Use midpoint to average out fluctuations during audit period
+        audit_midpoint = audit.start_date + (audit.end_date - audit.start_date) / 2
+
+        exchange_service = get_exchange_rate_service()
+        rate, source = await exchange_service.get_exchange_rate(
+            from_currency="USD",
+            to_currency=currency_info.currency_code,
+            target_date=audit_midpoint.date()
+        )
+
+        if rate is None:
+            logger.error(f"Failed to get exchange rate for {currency_info.currency_code}")
+            return {}
+
+        # Convert all USD values to local currency
+        rate_float = float(rate)
+
+        result = {
+            "local_currency": currency_info.currency_code,
+            "currency_symbol": currency_info.currency_symbol,
+            "exchange_rate": rate_float,
+            "total_volume_local": float(audit.total_volume_usd or 0) * rate_float if audit.total_volume_usd else 0,
+            "total_gains_local": float(audit.total_gains_usd or 0) * rate_float if audit.total_gains_usd else 0,
+            "total_losses_local": float(audit.total_losses_usd or 0) * rate_float if audit.total_losses_usd else 0,
+            "total_fees_local": float(audit.total_fees_usd or 0) * rate_float if audit.total_fees_usd else 0,
+            "short_term_gains_local": float(audit.short_term_gains or 0) * rate_float if audit.short_term_gains else 0,
+            "long_term_gains_local": float(audit.long_term_gains or 0) * rate_float if audit.long_term_gains else 0,
+            "ordinary_income_local": float(audit.ordinary_income or 0) * rate_float if audit.ordinary_income else 0,
+        }
+
+        logger.info(
+            f"✓ Enriched audit {audit.id}: Rate {rate_float:.4f} USD→{currency_info.currency_code}, "
+            f"Volume: ${audit.total_volume_usd or 0:.2f} = {currency_info.currency_symbol}{result['total_volume_local']:.2f}"
+        )
+
+        await exchange_service.close()
+        return result
+
+    except Exception as e:
+        logger.error(f"Error enriching audit with local currency: {e}", exc_info=True)
+        return {}
 
 
 class CreateAuditRequest(BaseModel):
@@ -69,6 +154,8 @@ class AuditResponse(BaseModel):
     end_date: str
     chains: List[str]
     total_transactions: int
+
+    # USD values (original)
     total_volume_usd: float
     total_gains_usd: float
     total_losses_usd: float
@@ -76,6 +163,19 @@ class AuditResponse(BaseModel):
     short_term_gains: float
     long_term_gains: float
     ordinary_income: float
+
+    # Local currency values (multi-currency support)
+    local_currency: Optional[str] = None
+    currency_symbol: Optional[str] = None
+    total_volume_local: Optional[float] = None
+    total_gains_local: Optional[float] = None
+    total_losses_local: Optional[float] = None
+    total_fees_local: Optional[float] = None
+    short_term_gains_local: Optional[float] = None
+    long_term_gains_local: Optional[float] = None
+    ordinary_income_local: Optional[float] = None
+    exchange_rate: Optional[float] = None
+
     protocols_used: dict
     created_at: str
     completed_at: Optional[str] = None
@@ -199,6 +299,9 @@ async def create_defi_audit(
             detail=f"Failed to create audit: {str(e)}"
         )
 
+    # Enrich with local currency values
+    local_currency_data = await enrich_audit_with_local_currency(audit, current_user.id, db)
+
     return AuditResponse(
         id=audit.id,
         status=audit.status,
@@ -215,7 +318,8 @@ async def create_defi_audit(
         ordinary_income=audit.ordinary_income or 0.0,
         protocols_used=audit.protocols_used or {},
         created_at=audit.created_at.isoformat(),
-        completed_at=audit.completed_at.isoformat() if audit.completed_at else None
+        completed_at=audit.completed_at.isoformat() if audit.completed_at else None,
+        **local_currency_data  # Add local currency fields
     )
 
 
@@ -227,14 +331,18 @@ async def list_user_audits(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Get all audits for current user"""
+    """Get all audits for current user with local currency values"""
 
     audits = db.query(DeFiAudit).filter(
         DeFiAudit.user_id == current_user.id
     ).order_by(DeFiAudit.created_at.desc()).all()
 
-    return [
-        AuditResponse(
+    # Enrich each audit with local currency values
+    results = []
+    for audit in audits:
+        local_currency_data = await enrich_audit_with_local_currency(audit, current_user.id, db)
+
+        results.append(AuditResponse(
             id=audit.id,
             status=audit.status,
             start_date=audit.start_date.isoformat(),
@@ -250,10 +358,11 @@ async def list_user_audits(
             ordinary_income=audit.ordinary_income or 0.0,
             protocols_used=audit.protocols_used or {},
             created_at=audit.created_at.isoformat(),
-            completed_at=audit.completed_at.isoformat() if audit.completed_at else None
-        )
-        for audit in audits
-    ]
+            completed_at=audit.completed_at.isoformat() if audit.completed_at else None,
+            **local_currency_data  # Add local currency fields
+        ))
+
+    return results
 
 
 @router.get("/audit/{audit_id}")
@@ -676,3 +785,88 @@ async def get_audit_status(
             "current_step": "Queued for processing",
             "total_transactions": 0
         }
+
+
+@router.post("/audit/{audit_id}/generate-cost-basis-lots")
+async def generate_cost_basis_lots_retroactively(
+    audit_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Generate cost basis lots retroactively for an existing audit
+
+    Useful when an audit was created before the automatic lot generation feature
+    or when lots were not created due to a bug.
+    """
+    # Get audit
+    audit = db.query(DeFiAudit).filter(
+        DeFiAudit.id == audit_id,
+        DeFiAudit.user_id == current_user.id
+    ).first()
+
+    if not audit:
+        raise HTTPException(status_code=404, detail="Audit not found")
+
+    if audit.status != "completed":
+        raise HTTPException(status_code=400, detail="Audit must be completed first")
+
+    # Get all transactions from this audit
+    from app.models.defi_protocol import DeFiTransaction
+    transactions = db.query(DeFiTransaction).filter(
+        DeFiTransaction.audit_id == audit_id
+    ).all()
+
+    if not transactions:
+        raise HTTPException(status_code=404, detail="No transactions found for this audit")
+
+    # Initialize service
+    service = DeFiAuditService(db)
+
+    lots_created = 0
+    errors = []
+
+    for tx in transactions:
+        try:
+            # Reconstruct tx_data from transaction record
+            tx_data = {
+                "tx_hash": tx.tx_hash,
+                "chain": tx.chain,
+                "token_in": tx.token_in,
+                "amount_in": float(tx.amount_in) if tx.amount_in else None,
+                "usd_value_in": float(tx.usd_value_in) if tx.usd_value_in else None,
+                "token_out": tx.token_out,
+                "amount_out": float(tx.amount_out) if tx.amount_out else None,
+                "usd_value_out": float(tx.usd_value_out) if tx.usd_value_out else None,
+                "timestamp": tx.timestamp,
+                "transaction_type": tx.transaction_type
+            }
+
+            # Get wallet address from audit (assuming single wallet per audit)
+            # If multiple wallets, this should be stored in the transaction
+            wallet_address = "unknown"  # Fallback
+
+            # Create lots for this transaction
+            await service._create_lots_for_transaction(
+                tx_data=tx_data,
+                audit_id=audit_id,
+                user_id=current_user.id,
+                wallet_address=wallet_address
+            )
+
+            lots_created += 1
+
+        except Exception as e:
+            errors.append({
+                "tx_hash": tx.tx_hash,
+                "error": str(e)
+            })
+            logger.error(f"Failed to create lots for tx {tx.tx_hash}: {e}")
+
+    return {
+        "audit_id": audit_id,
+        "total_transactions": len(transactions),
+        "lots_created": lots_created,
+        "errors": errors[:10],  # Limit errors returned
+        "success": len(errors) == 0
+    }

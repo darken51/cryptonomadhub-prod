@@ -4,7 +4,11 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { AppHeader } from "@/components/AppHeader";
-import { Plus, Trash2, Check, AlertCircle, Wallet } from "lucide-react";
+import {
+  Plus, Trash2, RefreshCw, ChevronDown, ChevronUp,
+  TrendingUp, TrendingDown, Wallet, Copy, Check
+} from "lucide-react";
+import { CurrencyDisplay } from "@/components/CurrencyDisplay";
 
 interface UserWallet {
   id: number;
@@ -13,42 +17,78 @@ interface UserWallet {
   wallet_name: string | null;
   is_primary: boolean;
   is_active: boolean;
-  total_transactions: number;
   created_at: string;
 }
 
-interface ConsolidatedPortfolio {
-  total_wallets: number;
+interface WalletPortfolio {
+  id: number;
+  name: string | null;
+  address: string;
+  chain: string;
   total_value_usd: number;
   total_cost_basis: number;
   total_unrealized_gain_loss: number;
-  wallets: Array<{
-    address: string;
-    chain: string;
-    name: string | null;
-    is_primary: boolean;
-  }>;
-  by_chain: Record<string, {
-    value_usd: number;
-    cost_basis: number;
-    gain_loss: number;
-    lots_count: number;
-  }>;
+  unrealized_gain_loss_percent: number;
+  change_24h_usd: number | null;
+  change_24h_percent: number | null;
+  total_tokens: number;
+  total_chains: number;
+  last_updated: string | null;
+}
+
+interface TokenPosition {
+  token: string;
+  token_address: string | null;
+  chain: string;
+  amount: number;
+  price_usd: number;
+  value_usd: number;
+  cost_basis: number;
+  unrealized_gain_loss: number;
+}
+
+interface ConsolidatedPortfolio {
+  total_value_usd: number;
+  total_cost_basis: number;
+  total_unrealized_gain_loss: number;
+  unrealized_gain_loss_percent: number;
+  change_24h_usd: number | null;
+  change_24h_percent: number | null;
+  total_wallets: number;
+  total_tokens: number;
+  total_chains: number;
+  wallets: WalletPortfolio[];
+}
+
+interface ChainDetectionResult {
+  blockchain_type: string;
+  possible_chains: string[];
+  suggested_chain: string | null;
+  is_valid: boolean;
+  error_message: string | null;
 }
 
 export default function WalletsPage() {
   const { user, token, isLoading } = useAuth();
   const router = useRouter();
+
   const [wallets, setWallets] = useState<UserWallet[]>([]);
   const [portfolio, setPortfolio] = useState<ConsolidatedPortfolio | null>(null);
+  const [expandedWallets, setExpandedWallets] = useState<Set<number>>(new Set());
+  const [walletPositions, setWalletPositions] = useState<Record<number, TokenPosition[]>>({});
   const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
+
   const [newWallet, setNewWallet] = useState({
     wallet_address: "",
     chain: "ethereum",
     wallet_name: "",
     is_primary: false
   });
+  const [detectedChain, setDetectedChain] = useState<ChainDetectionResult | null>(null);
+  const [detectingChain, setDetectingChain] = useState(false);
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -73,15 +113,116 @@ export default function WalletsPage() {
 
   const fetchPortfolio = async () => {
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/wallets/consolidated-portfolio`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/wallet-portfolio/overview`, {
         headers: { Authorization: `Bearer ${token}` }
       });
+
+      if (!res.ok) {
+        throw new Error(`Failed to fetch portfolio: ${res.status}`);
+      }
+
       const data = await res.json();
       setPortfolio(data);
     } catch (error) {
       console.error("Failed to fetch portfolio:", error);
+      // Initialize with empty data if error
+      setPortfolio({
+        total_value_usd: 0,
+        total_cost_basis: 0,
+        total_unrealized_gain_loss: 0,
+        unrealized_gain_loss_percent: 0,
+        change_24h_usd: null,
+        change_24h_percent: null,
+        total_wallets: 0,
+        total_tokens: 0,
+        total_chains: 0,
+        wallets: []
+      });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const syncAllWallets = async () => {
+    setSyncing(true);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/wallet-portfolio/sync`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (res.ok) {
+        // Wait a bit for sync to process
+        setTimeout(() => {
+          fetchPortfolio();
+          setSyncing(false);
+        }, 3000);
+      } else {
+        setSyncing(false);
+      }
+    } catch (error) {
+      console.error("Failed to sync wallets:", error);
+      setSyncing(false);
+    }
+  };
+
+  const toggleWalletExpand = async (walletId: number) => {
+    const newExpanded = new Set(expandedWallets);
+
+    if (newExpanded.has(walletId)) {
+      newExpanded.delete(walletId);
+      setExpandedWallets(newExpanded);
+    } else {
+      newExpanded.add(walletId);
+      setExpandedWallets(newExpanded);
+
+      // Fetch positions if not already loaded
+      if (!walletPositions[walletId]) {
+        try {
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/wallet-portfolio/${walletId}/portfolio`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+
+          if (res.ok) {
+            const data = await res.json();
+            setWalletPositions({
+              ...walletPositions,
+              [walletId]: data.positions
+            });
+          }
+        } catch (error) {
+          console.error("Failed to fetch wallet positions:", error);
+        }
+      }
+    }
+  };
+
+  const detectChainFromAddress = async (address: string) => {
+    if (!address || address.length < 10) {
+      setDetectedChain(null);
+      return;
+    }
+
+    setDetectingChain(true);
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/wallet-portfolio/detect-chain?address=${encodeURIComponent(address)}`
+      );
+
+      if (res.ok) {
+        const data: ChainDetectionResult = await res.json();
+        setDetectedChain(data);
+
+        // Auto-select suggested chain
+        if (data.suggested_chain && data.is_valid) {
+          setNewWallet({ ...newWallet, wallet_address: address, chain: data.suggested_chain });
+        }
+      }
+    } catch (error) {
+      console.error("Failed to detect chain:", error);
+    } finally {
+      setDetectingChain(false);
     }
   };
 
@@ -104,6 +245,7 @@ export default function WalletsPage() {
           wallet_name: "",
           is_primary: false
         });
+        setDetectedChain(null);
         fetchWallets();
         fetchPortfolio();
       }
@@ -127,6 +269,12 @@ export default function WalletsPage() {
     }
   };
 
+  const copyAddress = (address: string) => {
+    navigator.clipboard.writeText(address);
+    setCopiedAddress(address);
+    setTimeout(() => setCopiedAddress(null), 2000);
+  };
+
   if (loading) {
     return (
       <>
@@ -142,233 +290,348 @@ export default function WalletsPage() {
     <>
       <AppHeader />
       <div className="container mx-auto px-4 py-8 max-w-7xl">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Multi-Wallet Management</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Manage multiple wallets with consolidated portfolio tracking
-          </p>
-        </div>
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-        >
-          <Plus size={20} />
-          Add Wallet
-        </button>
-      </div>
-
-      {/* Consolidated Portfolio Summary */}
-      {portfolio && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-            <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 mb-2">
-              <Wallet size={20} />
-              <span className="text-sm">Total Wallets</span>
-            </div>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white">
-              {portfolio.total_wallets || 0}
+        {/* Header */}
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Wallet Portfolio</h1>
+            <p className="text-gray-600 dark:text-gray-400 mt-2">
+              Track your crypto wallets with real-time values and 24h changes
             </p>
           </div>
-
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-            <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">Total Value</div>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white">
-              ${(portfolio.total_value_usd || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </p>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-            <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">Cost Basis</div>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white">
-              ${(portfolio.total_cost_basis || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </p>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
-            <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">Unrealized P&L</div>
-            <p className={`text-3xl font-bold ${(portfolio.total_unrealized_gain_loss || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {(portfolio.total_unrealized_gain_loss || 0) >= 0 ? '+' : ''}${(portfolio.total_unrealized_gain_loss || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {/* By Chain Breakdown */}
-      {portfolio && portfolio.by_chain && Object.keys(portfolio.by_chain).length > 0 && (
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-8">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Portfolio by Chain</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {Object.entries(portfolio.by_chain).map(([chain, data]) => (
-              <div key={chain} className="border dark:border-gray-700 p-4 rounded-lg">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-semibold text-gray-900 dark:text-white capitalize">{chain}</span>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">{data.lots_count} lots</span>
-                </div>
-                <div className="space-y-1 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">Value:</span>
-                    <span className="font-medium text-gray-900 dark:text-white">
-                      ${data.value_usd.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">P&L:</span>
-                    <span className={`font-medium ${data.gain_loss >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {data.gain_loss >= 0 ? '+' : ''}${data.gain_loss.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Wallets List */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md">
-        <div className="px-6 py-4 border-b dark:border-gray-700">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Your Wallets</h2>
-        </div>
-
-        {wallets.length === 0 ? (
-          <div className="p-12 text-center">
-            <Wallet size={48} className="mx-auto text-gray-400 mb-4" />
-            <p className="text-gray-600 dark:text-gray-400 mb-4">No wallets added yet</p>
+          <div className="flex gap-3">
+            <button
+              onClick={syncAllWallets}
+              disabled={syncing}
+              className="flex items-center gap-2 px-4 py-2 border dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition disabled:opacity-50"
+            >
+              <RefreshCw size={20} className={syncing ? "animate-spin" : ""} />
+              {syncing ? "Syncing..." : "Sync"}
+            </button>
             <button
               onClick={() => setShowAddModal(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
             >
-              Add Your First Wallet
+              <Plus size={20} />
+              Add Wallet
             </button>
           </div>
-        ) : (
-          <div className="divide-y dark:divide-gray-700">
-            {wallets.map((wallet) => (
-              <div key={wallet.id} className="px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-750 transition">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="font-mono text-sm text-gray-900 dark:text-white">
-                        {wallet.wallet_address.slice(0, 6)}...{wallet.wallet_address.slice(-4)}
-                      </span>
-                      {wallet.is_primary && (
-                        <span className="flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-xs rounded-full">
-                          <Check size={12} />
-                          Primary
-                        </span>
-                      )}
-                      <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded-full capitalize">
-                        {wallet.chain}
-                      </span>
-                    </div>
-                    {wallet.wallet_name && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{wallet.wallet_name}</p>
-                    )}
-                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                      Added {new Date(wallet.created_at).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => deleteWallet(wallet.id)}
-                    className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition"
-                    title="Delete wallet"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </div>
+        </div>
+
+        {/* Portfolio Overview */}
+        {portfolio && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {/* Total Value */}
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+              <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">Total Value</div>
+              <div className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                <CurrencyDisplay amountUsd={portfolio.total_value_usd} mode="dual" />
               </div>
-            ))}
+              {portfolio.change_24h_usd !== null && (
+                <div className={`flex items-center gap-1 text-sm ${portfolio.change_24h_usd >= 0 ? "text-green-600" : "text-red-600"}`}>
+                  {portfolio.change_24h_usd >= 0 ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
+                  <span>
+                    {portfolio.change_24h_usd >= 0 ? "+" : ""}
+                    ${Math.abs(portfolio.change_24h_usd).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {portfolio.change_24h_percent !== null && ` (${portfolio.change_24h_percent >= 0 ? "+" : ""}${portfolio.change_24h_percent.toFixed(2)}%)`}
+                  </span>
+                  <span className="text-gray-500">24h</span>
+                </div>
+              )}
+            </div>
+
+            {/* Unrealized P&L */}
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+              <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">Unrealized P&L</div>
+              <div className={`text-2xl font-bold mb-1 ${portfolio.total_unrealized_gain_loss >= 0 ? "text-green-600" : "text-red-600"}`}>
+                {portfolio.total_unrealized_gain_loss >= 0 ? "+" : ""}
+                <CurrencyDisplay amountUsd={portfolio.total_unrealized_gain_loss} mode="dual" />
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                {portfolio.unrealized_gain_loss_percent >= 0 ? "+" : ""}
+                {portfolio.unrealized_gain_loss_percent.toFixed(2)}% gain
+              </div>
+            </div>
+
+            {/* Total Wallets */}
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400 mb-2">
+                <Wallet size={20} />
+                <span className="text-sm">Total Wallets</span>
+              </div>
+              <div className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                {portfolio.total_wallets}
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                {portfolio.total_tokens} tokens · {portfolio.total_chains} chains
+              </div>
+            </div>
+
+            {/* Cost Basis */}
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+              <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">Total Cost Basis</div>
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                <CurrencyDisplay amountUsd={portfolio.total_cost_basis} mode="dual" />
+              </div>
+            </div>
           </div>
         )}
-      </div>
 
-      {/* Add Wallet Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Add New Wallet</h3>
+        {/* Wallets List */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md">
+          <div className="px-6 py-4 border-b dark:border-gray-700">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Your Wallets</h2>
+          </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Wallet Address *
-                </label>
-                <input
-                  type="text"
-                  value={newWallet.wallet_address}
-                  onChange={(e) => setNewWallet({ ...newWallet, wallet_address: e.target.value })}
-                  placeholder="0x..."
-                  className="w-full px-3 py-2 border dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Blockchain *
-                </label>
-                <select
-                  value={newWallet.chain}
-                  onChange={(e) => setNewWallet({ ...newWallet, chain: e.target.value })}
-                  className="w-full px-3 py-2 border dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
-                >
-                  <option value="ethereum">Ethereum</option>
-                  <option value="polygon">Polygon</option>
-                  <option value="bsc">BNB Chain</option>
-                  <option value="arbitrum">Arbitrum</option>
-                  <option value="optimism">Optimism</option>
-                  <option value="avalanche">Avalanche</option>
-                  <option value="base">Base</option>
-                  <option value="fantom">Fantom</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Wallet Name (optional)
-                </label>
-                <input
-                  type="text"
-                  value={newWallet.wallet_name}
-                  onChange={(e) => setNewWallet({ ...newWallet, wallet_name: e.target.value })}
-                  placeholder="My Hardware Wallet"
-                  className="w-full px-3 py-2 border dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
-                />
-              </div>
-
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="is_primary"
-                  checked={newWallet.is_primary}
-                  onChange={(e) => setNewWallet({ ...newWallet, is_primary: e.target.checked })}
-                  className="rounded"
-                />
-                <label htmlFor="is_primary" className="text-sm text-gray-700 dark:text-gray-300">
-                  Set as primary wallet for this chain
-                </label>
-              </div>
+          {!portfolio || portfolio.wallets.length === 0 ? (
+            <div className="p-12 text-center">
+              <Wallet size={48} className="mx-auto text-gray-400 mb-4" />
+              <p className="text-gray-600 dark:text-gray-400 mb-4">No wallets added yet</p>
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              >
+                Add Your First Wallet
+              </button>
             </div>
+          ) : (
+            <div className="divide-y dark:divide-gray-700">
+              {portfolio.wallets.map((wallet) => {
+                const isExpanded = expandedWallets.has(wallet.id);
+                const positions = walletPositions[wallet.id] || [];
 
-            <div className="flex gap-3 mt-6">
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="flex-1 px-4 py-2 border dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={addWallet}
-                disabled={!newWallet.wallet_address || !newWallet.chain}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Add Wallet
-              </button>
+                return (
+                  <div key={wallet.id} className="transition">
+                    {/* Wallet Header */}
+                    <div className="px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-750">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <button
+                              onClick={() => copyAddress(wallet.address)}
+                              className="font-mono text-sm text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-2"
+                              title="Click to copy"
+                            >
+                              {wallet.address.slice(0, 6)}...{wallet.address.slice(-4)}
+                              {copiedAddress === wallet.address ? (
+                                <Check size={14} className="text-green-600" />
+                              ) : (
+                                <Copy size={14} />
+                              )}
+                            </button>
+                            <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded-full capitalize">
+                              {wallet.chain}
+                            </span>
+                          </div>
+                          {wallet.name && (
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{wallet.name}</p>
+                          )}
+
+                          {/* Wallet Stats */}
+                          <div className="flex flex-wrap gap-4 text-sm">
+                            <div>
+                              <span className="text-gray-600 dark:text-gray-400">Value: </span>
+                              <span className="font-semibold text-gray-900 dark:text-white">
+                                <CurrencyDisplay amountUsd={wallet.total_value_usd} mode="dual" />
+                              </span>
+                            </div>
+                            {wallet.change_24h_usd !== null && (
+                              <div className={wallet.change_24h_usd >= 0 ? "text-green-600" : "text-red-600"}>
+                                24h: {wallet.change_24h_usd >= 0 ? "+" : ""}
+                                ${Math.abs(wallet.change_24h_usd).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                {wallet.change_24h_percent !== null && ` (${wallet.change_24h_percent >= 0 ? "+" : ""}${wallet.change_24h_percent.toFixed(2)}%)`}
+                              </div>
+                            )}
+                            <div className={wallet.total_unrealized_gain_loss >= 0 ? "text-green-600" : "text-red-600"}>
+                              P&L: {wallet.total_unrealized_gain_loss >= 0 ? "+" : ""}
+                              <CurrencyDisplay amountUsd={wallet.total_unrealized_gain_loss} mode="dual" />
+                            </div>
+                            <div className="text-gray-600 dark:text-gray-400">
+                              {wallet.total_tokens} tokens
+                            </div>
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={() => toggleWalletExpand(wallet.id)}
+                          className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition"
+                          title={isExpanded ? "Collapse" : "Expand positions"}
+                        >
+                          {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Wallet Positions (Expanded) */}
+                    {isExpanded && positions.length > 0 && (
+                      <div className="px-6 pb-4 bg-gray-50 dark:bg-gray-750">
+                        <div className="space-y-2">
+                          {positions.map((position, idx) => (
+                            <div key={idx} className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="font-semibold text-gray-900 dark:text-white">
+                                    {position.token}
+                                  </span>
+                                  <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">
+                                    {position.chain}
+                                  </span>
+                                </div>
+                                <div className="text-sm text-gray-600 dark:text-gray-400">
+                                  {position.amount.toLocaleString(undefined, { maximumFractionDigits: 6 })} @ ${position.price_usd.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className="font-semibold text-gray-900 dark:text-white">
+                                  <CurrencyDisplay amountUsd={position.value_usd} mode="dual" />
+                                </div>
+                                <div className={`text-sm ${position.unrealized_gain_loss >= 0 ? "text-green-600" : "text-red-600"}`}>
+                                  {position.unrealized_gain_loss >= 0 ? "+" : ""}
+                                  ${Math.abs(position.unrealized_gain_loss).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Add Wallet Modal */}
+        {showAddModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Add New Wallet</h3>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Wallet Address *
+                  </label>
+                  <input
+                    type="text"
+                    value={newWallet.wallet_address}
+                    onChange={(e) => {
+                      const address = e.target.value;
+                      setNewWallet({ ...newWallet, wallet_address: address });
+                      detectChainFromAddress(address);
+                    }}
+                    placeholder="0x... or bc1... or base58..."
+                    className="w-full px-3 py-2 border dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  />
+                  {detectingChain && (
+                    <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                      Detecting blockchain...
+                    </div>
+                  )}
+                  {detectedChain && (
+                    <div className="mt-2">
+                      {detectedChain.is_valid ? (
+                        <div className="flex items-center gap-2 text-sm text-green-600">
+                          <Check size={16} />
+                          <span>
+                            Detected: {detectedChain.blockchain_type}
+                            {detectedChain.suggested_chain && ` (${detectedChain.suggested_chain})`}
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="text-sm text-red-600">
+                          {detectedChain.error_message || "Invalid address format"}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Blockchain *
+                  </label>
+                  <select
+                    value={newWallet.chain}
+                    onChange={(e) => setNewWallet({ ...newWallet, chain: e.target.value })}
+                    className="w-full px-3 py-2 border dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  >
+                    <optgroup label="EVM Chains">
+                      <option value="ethereum">Ethereum</option>
+                      <option value="polygon">Polygon</option>
+                      <option value="bsc">BNB Chain (BSC)</option>
+                      <option value="arbitrum">Arbitrum</option>
+                      <option value="optimism">Optimism</option>
+                      <option value="base">Base</option>
+                      <option value="avalanche">Avalanche C-Chain</option>
+                      <option value="fantom">Fantom</option>
+                      <option value="cronos">Cronos</option>
+                      <option value="gnosis">Gnosis</option>
+                      <option value="celo">Celo</option>
+                      <option value="moonbeam">Moonbeam</option>
+                      <option value="moonriver">Moonriver</option>
+                      <option value="aurora">Aurora</option>
+                    </optgroup>
+                    <optgroup label="Other Chains">
+                      <option value="solana">Solana</option>
+                      <option value="bitcoin">Bitcoin</option>
+                    </optgroup>
+                  </select>
+                  {detectedChain && detectedChain.possible_chains.length > 0 && (
+                    <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                      Compatible: {detectedChain.possible_chains.join(", ")}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Wallet Name (optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={newWallet.wallet_name}
+                    onChange={(e) => setNewWallet({ ...newWallet, wallet_name: e.target.value })}
+                    placeholder="My Hardware Wallet"
+                    className="w-full px-3 py-2 border dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="is_primary"
+                    checked={newWallet.is_primary}
+                    onChange={(e) => setNewWallet({ ...newWallet, is_primary: e.target.checked })}
+                    className="rounded"
+                  />
+                  <label htmlFor="is_primary" className="text-sm text-gray-700 dark:text-gray-300">
+                    Set as primary wallet for this chain
+                  </label>
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => {
+                    setShowAddModal(false);
+                    setDetectedChain(null);
+                  }}
+                  className="flex-1 px-4 py-2 border dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={addWallet}
+                  disabled={!newWallet.wallet_address || !newWallet.chain || (detectedChain ? !detectedChain.is_valid : false)}
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Add Wallet
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
       </div>
     </>
   );

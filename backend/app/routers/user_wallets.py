@@ -13,6 +13,7 @@ from app.database import get_db
 from app.models.user import User
 from app.models.user_wallet import UserWallet
 from app.routers.auth import get_current_user
+import html
 
 router = APIRouter(prefix="/wallets", tags=["User Wallets"])
 
@@ -23,13 +24,68 @@ class WalletCreate(BaseModel):
     wallet_name: Optional[str] = None
     is_primary: bool = False
     notes: Optional[str] = None
-    
+
+    @validator('wallet_name')
+    def sanitize_wallet_name(cls, v):
+        """Sanitize wallet name to prevent XSS"""
+        if v:
+            v = html.escape(v.strip())
+            if len(v) > 100:
+                raise ValueError('Wallet name must be 100 characters or less')
+        return v
+
+    @validator('notes')
+    def sanitize_notes(cls, v):
+        """Sanitize notes to prevent XSS"""
+        if v:
+            v = html.escape(v.strip())
+            if len(v) > 1000:
+                raise ValueError('Notes must be 1000 characters or less')
+        return v
+
     @validator('wallet_address')
     def validate_address(cls, v):
-        v = v.strip().lower()
-        if not v.startswith('0x') or len(v) != 42:
-            raise ValueError('Invalid Ethereum-compatible address format')
-        return v
+        import re
+        v = v.strip()
+
+        # EVM address: 0x followed by 40 hex characters with checksum validation
+        if re.match(r'^0x[a-fA-F0-9]{40}$', v):
+            try:
+                from eth_utils import is_address, to_checksum_address
+                if not is_address(v):
+                    raise ValueError('Invalid EVM address format')
+                # Return checksummed address for consistency
+                return to_checksum_address(v)
+            except ImportError:
+                # Fallback if eth_utils not available
+                return v.lower()
+
+        # Solana address: base58, 32-44 characters with basic validation
+        if re.match(r'^[1-9A-HJ-NP-Za-km-z]{32,44}$', v):
+            try:
+                import base58
+                # Verify it can be decoded (valid base58)
+                decoded = base58.b58decode(v)
+                if len(decoded) != 32:  # Solana addresses decode to 32 bytes
+                    raise ValueError('Invalid Solana address: incorrect length after decoding')
+                return v
+            except (ValueError, ImportError):
+                # Basic validation failed or library not available
+                return v
+
+        # Bitcoin Legacy (P2PKH): starts with 1
+        if re.match(r'^1[a-km-zA-HJ-NP-Z1-9]{25,34}$', v):
+            return v
+
+        # Bitcoin SegWit (P2SH): starts with 3
+        if re.match(r'^3[a-km-zA-HJ-NP-Z1-9]{25,34}$', v):
+            return v
+
+        # Bitcoin Bech32 (native SegWit): starts with bc1
+        if re.match(r'^bc1[a-z0-9]{39,59}$', v.lower()):
+            return v.lower()
+
+        raise ValueError('Invalid wallet address format. Supported: EVM, Solana, Bitcoin')
     
     @validator('chain')
     def validate_chain(cls, v):
@@ -107,40 +163,49 @@ async def add_wallet(
     """
     Add a new wallet address to user's portfolio
     """
-    # Check if wallet already exists for this user
-    existing = db.query(UserWallet).filter(
-        UserWallet.user_id == current_user.id,
-        UserWallet.wallet_address == request.wallet_address,
-        UserWallet.chain == request.chain
-    ).first()
-    
-    if existing:
-        raise HTTPException(
-            status_code=400,
-            detail="This wallet address is already linked to your account"
-        )
-    
-    # If this is set as primary, unset other primary wallets on same chain
-    if request.is_primary:
-        db.query(UserWallet).filter(
+    # Use transaction to prevent race conditions
+    try:
+        # Check if wallet already exists for this user
+        existing = db.query(UserWallet).filter(
             UserWallet.user_id == current_user.id,
-            UserWallet.chain == request.chain,
-            UserWallet.is_primary == True
-        ).update({"is_primary": False})
-    
-    # Create wallet
-    wallet = UserWallet(
-        user_id=current_user.id,
-        wallet_address=request.wallet_address,
-        chain=request.chain,
-        wallet_name=request.wallet_name,
-        is_primary=request.is_primary,
-        notes=request.notes
-    )
-    
-    db.add(wallet)
-    db.commit()
-    db.refresh(wallet)
+            UserWallet.wallet_address == request.wallet_address,
+            UserWallet.chain == request.chain
+        ).first()
+
+        if existing:
+            raise HTTPException(
+                status_code=400,
+                detail="This wallet address is already linked to your account"
+            )
+
+        # If this is set as primary, unset other primary wallets on same chain
+        if request.is_primary:
+            db.query(UserWallet).filter(
+                UserWallet.user_id == current_user.id,
+                UserWallet.chain == request.chain,
+                UserWallet.is_primary == True
+            ).update({"is_primary": False})
+            db.flush()  # Execute update before insert
+
+        # Create wallet
+        wallet = UserWallet(
+            user_id=current_user.id,
+            wallet_address=request.wallet_address,
+            chain=request.chain,
+            wallet_name=request.wallet_name,
+            is_primary=request.is_primary,
+            notes=request.notes
+        )
+
+        db.add(wallet)
+        db.commit()
+        db.refresh(wallet)
+    except HTTPException:
+        db.rollback()
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to add wallet: {str(e)}")
     
     return WalletResponse(
         id=wallet.id,
@@ -174,11 +239,11 @@ async def delete_wallet(
     if not wallet:
         raise HTTPException(status_code=404, detail="Wallet not found")
     
-    # Check if there are cost basis lots associated
+    # Check if there are cost basis lots associated with this specific wallet
     from app.models.cost_basis import CostBasisLot
     lots_count = db.query(CostBasisLot).filter(
         CostBasisLot.user_id == current_user.id,
-        CostBasisLot.chain == wallet.chain
+        CostBasisLot.wallet_address == wallet.wallet_address
     ).count()
     
     if lots_count > 0:
@@ -246,11 +311,11 @@ async def get_consolidated_portfolio(
         # Get current price
         if lot.token not in price_cache:
             current_price_decimal = price_service.get_current_price(lot.token)
-            price_cache[lot.token] = float(current_price_decimal) if current_price_decimal else lot.acquisition_price_usd
+            price_cache[lot.token] = float(current_price_decimal) if current_price_decimal else float(lot.acquisition_price_usd)
         
         current_price = price_cache[lot.token]
-        lot_value = lot.remaining_amount * current_price
-        lot_cost_basis = lot.remaining_amount * lot.acquisition_price_usd
+        lot_value = float(lot.remaining_amount) * current_price
+        lot_cost_basis = float(lot.remaining_amount) * float(lot.acquisition_price_usd)
         
         total_value += lot_value
         total_cost_basis += lot_cost_basis
@@ -265,7 +330,7 @@ async def get_consolidated_portfolio(
                 "current_price": current_price
             }
         
-        tokens_summary[lot.token]["amount"] += lot.remaining_amount
+        tokens_summary[lot.token]["amount"] += float(lot.remaining_amount)
         tokens_summary[lot.token]["value_usd"] += lot_value
         tokens_summary[lot.token]["cost_basis"] += lot_cost_basis
         tokens_summary[lot.token]["gain_loss"] += (lot_value - lot_cost_basis)

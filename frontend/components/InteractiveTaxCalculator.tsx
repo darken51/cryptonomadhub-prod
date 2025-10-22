@@ -4,21 +4,16 @@ import { useState, useEffect } from 'react'
 import { ArrowRight, TrendingDown } from 'lucide-react'
 import { AnimatedCounter } from './AnimatedCounter'
 
-// Simplified tax rates for quick calculation (real data should come from API)
-const COUNTRIES = [
-  { code: 'US', name: 'United States', flag: '🇺🇸', cgtRate: 0.238 },
-  { code: 'PT', name: 'Portugal', flag: '🇵🇹', cgtRate: 0.28 },
-  { code: 'AE', name: 'UAE (Dubai)', flag: '🇦🇪', cgtRate: 0.0 },
-  { code: 'DE', name: 'Germany', flag: '🇩🇪', cgtRate: 0.0 }, // 0% after 1 year
-  { code: 'SG', name: 'Singapore', flag: '🇸🇬', cgtRate: 0.0 },
-  { code: 'FR', name: 'France', flag: '🇫🇷', cgtRate: 0.30 },
-  { code: 'GB', name: 'United Kingdom', flag: '🇬🇧', cgtRate: 0.20 },
-  { code: 'ES', name: 'Spain', flag: '🇪🇸', cgtRate: 0.23 },
-  { code: 'AU', name: 'Australia', flag: '🇦🇺', cgtRate: 0.235 },
-  { code: 'CA', name: 'Canada', flag: '🇨🇦', cgtRate: 0.25 },
-]
+interface Country {
+  code: string
+  name: string
+  flag: string
+  cgtRate: number
+}
 
 export function InteractiveTaxCalculator() {
+  const [countries, setCountries] = useState<Country[]>([])
+  const [loading, setLoading] = useState(true)
   const [fromCountry, setFromCountry] = useState('US')
   const [toCountry, setToCountry] = useState('PT')
   const [amount, setAmount] = useState(100000)
@@ -26,9 +21,46 @@ export function InteractiveTaxCalculator() {
   const [currentTax, setCurrentTax] = useState(0)
   const [newTax, setNewTax] = useState(0)
 
+  // Fetch countries from API
   useEffect(() => {
-    const from = COUNTRIES.find(c => c.code === fromCountry)
-    const to = COUNTRIES.find(c => c.code === toCountry)
+    const fetchCountries = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/regulations`)
+        if (!response.ok) throw new Error('Failed to fetch regulations')
+
+        const data = await response.json()
+
+        // Transform API data to Country format
+        const transformedCountries: Country[] = data.map((reg: any) => ({
+          code: reg.country_code,
+          name: reg.country_name,
+          flag: reg.flag_emoji || '🏳️',
+          // Use crypto-specific rate if available, otherwise CGT long-term rate
+          cgtRate: reg.crypto_long_rate !== null ? reg.crypto_long_rate : reg.cgt_long_rate
+        }))
+
+        setCountries(transformedCountries)
+        setLoading(false)
+      } catch (error) {
+        console.error('Failed to load tax rates:', error)
+        // Fallback to default countries if API fails
+        setCountries([
+          { code: 'US', name: 'United States', flag: '🇺🇸', cgtRate: 0.20 },
+          { code: 'PT', name: 'Portugal', flag: '🇵🇹', cgtRate: 0.0 },
+          { code: 'AE', name: 'UAE (Dubai)', flag: '🇦🇪', cgtRate: 0.0 },
+        ])
+        setLoading(false)
+      }
+    }
+
+    fetchCountries()
+  }, [])
+
+  useEffect(() => {
+    if (countries.length === 0) return
+
+    const from = countries.find(c => c.code === fromCountry)
+    const to = countries.find(c => c.code === toCountry)
 
     if (from && to) {
       const taxFrom = amount * from.cgtRate
@@ -39,10 +71,10 @@ export function InteractiveTaxCalculator() {
       setNewTax(taxTo)
       setSavings(Math.max(0, saved))
     }
-  }, [fromCountry, toCountry, amount])
+  }, [fromCountry, toCountry, amount, countries])
 
-  const fromData = COUNTRIES.find(c => c.code === fromCountry)
-  const toData = COUNTRIES.find(c => c.code === toCountry)
+  const fromData = countries.find(c => c.code === fromCountry)
+  const toData = countries.find(c => c.code === toCountry)
 
   return (
     <div className="w-full max-w-2xl mx-auto">
@@ -67,13 +99,18 @@ export function InteractiveTaxCalculator() {
             <select
               value={fromCountry}
               onChange={(e) => setFromCountry(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all"
+              disabled={loading}
+              className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all disabled:opacity-50"
             >
-              {COUNTRIES.map((country) => (
-                <option key={country.code} value={country.code}>
-                  {country.flag} {country.name}
-                </option>
-              ))}
+              {loading ? (
+                <option>Loading countries...</option>
+              ) : (
+                countries.map((country) => (
+                  <option key={country.code} value={country.code}>
+                    {country.flag} {country.name}
+                  </option>
+                ))
+              )}
             </select>
           </div>
 
@@ -85,13 +122,18 @@ export function InteractiveTaxCalculator() {
             <select
               value={toCountry}
               onChange={(e) => setToCountry(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all"
+              disabled={loading}
+              className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all disabled:opacity-50"
             >
-              {COUNTRIES.map((country) => (
-                <option key={country.code} value={country.code}>
-                  {country.flag} {country.name}
-                </option>
-              ))}
+              {loading ? (
+                <option>Loading countries...</option>
+              ) : (
+                countries.map((country) => (
+                  <option key={country.code} value={country.code}>
+                    {country.flag} {country.name}
+                  </option>
+                ))
+              )}
             </select>
           </div>
 
@@ -152,9 +194,13 @@ export function InteractiveTaxCalculator() {
         )}
 
         {/* Disclaimer */}
-        <p className="text-xs text-slate-500 dark:text-slate-400 text-center mt-4">
-          ⚠️ Estimates for illustration only. Consult a tax professional for personalized advice.
-        </p>
+        <div className="mt-4">
+          <p className="text-xs text-slate-500 dark:text-slate-400 text-center">
+            ⚠️ <strong>For informational purposes only. Not tax advice.</strong> Tax laws are complex and vary by jurisdiction.
+            Always consult with a licensed tax professional before making any financial decisions.
+            You are solely responsible for your tax obligations.
+          </p>
+        </div>
       </div>
     </div>
   )

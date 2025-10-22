@@ -67,7 +67,7 @@ RATE_LIMITS = {
     # Core features - moderate limits
     "simulations": "20/minute, 100/hour",  # Tax simulations
     "chat": "15/minute, 60/hour",  # AI chat
-    "defi_audit": "10/minute, 30/hour",  # DeFi audit (more expensive)
+    "defi_audit": "5/minute, 20/hour",  # ✅ PHASE 1.5: Réduit pour limiter coûts API blockchain
     "wallet_operations": "100/minute, 500/hour",  # Wallet group management (high refresh rate)
 
     # Data retrieval - lenient limits

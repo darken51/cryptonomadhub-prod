@@ -5,7 +5,7 @@ Tracks cost basis for crypto assets to calculate accurate capital gains/losses.
 Supports FIFO, LIFO, HIFO, and Specific Identification methods.
 """
 
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Enum, Text, Boolean
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Enum, Text, Boolean, Numeric, CheckConstraint
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from app.database import Base
@@ -49,17 +49,26 @@ class CostBasisLot(Base):
     token = Column(String(50), nullable=False, index=True)  # e.g., "ETH", "USDC"
     token_address = Column(String(255), nullable=True)  # Contract address if ERC20
     chain = Column(String(50), nullable=False)  # e.g., "ethereum", "polygon"
+    wallet_address = Column(String(255), nullable=True, index=True)  # Wallet that acquired the asset
 
     # Acquisition details
     acquisition_date = Column(DateTime, nullable=False, index=True)
     acquisition_method = Column(Enum(AcquisitionMethod), nullable=False)
-    acquisition_price_usd = Column(Float, nullable=False)  # Unit price in USD
+    acquisition_price_usd = Column(Numeric(20, 10), nullable=False)  # Unit price in USD
     source_tx_hash = Column(String(255), nullable=True, index=True)  # Original transaction
+    source_audit_id = Column(Integer, ForeignKey("defi_audits.id", ondelete="SET NULL"), nullable=True, index=True)  # DeFi audit that created this lot
+
+    # Multi-currency support
+    acquisition_price_local = Column(Numeric(20, 10), nullable=True)  # Price in local currency
+    local_currency = Column(String(3), nullable=True, index=True)  # Currency code (EUR, GBP, etc.)
+    exchange_rate = Column(Numeric(20, 10), nullable=True)  # USD to local currency rate
+    exchange_rate_source = Column(String(50), nullable=True)  # "ECB", "EXCHANGERATE_API", etc.
+    exchange_rate_date = Column(DateTime, nullable=True)  # Date of exchange rate
 
     # Amounts
-    original_amount = Column(Float, nullable=False)  # Original amount acquired
-    remaining_amount = Column(Float, nullable=False)  # Amount still held (for FIFO)
-    disposed_amount = Column(Float, default=0.0)  # Amount already sold/disposed
+    original_amount = Column(Numeric(20, 10), nullable=False)  # Original amount acquired
+    remaining_amount = Column(Numeric(20, 10), nullable=False)  # Amount still held (for FIFO)
+    disposed_amount = Column(Numeric(20, 10), default=0.0)  # Amount already sold/disposed
 
     # Metadata
     notes = Column(Text, nullable=True)
@@ -72,6 +81,14 @@ class CostBasisLot(Base):
     # Relationships
     user = relationship("User")
     disposals = relationship("CostBasisDisposal", back_populates="lot")
+
+    # Table constraints
+    __table_args__ = (
+        CheckConstraint('remaining_amount >= 0', name='check_remaining_positive'),
+        CheckConstraint('disposed_amount >= 0', name='check_disposed_positive'),
+        CheckConstraint('original_amount > 0', name='check_original_positive'),
+        CheckConstraint('acquisition_price_usd >= 0', name='check_price_positive'),
+    )
 
 
 class CostBasisDisposal(Base):
@@ -88,16 +105,27 @@ class CostBasisDisposal(Base):
 
     # Disposal details
     disposal_date = Column(DateTime, nullable=False, index=True)
-    disposal_price_usd = Column(Float, nullable=False)  # Sale price per unit
-    amount_disposed = Column(Float, nullable=False)  # Amount sold
+    disposal_price_usd = Column(Numeric(20, 10), nullable=False)  # Sale price per unit
+    amount_disposed = Column(Numeric(20, 10), nullable=False)  # Amount sold
     disposal_tx_hash = Column(String(255), nullable=True, index=True)
 
+    # Multi-currency support
+    disposal_price_local = Column(Numeric(20, 10), nullable=True)  # Sale price in local currency
+    local_currency = Column(String(3), nullable=True, index=True)  # Currency code
+    exchange_rate = Column(Numeric(20, 10), nullable=True)  # USD to local currency rate
+    exchange_rate_source = Column(String(50), nullable=True)  # Exchange rate source
+
     # Calculated values
-    cost_basis_per_unit = Column(Float, nullable=False)  # From lot
-    total_cost_basis = Column(Float, nullable=False)  # cost_basis_per_unit * amount
-    total_proceeds = Column(Float, nullable=False)  # disposal_price * amount
-    gain_loss = Column(Float, nullable=False)  # proceeds - cost_basis
+    cost_basis_per_unit = Column(Numeric(20, 10), nullable=False)  # From lot
+    total_cost_basis = Column(Numeric(20, 10), nullable=False)  # cost_basis_per_unit * amount
+    total_proceeds = Column(Numeric(20, 10), nullable=False)  # disposal_price * amount
+    gain_loss = Column(Numeric(20, 10), nullable=False)  # proceeds - cost_basis
     holding_period_days = Column(Integer, nullable=False)  # Days held
+
+    # Calculated values in local currency
+    total_cost_basis_local = Column(Numeric(20, 10), nullable=True)  # Cost basis in local currency
+    total_proceeds_local = Column(Numeric(20, 10), nullable=True)  # Proceeds in local currency
+    gain_loss_local = Column(Numeric(20, 10), nullable=True)  # Gain/loss in local currency
 
     # Tax classification
     is_short_term = Column(Boolean, nullable=False)  # < 1 year
@@ -126,17 +154,22 @@ class UserCostBasisSettings(Base):
         nullable=False
     )
 
-    # Tax jurisdiction
-    tax_jurisdiction = Column(String(10), default="US")  # ISO country code
+    # Tax jurisdiction (set from User.current_country on creation)
+    tax_jurisdiction = Column(String(10), nullable=True)  # ISO country code, no default
     tax_year_start = Column(Integer, default=1)  # Month (1 = January)
 
-    # Wash sale rule (US only)
-    apply_wash_sale_rule = Column(Boolean, default=True)
+    # Wash sale rule (US only - should be False by default, enabled only for US jurisdiction)
+    apply_wash_sale_rule = Column(Boolean, default=False)
     wash_sale_days = Column(Integer, default=30)  # 30 days for US
 
     # Tracking preferences
     track_inter_wallet_transfers = Column(Boolean, default=False)  # Ignore or track
     auto_import_enabled = Column(Boolean, default=True)
+
+    # Multi-currency preferences
+    reporting_currency = Column(String(3), nullable=True)  # Currency for reports (auto-set from tax_jurisdiction)
+    preferred_exchange_source = Column(String(50), nullable=True)  # Preferred exchange rate source
+    show_dual_currency = Column(Boolean, default=True)  # Show both USD and local currency
 
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -159,7 +192,7 @@ class WashSaleViolation(Base):
 
     # Original loss sale
     loss_disposal_id = Column(Integer, ForeignKey("cost_basis_disposals.id"), nullable=False)
-    loss_amount = Column(Float, nullable=False)  # Original loss
+    loss_amount = Column(Numeric(20, 10), nullable=False)  # Original loss
 
     # Repurchase within wash sale period
     repurchase_lot_id = Column(Integer, ForeignKey("cost_basis_lots.id"), nullable=False)
@@ -167,8 +200,8 @@ class WashSaleViolation(Base):
     days_between = Column(Integer, nullable=False)  # Should be <= 30
 
     # Adjusted values
-    disallowed_loss = Column(Float, nullable=False)  # Loss that can't be claimed now
-    adjusted_cost_basis = Column(Float, nullable=False)  # New cost basis with loss added
+    disallowed_loss = Column(Numeric(20, 10), nullable=False)  # Loss that can't be claimed now
+    adjusted_cost_basis = Column(Numeric(20, 10), nullable=False)  # New cost basis with loss added
 
     created_at = Column(DateTime, default=datetime.utcnow)
 
