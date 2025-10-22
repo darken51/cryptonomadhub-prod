@@ -32,7 +32,7 @@ function TopCountriesPodium({ countries }: TopCountriesPodiumProps) {
             ? c.ai_analysis.crypto_score
             : category === 'nomad'
             ? c.ai_analysis.nomad_score
-            : c.ai_analysis.overall_score
+            : Math.round((c.ai_analysis.crypto_score + c.ai_analysis.nomad_score) / 2)
         }))
         .sort((a, b) => b.score - a.score)
         .slice(0, 3)
