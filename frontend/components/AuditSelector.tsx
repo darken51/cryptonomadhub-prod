@@ -139,7 +139,7 @@ export function AuditSelector({
           }}
         >
           <SelectTrigger className="w-full md:w-[500px] h-14 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border-2 border-violet-300 dark:border-violet-700 hover:border-violet-500 dark:hover:border-violet-500 hover:shadow-lg transition-all cursor-pointer font-medium">
-            <SelectValue placeholder={getDisplayText(selectedAuditId)} className="text-slate-900 dark:text-slate-100" />
+            <SelectValue placeholder={getDisplayText(selectedAuditId)} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">
