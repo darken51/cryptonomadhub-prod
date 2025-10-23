@@ -29,10 +29,10 @@ const actions = [
     label: 'Explore'
   },
   {
-    href: '/features/multi-country-compare',
+    href: '/simulations/compare',
     Icon: GitCompare,
     title: 'Compare Countries',
-    description: 'Side-by-side tax comparison',
+    description: 'Side-by-side tax comparison (2-5 countries)',
     gradient: 'from-purple-600 to-violet-700',
     label: 'Compare'
   },
