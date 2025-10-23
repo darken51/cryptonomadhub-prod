@@ -42,7 +42,7 @@ export default function AIScoringPage() {
                 href="/countries"
                 className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all"
               >
-                Explore 163 Country Scores
+                Explore 167 Country Scores
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Link>
               <Link

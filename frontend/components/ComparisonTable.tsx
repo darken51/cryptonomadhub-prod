@@ -13,7 +13,7 @@ interface Feature {
 const features: Feature[] = [
   {
     name: 'Countries Supported',
-    cryptoNomad: '163',
+    cryptoNomad: '167',
     koinly: '~100',
     coinTracker: '~20'
   },

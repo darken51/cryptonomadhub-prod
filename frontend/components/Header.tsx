@@ -28,7 +28,7 @@ const featuresMenu: MegaMenuSection[] = [
     title: 'Core Features',
     items: [
       {
-        title: '163 Countries',
+        title: '167 Countries',
         description: 'Worldwide tax coverage with verified data',
         icon: Globe,
         href: '/features/countries',

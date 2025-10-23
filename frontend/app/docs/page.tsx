@@ -82,7 +82,7 @@ export default function DocsPage() {
               {
                 icon: Rocket,
                 title: 'Getting Started',
-                description: 'Quick setup guide to connect wallets, run DeFi audit, and explore 163 country tax rates.',
+                description: 'Quick setup guide to connect wallets, run DeFi audit, and explore 167 country tax rates.',
                 items: ['Create account', 'Connect wallets', 'Run first audit', 'View tax comparison'],
                 gradient: 'from-emerald-500 to-teal-600',
                 href: '#getting-started'

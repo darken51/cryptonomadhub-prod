@@ -243,7 +243,7 @@ export default function ConnectWalletDoc() {
             </p>
             <ul className="list-disc list-inside text-slate-700 dark:text-slate-300 space-y-2 mb-6">
               <li><Link href="/docs/first-defi-audit" className="text-blue-600 dark:text-indigo-400 hover:underline">Run your first DeFi Audit</Link></li>
-              <li>Explore the <Link href="/countries" className="text-blue-600 dark:text-indigo-400 hover:underline">163-country tax database</Link></li>
+              <li>Explore the <Link href="/countries" className="text-blue-600 dark:text-indigo-400 hover:underline">167-country tax database</Link></li>
               <li><Link href="/docs/cost-basis-methods" className="text-blue-600 dark:text-indigo-400 hover:underline">Choose a cost basis method</Link> (FIFO/LIFO/HIFO)</li>
               <li>Calculate potential tax savings with the Tax Optimizer</li>
             </ul>

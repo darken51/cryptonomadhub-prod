@@ -253,7 +253,7 @@ export default function PortugalCryptoTaxBlogPost() {
                 href="/countries"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-violet-600 text-white rounded-xl font-semibold hover:bg-violet-700 transition-colors"
               >
-                Explore 163 Countries
+                Explore 167 Countries
               </Link>
             </div>
           </div>

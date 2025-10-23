@@ -16,7 +16,7 @@ export default function AccountantsPage() {
             "@context": "https://schema.org",
             "@type": "WebPage",
             "name": "For Accountants & CPAs - Crypto Tax Professional Tools",
-            "description": "Professional crypto tax tools for accountants and CPAs. Client management, Form 8949 export, 163 country tax knowledge, FIFO/LIFO/HIFO, and wash sale detection. Save 80% of research time.",
+            "description": "Professional crypto tax tools for accountants and CPAs. Client management, Form 8949 export, 167 country tax knowledge, FIFO/LIFO/HIFO, and wash sale detection. Save 80% of research time.",
             "url": "https://cryptonomadhub.com/solutions/accountants"
           })
         }}
@@ -42,7 +42,7 @@ export default function AccountantsPage() {
             </h1>
 
             <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto mb-8">
-              Professional crypto tax tools for accountants. <strong>163 country tax knowledge</strong>, <strong>Form 8949 export</strong>, and <strong>client management</strong>. Save 80% of research time.
+              Professional crypto tax tools for accountants. <strong>167 country tax knowledge</strong>, <strong>Form 8949 export</strong>, and <strong>client management</strong>. Save 80% of research time.
             </p>
 
             <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -80,7 +80,7 @@ export default function AccountantsPage() {
             {[
               {
                 icon: Globe,
-                title: '163 Country Tax Database',
+                title: '167 Country Tax Database',
                 description: 'Instant access to crypto tax rates, regulations, and reporting requirements for every country. Sourced from PwC, OECD, KPMG, and government APIs.',
                 gradient: 'from-blue-500 to-cyan-600'
               },
@@ -178,7 +178,7 @@ export default function AccountantsPage() {
                 title: 'International Clients',
                 description: 'US client moved to Portugal (0% crypto tax). German client trading from Spain. You need to understand tax residency, treaties, and 183-day rules for 167 countries.',
                 problem: 'Problem: No global tax expertise',
-                solution: 'Solution: 163 country database with AI recommendations'
+                solution: 'Solution: 167 country database with AI recommendations'
               }
             ].map((scenario, idx) => (
               <motion.div
@@ -224,7 +224,7 @@ export default function AccountantsPage() {
 
           <div className="grid md:grid-cols-2 gap-4">
             {[
-              { feature: '163 Country Tax Database', description: 'Instant crypto tax rates and regulations worldwide' },
+              { feature: '167 Country Tax Database', description: 'Instant crypto tax rates and regulations worldwide' },
               { feature: 'Form 8949 Export', description: 'IRS-compliant forms in CSV/PDF format' },
               { feature: 'FIFO/LIFO/HIFO Methods', description: 'All IRS-approved cost basis methods supported' },
               { feature: 'Wash Sale Detection', description: '30-day rule tracking for crypto transactions' },

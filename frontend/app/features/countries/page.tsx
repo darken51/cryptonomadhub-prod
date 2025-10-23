@@ -15,7 +15,7 @@ export default function CountriesFeaturePage() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebPage",
-            "name": "163 Country Tax Database - CryptoNomadHub",
+            "name": "167 Country Tax Database - CryptoNomadHub",
             "description": "Comprehensive crypto tax regulations for 167 countries with verified data from official sources including PwC, OECD, KPMG, and government APIs.",
             "url": "https://cryptonomadhub.com/features/countries"
           })
@@ -38,7 +38,7 @@ export default function CountriesFeaturePage() {
             </div>
 
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6">
-              <span className="text-slate-900 dark:text-white">163 Countries</span>
+              <span className="text-slate-900 dark:text-white">167 Countries</span>
               <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600">
                 Complete Tax Coverage
@@ -73,7 +73,7 @@ export default function CountriesFeaturePage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
-              { value: '163', label: 'Countries', sublabel: 'Most in industry' },
+              { value: '167', label: 'Countries', sublabel: 'Most in industry' },
               { value: '5+', label: 'Data Sources', sublabel: 'PwC, OECD, KPMG' },
               { value: '100%', label: 'Verified', sublabel: 'Official sources' },
               { value: 'Q4', label: 'Updates', sublabel: 'Quarterly refresh' }
@@ -198,7 +198,7 @@ export default function CountriesFeaturePage() {
       <section className="py-20 md:py-32 px-4 bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-600">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Explore 163 Countries Today
+            Explore 167 Countries Today
           </h2>
           <p className="text-xl text-white/90 mb-8">
             Interactive map, detailed regulations, and AI-powered country scoring

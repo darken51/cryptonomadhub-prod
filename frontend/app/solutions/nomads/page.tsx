@@ -50,7 +50,7 @@ export default function DigitalNomadsPage() {
                 href="/countries"
                 className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all"
               >
-                Explore 163 Countries
+                Explore 167 Countries
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Link>
               <Link

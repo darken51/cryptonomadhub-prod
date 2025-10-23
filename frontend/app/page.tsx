@@ -366,7 +366,7 @@ export default function Home() {
               </div>
 
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                Explore Tax Regulations Across 163 Countries
+                Explore Tax Regulations Across 167 Countries
               </h2>
 
               <p className="text-xl text-white/90 mb-8">
@@ -463,7 +463,7 @@ export default function Home() {
                   {/* Stats overlay */}
                   <div className="absolute bottom-4 right-4 bg-white/10 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/20">
                     <div className="text-white text-sm font-semibold">
-                      163 Countries • Real-time Data
+                      167 Countries • Real-time Data
                     </div>
                   </div>
                 </div>
@@ -740,7 +740,7 @@ export default function Home() {
                 className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-slate-900 dark:text-white bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 hover:border-violet-600 dark:hover:border-fuchsia-400 rounded-xl shadow-lg hover:shadow-xl transition-all"
               >
                 <Globe className="w-5 h-5 mr-2" />
-                Browse 163 Countries
+                Browse 167 Countries
               </Link>
             </div>
 
@@ -766,7 +766,7 @@ export default function Home() {
           <div className="grid md:grid-cols-4 gap-8">
             {[
               { step: '01', title: 'Connect Wallets', description: 'Add wallet addresses or import CSV transactions', icon: '🔗' },
-              { step: '02', title: 'AI Analyzes 163 Countries', description: 'Dual scoring: crypto tax rates + nomad quality of life', icon: '🤖' },
+              { step: '02', title: 'AI Analyzes 167 Countries', description: 'Dual scoring: crypto tax rates + nomad quality of life', icon: '🤖' },
               { step: '03', title: 'Get Recommendations', description: 'Personalized suggestions with confidence scores', icon: '🎯' },
               { step: '04', title: 'Export Reports', description: 'IRS Form 8949, CSV, or PDF with full audit trail', icon: '📄' }
             ].map((item, index) => (

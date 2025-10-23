@@ -40,7 +40,7 @@ export default function APIAuthenticationDoc() {
               The CryptoNomadHub API allows developers to integrate crypto tax optimization into their applications. Access:
             </p>
             <ul className="list-disc list-inside text-slate-700 dark:text-slate-300 space-y-2 mb-6">
-              <li>163 country tax data and AI scores</li>
+              <li>167 country tax data and AI scores</li>
               <li>DeFi audit automation</li>
               <li>Portfolio tracking and analytics</li>
               <li>Cost basis calculations (FIFO/LIFO/HIFO)</li>

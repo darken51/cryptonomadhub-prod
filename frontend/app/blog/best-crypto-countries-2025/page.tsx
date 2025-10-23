@@ -348,7 +348,7 @@ export default function BestCryptoCountriesBlogPost() {
             </p>
 
             <div className="bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 rounded-xl p-8 mt-12">
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">Compare All 163 Countries</h3>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">Compare All 167 Countries</h3>
               <p className="text-slate-700 dark:text-slate-300 mb-4">
                 Use our interactive tool to filter by tax rate, visa difficulty, cost of living, and more. Find your perfect crypto destination.
               </p>
