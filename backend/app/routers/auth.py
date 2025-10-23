@@ -381,6 +381,12 @@ async def reset_password(
     user.reset_token = None
     user.reset_token_expires = None
 
+    # ✅ FIX: Auto-verify email when resetting password
+    # If user can receive and click reset email, their email is verified
+    if not user.email_verified:
+        user.email_verified = True
+        logger.info(f"Auto-verified email for user {user.email} during password reset")
+
     db.commit()
 
     logger.info(f"Password reset successful for user {user.email}")
