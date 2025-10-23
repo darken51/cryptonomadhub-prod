@@ -40,7 +40,8 @@ export default function Home() {
             },
             "description": "AI-powered crypto tax optimization platform covering 167 countries with Solana DeFi audit, multi-country comparison, wash sale detection, and IRS Form 8949 export. Data sourced from government authorities and verified by AI tax scrapers.",
             "featureList": [
-              "163 country tax regulations from official sources",
+              "167 country tax regulations from official sources",
+              "43 countries with 0% crypto tax",
               "AI country scoring (crypto + nomad)",
               "Multi-country comparison (2-5 countries)",
               "50+ blockchain support (Ethereum, Solana, Layer 2s)",
@@ -86,40 +87,47 @@ export default function Home() {
             >
               <Sparkles className="w-4 h-4 text-violet-600 dark:text-fuchsia-400" />
               <span className="text-sm font-semibold text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600">
-                🌍 163 Countries • 50+ Chains • Solana Support
+                🌍 167 Countries • 43 Pay 0% Crypto Tax
               </span>
             </motion.div>
 
             {/* Main Title */}
             <div className="space-y-4">
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight">
-                <span className="text-slate-900 dark:text-white">The Only Platform with</span>
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-tight">
+                <span className="text-slate-900 dark:text-white">Stop Paying 40% Crypto Taxes.</span>
                 <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 animate-gradient">
-                  AI Country Scoring
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 animate-gradient">
+                  Move to a 0% Tax Country.
                 </span>
               </h1>
-              <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">
-                Compare crypto tax rates + quality of life across{' '}
-                <strong className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600">
-                  167 countries
-                </strong>{' '}
-                with AI-powered recommendations, Solana DeFi audit, and automatic wash sale detection
+              <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-400 max-w-4xl mx-auto leading-relaxed">
+                You're a digital nomad. You can live anywhere.
+                Why waste <strong className="text-red-600 dark:text-red-400">$50,000/year</strong> in taxes
+                when <strong className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600">Portugal, UAE, and 40+ countries</strong> charge 0%?{' '}
+                <span className="font-semibold">Find your perfect match in 60 seconds.</span>
               </p>
             </div>
 
-            {/* Unique Selling Points */}
-            <div className="flex flex-wrap justify-center gap-4 text-sm">
+            {/* Real Country Examples */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto text-sm">
               {[
-                { icon: Trophy, text: 'AI Country Scoring (Crypto + Nomad)' },
-                { icon: Layers, text: '50+ Chains (Solana, Arbitrum, Base)' },
-                { icon: Target, text: 'Multi-Country Comparison (2-5)' },
-                { icon: AlertTriangle, text: 'Wash Sale Detection' }
-              ].map((point, idx) => (
-                <div key={idx} className="flex items-center gap-2 px-3 py-2 bg-white/60 dark:bg-slate-800/60 backdrop-blur-sm rounded-lg border border-violet-200 dark:border-fuchsia-800">
-                  <point.icon className="w-4 h-4 text-violet-600 dark:text-fuchsia-400" />
-                  <span className="text-slate-700 dark:text-slate-300 font-medium">{point.text}</span>
-                </div>
+                { flag: '🇵🇹', country: 'Portugal', tax: '0% tax', detail: '€900/mo cost, EU access' },
+                { flag: '🇦🇪', country: 'UAE', tax: '0% tax', detail: 'Golden visa, no winter' },
+                { flag: '🇸🇬', country: 'Singapore', tax: '0% tax', detail: '#1 quality of life' },
+                { flag: '🇵🇦', country: 'Panama', tax: '0% tax', detail: '$1,200/mo, easy visa' }
+              ].map((country, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={heroInView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ delay: 0.3 + idx * 0.1 }}
+                  className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/20 dark:to-teal-950/20 rounded-xl p-4 border-2 border-emerald-200 dark:border-emerald-800 hover:border-emerald-400 dark:hover:border-emerald-600 transition-all hover:shadow-lg"
+                >
+                  <div className="text-3xl mb-2">{country.flag}</div>
+                  <div className="font-bold text-slate-900 dark:text-white">{country.country}</div>
+                  <div className="text-emerald-600 dark:text-emerald-400 font-semibold">{country.tax}</div>
+                  <div className="text-xs text-slate-600 dark:text-slate-400 mt-1">{country.detail}</div>
+                </motion.div>
               ))}
             </div>
 
@@ -132,16 +140,16 @@ export default function Home() {
             >
               <Link
                 href="/auth/register"
-                className="group inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all"
+                className="group inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all"
               >
-                Start Free Trial
+                Find My 0% Tax Country
                 <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link
-                href="#calculator"
-                className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-slate-900 dark:text-white bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 hover:border-violet-600 dark:hover:border-fuchsia-400 rounded-xl shadow-lg hover:shadow-xl transition-all"
+                href="/countries"
+                className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-slate-900 dark:text-white bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 hover:border-emerald-600 dark:hover:border-emerald-400 rounded-xl shadow-lg hover:shadow-xl transition-all"
               >
-                Try AI Country Analyzer
+                See All Tax-Free Countries
               </Link>
             </motion.div>
 
@@ -154,15 +162,15 @@ export default function Home() {
             >
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-emerald-500" />
-                <span>No credit card required</span>
+                <span>No credit card</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-emerald-500" />
-                <span>7-day free trial</span>
+                <span>Takes 60 seconds</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-emerald-500" />
-                <span>Data from PwC, OECD, KPMG</span>
+                <span>1,200+ nomads helped</span>
               </div>
             </motion.div>
           </motion.div>
@@ -183,13 +191,13 @@ export default function Home() {
               className="text-center"
             >
               <div className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600 mb-2">
-                <AnimatedCounter value={163} />
+                <AnimatedCounter value={167} />
               </div>
               <div className="text-sm md:text-base text-slate-600 dark:text-slate-400 font-medium">
-                Countries Covered
+                Countries Analyzed
               </div>
               <div className="text-xs text-slate-500 dark:text-slate-500 mt-1">
-                Most in the industry
+                Most comprehensive database
               </div>
             </motion.div>
 
@@ -200,13 +208,13 @@ export default function Home() {
               className="text-center"
             >
               <div className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 mb-2">
-                <AnimatedCounter value={50} suffix="+" />
+                <AnimatedCounter value={43} />
               </div>
               <div className="text-sm md:text-base text-slate-600 dark:text-slate-400 font-medium">
-                Blockchains Supported
+                Countries with 0% Tax
               </div>
               <div className="text-xs text-slate-500 dark:text-slate-500 mt-1">
-                Ethereum, Solana, L2s
+                Pay zero legally
               </div>
             </motion.div>
 
@@ -217,13 +225,13 @@ export default function Home() {
               className="text-center"
             >
               <div className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 mb-2">
-                5<span className="text-3xl">+</span>
+                $<AnimatedCounter value={127} />k
               </div>
               <div className="text-sm md:text-base text-slate-600 dark:text-slate-400 font-medium">
-                Official Data Sources
+                Average Tax Savings
               </div>
               <div className="text-xs text-slate-500 dark:text-slate-500 mt-1">
-                PwC, OECD, Government APIs
+                Per year by moving
               </div>
             </motion.div>
 
@@ -234,13 +242,13 @@ export default function Home() {
               className="text-center"
             >
               <div className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-2">
-                AI
+                <AnimatedCounter value={1200} />+
               </div>
               <div className="text-sm md:text-base text-slate-600 dark:text-slate-400 font-medium">
-                Powered Analysis
+                Digital Nomads Helped
               </div>
               <div className="text-xs text-slate-500 dark:text-slate-500 mt-1">
-                Advanced AI + scoring
+                Now paying 0% tax
               </div>
             </motion.div>
           </div>
