@@ -280,24 +280,38 @@ async def create_defi_audit(
         except ValueError:
             raise HTTPException(status_code=400, detail="Invalid end_date format. Use ISO format.")
 
-    # Create audit
-    service = DeFiAuditService(db)
-    logger.info(f"Creating audit for wallet {audit_request.wallet_address} on chains {audit_request.chains}")
+    # Create audit record (without processing yet)
+    # Default date range: last tax year
+    if not start_date:
+        from datetime import timedelta
+        start_date = datetime.now(timezone.utc) - timedelta(days=365)
+    if not end_date:
+        end_date = datetime.now(timezone.utc)
+
+    audit = DeFiAudit(
+        user_id=current_user.id,
+        start_date=start_date,
+        end_date=end_date,
+        chains=audit_request.chains,
+        status="pending"  # Start as pending, will be processed by Celery
+    )
+    db.add(audit)
+    db.commit()
+    db.refresh(audit)
+
+    logger.info(f"Audit {audit.id} created with status pending")
+
+    # Launch background task to process audit
     try:
-        audit = await service.create_audit(
-            user_id=current_user.id,
-            wallet_address=audit_request.wallet_address,
-            chains=audit_request.chains,
-            start_date=start_date,
-            end_date=end_date
-        )
-        logger.info(f"Audit {audit.id} created with status {audit.status}")
+        from app.tasks.defi_audit_tasks import process_defi_audit_task
+        task = process_defi_audit_task.delay(audit.id, audit_request.wallet_address)
+        logger.info(f"Launched Celery task {task.id} for audit {audit.id}")
     except Exception as e:
-        logger.error(f"Failed to create audit: {e}", exc_info=True)
-        raise HTTPException(
-            status_code=500,
-            detail=f"Failed to create audit: {str(e)}"
-        )
+        logger.error(f"Failed to launch Celery task for audit {audit.id}: {e}", exc_info=True)
+        # Don't fail the request - audit is created, just mark as failed
+        audit.status = "failed"
+        audit.error_message = f"Failed to start processing: {str(e)}"
+        db.commit()
 
     # Enrich with local currency values
     local_currency_data = await enrich_audit_with_local_currency(audit, current_user.id, db)
