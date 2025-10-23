@@ -5,13 +5,24 @@ Celery application configuration
 from celery import Celery
 from celery.schedules import crontab
 import os
+import ssl
+
+# Get Redis URL from environment
+redis_url = os.getenv("REDIS_URL", "redis://redis:6379/0")
 
 # Initialize Celery
 celery_app = Celery(
     "nomadcrypto",
-    broker=os.getenv("REDIS_URL", "redis://redis:6379/0"),
-    backend=os.getenv("REDIS_URL", "redis://redis:6379/0"),
+    broker=redis_url,
+    backend=redis_url,
 )
+
+# Configure SSL for Redis if using rediss://
+broker_use_ssl = None
+if redis_url.startswith('rediss://'):
+    broker_use_ssl = {
+        'ssl_cert_reqs': ssl.CERT_NONE,  # Accept any certificate (Render managed)
+    }
 
 # Celery configuration
 celery_app.conf.update(
@@ -23,6 +34,8 @@ celery_app.conf.update(
     task_track_started=True,
     task_time_limit=3600,  # 1 hour max
     task_soft_time_limit=3000,  # 50 minutes soft limit
+    broker_use_ssl=broker_use_ssl,
+    redis_backend_use_ssl=broker_use_ssl,
 )
 
 # Periodic task schedule
