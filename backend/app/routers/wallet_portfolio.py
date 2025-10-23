@@ -364,7 +364,7 @@ async def sync_wallet(
     }
 
 
-@router.post("/detect-chain")
+@router.get("/detect-chain")
 async def detect_chain_from_address(
     address: str
 ):
@@ -372,12 +372,16 @@ async def detect_chain_from_address(
     Auto-detect blockchain from wallet address
 
     Args:
-        address: Wallet address
+        address: Wallet address (query parameter)
 
     Returns:
         - blockchain_type: evm, solana, bitcoin, unknown
         - possible_chains: List of compatible chains
+        - suggested_chain: Recommended chain to use
+        - is_valid: Whether address format is valid
     """
+    from app.services.blockchain_detector import ChainDetector
+
     blockchain_type = ChainDetector.detect_blockchain_type(address)
     possible_chains = ChainDetector.get_possible_chains(address)
 
