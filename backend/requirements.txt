@@ -46,7 +46,8 @@ python-dateutil==2.8.2
 python-dotenv==1.0.0
 
 # AI & LLM
-anthropic==0.71.0  # Claude AI for chat assistant
+anthropic==0.71.0  # Claude AI for country analysis
+google-generativeai>=0.8.0  # Gemini for chat assistant (13x faster, 91% cheaper)
 
 # Web Scraping & Data Fetching
 beautifulsoup4==4.12.2

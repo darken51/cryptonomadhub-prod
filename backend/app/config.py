@@ -15,9 +15,13 @@ class Settings(BaseSettings):
     # Redis
     REDIS_URL: str
 
-    # AI Assistant - Anthropic Claude
+    # AI Assistant - Anthropic Claude (for country analysis)
     ANTHROPIC_API_KEY: str
-    ANTHROPIC_MODEL: str = "claude-3-5-haiku-20241022"  # Haiku = 3x cheaper, fast, great for chat
+    ANTHROPIC_MODEL: str = "claude-3-5-sonnet-20241022"  # Sonnet for deep analysis
+
+    # AI Assistant - Google Gemini (for chat assistant)
+    GOOGLE_API_KEY: str
+    GEMINI_MODEL: str = "gemini-2.5-flash-lite"  # Flash-Lite = 13x faster, 91% cheaper than Haiku
 
     # Ollama (deprecated - migrated to Claude)
     # OLLAMA_HOST: str
