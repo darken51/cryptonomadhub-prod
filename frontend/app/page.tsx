@@ -87,24 +87,22 @@ export default function Home() {
             >
               <Sparkles className="w-4 h-4 text-violet-600 dark:text-fuchsia-400" />
               <span className="text-sm font-semibold text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600">
-                🌍 167 Countries • 43 Pay 0% Crypto Tax
+                🤖 AI-Powered Platform • 167 Countries Analyzed
               </span>
             </motion.div>
 
             {/* Main Title */}
             <div className="space-y-4">
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-tight">
-                <span className="text-slate-900 dark:text-white">Stop Paying 40% Crypto Taxes.</span>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight">
+                <span className="text-slate-900 dark:text-white">The AI Crypto Tax Platform</span>
                 <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 animate-gradient">
-                  Move to a 0% Tax Country.
+                  for Digital Nomads
                 </span>
               </h1>
-              <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-400 max-w-4xl mx-auto leading-relaxed">
-                You're a digital nomad. You can live anywhere.
-                Why waste <strong className="text-red-600 dark:text-red-400">$50,000/year</strong> in taxes
-                when <strong className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600">Portugal, UAE, and 40+ countries</strong> charge 0%?{' '}
-                <span className="font-semibold">Find your perfect match in 60 seconds.</span>
+              <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-4xl mx-auto leading-relaxed">
+                Find which of <strong className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600">167 countries</strong> let you pay <strong className="text-emerald-600 dark:text-emerald-400">0% crypto tax</strong>.
+                AI analyzes your situation and gives personalized relocation recommendations in <strong className="text-slate-900 dark:text-white">60 seconds</strong>.
               </p>
             </div>
 
