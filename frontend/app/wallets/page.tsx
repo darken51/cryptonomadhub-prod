@@ -524,23 +524,47 @@ export default function WalletsPage() {
                     className="w-full px-3 py-2 border dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
                   />
                   {detectingChain && (
-                    <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                    <div className="mt-2 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
                       Detecting blockchain...
                     </div>
                   )}
                   {detectedChain && (
                     <div className="mt-2">
                       {detectedChain.is_valid ? (
-                        <div className="flex items-center gap-2 text-sm text-green-600">
-                          <Check size={16} />
-                          <span>
-                            Detected: {detectedChain.blockchain_type}
-                            {detectedChain.suggested_chain && ` (${detectedChain.suggested_chain})`}
-                          </span>
+                        <div className="space-y-2">
+                          {detectedChain.blockchain_type === 'evm' && (
+                            <div className="inline-flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-violet-50 to-fuchsia-50 dark:from-violet-900/30 dark:to-fuchsia-900/30 text-violet-700 dark:text-fuchsia-300 rounded-lg text-sm font-semibold border border-violet-200 dark:border-violet-800">
+                              <Check size={16} />
+                              <span>✓ EVM address detected - {detectedChain.possible_chains.length} compatible chains</span>
+                            </div>
+                          )}
+                          {detectedChain.blockchain_type === 'solana' && (
+                            <div className="inline-flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/30 text-purple-700 dark:text-pink-300 rounded-lg text-sm font-semibold border border-purple-200 dark:border-purple-800">
+                              <Check size={16} />
+                              <span>✓ Solana address detected - blockchain auto-selected</span>
+                            </div>
+                          )}
+                          {detectedChain.blockchain_type === 'bitcoin' && (
+                            <div className="inline-flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-900/30 dark:to-amber-900/30 text-orange-700 dark:text-amber-300 rounded-lg text-sm font-semibold border border-orange-200 dark:border-orange-800">
+                              <Check size={16} />
+                              <span>✓ Bitcoin address detected</span>
+                            </div>
+                          )}
+                          {detectedChain.blockchain_type === 'unknown' && (
+                            <div className="inline-flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg text-sm font-semibold border border-gray-200 dark:border-gray-700">
+                              <span>⚠️ Unknown address format</span>
+                            </div>
+                          )}
+                          {detectedChain.suggested_chain && (
+                            <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                              Suggested: <span className="font-semibold text-blue-600 dark:text-blue-400">{detectedChain.suggested_chain}</span> (auto-selected below)
+                            </div>
+                          )}
                         </div>
                       ) : (
-                        <div className="text-sm text-red-600">
-                          {detectedChain.error_message || "Invalid address format"}
+                        <div className="inline-flex items-center gap-2 px-3 py-2 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg text-sm font-semibold border border-red-200 dark:border-red-800">
+                          <span>❌ {detectedChain.error_message || "Invalid address format"}</span>
                         </div>
                       )}
                     </div>
@@ -578,8 +602,29 @@ export default function WalletsPage() {
                     </optgroup>
                   </select>
                   {detectedChain && detectedChain.possible_chains.length > 0 && (
-                    <div className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                      Compatible: {detectedChain.possible_chains.join(", ")}
+                    <div className="mt-3">
+                      <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                        Compatible chains ({detectedChain.possible_chains.length}):
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
+                        {detectedChain.possible_chains.slice(0, 10).map((chain) => (
+                          <span
+                            key={chain}
+                            className={`px-2 py-1 rounded text-xs font-medium ${
+                              chain === newWallet.chain
+                                ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700'
+                                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-600'
+                            }`}
+                          >
+                            {chain}
+                          </span>
+                        ))}
+                        {detectedChain.possible_chains.length > 10 && (
+                          <span className="px-2 py-1 text-xs text-gray-500 dark:text-gray-400">
+                            +{detectedChain.possible_chains.length - 10} more
+                          </span>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
