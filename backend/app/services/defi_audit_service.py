@@ -570,10 +570,16 @@ class DeFiAuditService:
         protocols_breakdown = {}
 
         for tx in transactions:
-            # Volume - compter BOTH usd_value_in ET usd_value_out pour inclure rewards/income
-            if tx.usd_value_in:
+            # Volume - count only ONE side to avoid double counting
+            # Use the larger of in/out (or the one that exists)
+            if tx.usd_value_in and tx.usd_value_out:
+                # Both exist (swap) - take the larger value
+                total_volume += Decimal(max(tx.usd_value_in, tx.usd_value_out))
+            elif tx.usd_value_in:
+                # Only IN (spending/selling)
                 total_volume += Decimal(tx.usd_value_in)
-            if tx.usd_value_out:
+            elif tx.usd_value_out:
+                # Only OUT (receiving/rewards)
                 total_volume += Decimal(tx.usd_value_out)
 
             # Fees
