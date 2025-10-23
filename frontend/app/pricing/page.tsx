@@ -73,7 +73,7 @@ export default function Pricing() {
         { text: 'API access', included: true },
       ],
       cta: 'Contact Sales',
-      href: 'mailto:sales@cryptonomadhub.com',
+      href: 'mailto:contact@cryptonomadhub.io',
       dark: true,
     },
   ]

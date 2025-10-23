@@ -157,7 +157,7 @@ export default function HelpPage() {
         },
         {
           question: 'Is there a refund policy?',
-          answer: 'Yes. 30-day money-back guarantee if you\'re not satisfied. Contact support@cryptonomadhub.com for refunds.'
+          answer: 'Yes. 30-day money-back guarantee if you\'re not satisfied. Contact support@cryptonomadhub.io for refunds.'
         }
       ]
     }
@@ -365,7 +365,7 @@ export default function HelpPage() {
               Start Live Chat
             </button>
             <Link
-              href="mailto:support@cryptonomadhub.com"
+              href="mailto:support@cryptonomadhub.io"
               className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-white/20 hover:bg-white/30 backdrop-blur-sm border-2 border-white/50 rounded-xl transition-all"
             >
               <Mail className="w-5 h-5 mr-2" />

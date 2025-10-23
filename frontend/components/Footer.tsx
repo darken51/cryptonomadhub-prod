@@ -70,7 +70,7 @@ export function Footer() {
                 <Linkedin className="w-5 h-5" />
               </a>
               <a
-                href="mailto:hello@cryptonomadhub.com"
+                href="mailto:contact@cryptonomadhub.io"
                 className="p-2 text-slate-500 hover:text-violet-600 dark:hover:text-fuchsia-400 transition-colors"
                 aria-label="Email"
               >
@@ -91,7 +91,7 @@ export function Footer() {
               <Link href="/privacy" className="hover:text-violet-600 dark:hover:text-fuchsia-400 transition-colors">
                 Privacy
               </Link>
-              <a href="mailto:legal@cryptonomadhub.com" className="hover:text-violet-600 dark:hover:text-fuchsia-400 transition-colors">
+              <a href="mailto:contact@cryptonomadhub.io" className="hover:text-violet-600 dark:hover:text-fuchsia-400 transition-colors">
                 Legal
               </a>
             </div>

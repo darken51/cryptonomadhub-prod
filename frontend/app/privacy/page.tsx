@@ -253,7 +253,7 @@ export default function PrivacyPolicy() {
                 </li>
               </ul>
               <p className="text-slate-700 dark:text-slate-300 mt-6 leading-relaxed">
-                To exercise these rights, contact us at <strong className="text-violet-600 dark:text-fuchsia-400">privacy@cryptonomadhub.com</strong>
+                To exercise these rights, contact us at <strong className="text-violet-600 dark:text-fuchsia-400">contact@cryptonomadhub.io</strong>
               </p>
             </motion.section>
 
@@ -375,8 +375,8 @@ export default function PrivacyPolicy() {
                 If you have questions about this Privacy Policy or want to exercise your privacy rights, contact us at:
               </p>
               <div className="space-y-2 text-slate-700 dark:text-slate-300">
-                <p><strong className="text-violet-600 dark:text-fuchsia-400">Email:</strong> privacy@cryptonomadhub.com</p>
-                <p><strong className="text-violet-600 dark:text-fuchsia-400">Data Protection Officer:</strong> dpo@cryptonomadhub.com</p>
+                <p><strong className="text-violet-600 dark:text-fuchsia-400">Email:</strong> contact@cryptonomadhub.io</p>
+                <p><strong className="text-violet-600 dark:text-fuchsia-400">Data Protection Officer:</strong> contact@cryptonomadhub.io</p>
                 <p className="mt-4">
                   <strong className="text-violet-600 dark:text-fuchsia-400">Address:</strong><br />
                   NomadCrypto Hub<br />

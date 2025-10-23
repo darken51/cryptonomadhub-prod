@@ -375,7 +375,7 @@ export default function TermsOfService() {
               </h2>
               <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
                 If you have questions about these Terms, please contact us at:<br />
-                <strong className="text-violet-600 dark:text-fuchsia-400">legal@cryptonomadhub.com</strong>
+                <strong className="text-violet-600 dark:text-fuchsia-400">contact@cryptonomadhub.io</strong>
               </p>
             </motion.section>
 
