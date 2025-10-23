@@ -176,7 +176,7 @@ export default function AccountantsPage() {
               {
                 icon: '🌍',
                 title: 'International Clients',
-                description: 'US client moved to Portugal (0% crypto tax). German client trading from Spain. You need to understand tax residency, treaties, and 183-day rules for 163 countries.',
+                description: 'US client moved to Portugal (0% crypto tax). German client trading from Spain. You need to understand tax residency, treaties, and 183-day rules for 167 countries.',
                 problem: 'Problem: No global tax expertise',
                 solution: 'Solution: 163 country database with AI recommendations'
               }
@@ -335,7 +335,7 @@ export default function AccountantsPage() {
           </div>
 
           <p className="text-white/80 text-sm mt-6">
-            No credit card required • 7-day free trial • 163 countries covered
+            No credit card required • 7-day free trial • 167 countries covered
           </p>
         </div>
       </section>

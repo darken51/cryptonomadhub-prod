@@ -16,7 +16,7 @@ export default function DigitalNomadsPage() {
             "@context": "https://schema.org",
             "@type": "WebPage",
             "name": "For Digital Nomads - Crypto Tax Optimization",
-            "description": "Find the perfect country for your digital nomad lifestyle. AI-powered country scoring evaluates 163 countries on crypto tax rates AND quality of life.",
+            "description": "Find the perfect country for your digital nomad lifestyle. AI-powered country scoring evaluates 167 countries on crypto tax rates AND quality of life.",
             "url": "https://cryptonomadhub.com/solutions/nomads"
           })
         }}
@@ -93,7 +93,7 @@ export default function DigitalNomadsPage() {
               {
                 icon: Map,
                 title: 'Visa Requirements',
-                description: 'See visa rules, residency requirements, and digital nomad visa programs for all 163 countries. 183-day rule tracking included.',
+                description: 'See visa rules, residency requirements, and digital nomad visa programs for all 167 countries. 183-day rule tracking included.',
                 gradient: 'from-violet-500 to-fuchsia-600'
               },
               {
@@ -269,7 +269,7 @@ export default function DigitalNomadsPage() {
           </div>
 
           <p className="text-white/80 text-sm mt-6">
-            No credit card required • 7-day free trial • 163 countries analyzed
+            No credit card required • 7-day free trial • 167 countries analyzed
           </p>
         </div>
       </section>

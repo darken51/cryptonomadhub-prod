@@ -234,7 +234,7 @@ export default function CryptoTradersPage() {
               { feature: 'P&L Analysis', description: 'Realized/unrealized gains, ROI, performance metrics' },
               { feature: 'Form 8949 Export', description: 'IRS-compliant tax forms in CSV/PDF format' },
               { feature: 'AI Chat Assistant', description: 'Ask: "Show me my wash sales from last month"' },
-              { feature: 'Multi-Country Tax Rates', description: 'See tax implications in 163 countries' },
+              { feature: 'Multi-Country Tax Rates', description: 'See tax implications in 167 countries' },
               { feature: 'Transaction History', description: 'Complete audit trail with blockchain verification' }
             ].map((item, idx) => (
               <motion.div

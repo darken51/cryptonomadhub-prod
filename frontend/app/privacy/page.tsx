@@ -66,7 +66,7 @@ export default function PrivacyPolicy() {
                 1. Introduction
               </h2>
               <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
-                NomadCrypto Hub ("we", "our", "us") respects your privacy and is committed to protecting your personal data.
+                CryptoNomadHub ("we", "our", "us") respects your privacy and is committed to protecting your personal data.
                 This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our Service.
               </p>
             </motion.section>
@@ -379,7 +379,7 @@ export default function PrivacyPolicy() {
                 <p><strong className="text-violet-600 dark:text-fuchsia-400">Data Protection Officer:</strong> contact@cryptonomadhub.io</p>
                 <p className="mt-4">
                   <strong className="text-violet-600 dark:text-fuchsia-400">Address:</strong><br />
-                  NomadCrypto Hub<br />
+                  CryptoNomadHub<br />
                   [Your Company Address]<br />
                   Seychelles
                 </p>

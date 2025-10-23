@@ -12,11 +12,11 @@ interface FAQItem {
 const faqs: FAQItem[] = [
   {
     question: 'Is this legal? Can I really optimize my crypto taxes this way?',
-    answer: 'Yes! Tax residency optimization is completely legal. CryptoNomadHub provides educational tools and simulations based on official tax data from 160+ countries. We help you understand different jurisdictions, but you should always consult a licensed tax professional before making any residency changes. Our platform is for informational purposes only.'
+    answer: 'Yes! Tax residency optimization is completely legal. CryptoNomadHub provides educational tools and simulations based on official tax data from 167 countries. We help you understand different jurisdictions, but you should always consult a licensed tax professional before making any residency changes. Our platform is for informational purposes only.'
   },
   {
     question: 'Which countries do you support?',
-    answer: 'We support 160+ countries worldwide, making us the most comprehensive crypto tax platform available. This includes all major jurisdictions like the US, UK, EU countries, UAE, Singapore, Australia, Canada, and over 150 others. Each country has official tax rate data, treaty information, and residency requirements.'
+    answer: 'We support 167 countries worldwide, making us the most comprehensive crypto tax platform available. This includes all major jurisdictions like the US, UK, EU countries, UAE, Singapore, Australia, Canada, and over 150 others. Each country has official tax rate data, treaty information, and residency requirements.'
   },
   {
     question: 'How accurate are your tax rate calculations?',

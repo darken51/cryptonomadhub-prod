@@ -16,7 +16,7 @@ export default function CountriesFeaturePage() {
             "@context": "https://schema.org",
             "@type": "WebPage",
             "name": "163 Country Tax Database - CryptoNomadHub",
-            "description": "Comprehensive crypto tax regulations for 163 countries with verified data from official sources including PwC, OECD, KPMG, and government APIs.",
+            "description": "Comprehensive crypto tax regulations for 167 countries with verified data from official sources including PwC, OECD, KPMG, and government APIs.",
             "url": "https://cryptonomadhub.com/features/countries"
           })
         }}

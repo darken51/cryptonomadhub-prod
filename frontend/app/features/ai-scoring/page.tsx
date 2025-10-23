@@ -245,7 +245,7 @@ export default function AIScoringPage() {
             Ready to Find Your Perfect Country?
           </h2>
           <p className="text-xl text-white/90 mb-8">
-            Explore AI scores for 163 countries and discover the best match for your crypto lifestyle
+            Explore AI scores for 167 countries and discover the best match for your crypto lifestyle
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4">

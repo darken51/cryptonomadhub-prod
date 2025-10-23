@@ -38,7 +38,7 @@ export default function Home() {
               "ratingValue": "4.8",
               "ratingCount": "1247"
             },
-            "description": "AI-powered crypto tax optimization platform covering 163 countries with Solana DeFi audit, multi-country comparison, wash sale detection, and IRS Form 8949 export. Data sourced from government authorities and verified by AI tax scrapers.",
+            "description": "AI-powered crypto tax optimization platform covering 167 countries with Solana DeFi audit, multi-country comparison, wash sale detection, and IRS Form 8949 export. Data sourced from government authorities and verified by AI tax scrapers.",
             "featureList": [
               "163 country tax regulations from official sources",
               "AI country scoring (crypto + nomad)",
@@ -102,7 +102,7 @@ export default function Home() {
               <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">
                 Compare crypto tax rates + quality of life across{' '}
                 <strong className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600">
-                  163 countries
+                  167 countries
                 </strong>{' '}
                 with AI-powered recommendations, Solana DeFi audit, and automatic wash sale detection
               </p>
@@ -368,7 +368,7 @@ export default function Home() {
               {/* Features List */}
               <div className="space-y-4 mb-8">
                 {[
-                  { icon: '🌍', text: 'Real-time data from 163 countries' },
+                  { icon: '🌍', text: 'Real-time data from 167 countries' },
                   { icon: '🎨', text: 'Color-coded by tax rate (0% to 30%+)' },
                   { icon: '🔍', text: 'Hover any country for instant details' },
                   { icon: '📊', text: 'AI country scores + rankings' },
@@ -663,7 +663,7 @@ export default function Home() {
                 emoji: '🌍',
                 title: 'Digital Nomads',
                 description: 'AI country scoring helps choose best location for taxes + quality of life',
-                highlight: '163 countries analyzed'
+                highlight: '167 countries analyzed'
               },
               {
                 emoji: '🔄',
@@ -843,7 +843,7 @@ export default function Home() {
             Ready to Optimize Your Crypto Taxes with AI?
           </h2>
           <p className="text-xl text-white/90 mb-8">
-            Join digital nomads using AI country scoring across 163 countries
+            Join digital nomads using AI country scoring across 167 countries
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4">

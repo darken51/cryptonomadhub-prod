@@ -9,7 +9,7 @@ import ErrorBoundary from '@/components/ErrorBoundary'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'NomadCrypto Hub - AI-Powered Crypto Tax Optimization',
+  title: 'CryptoNomadHub - AI-Powered Crypto Tax Optimization',
   description: 'Multi-jurisdiction crypto tax optimization for digital nomads. NOT financial or legal advice.',
   keywords: 'crypto, tax, digital nomad, optimization, bitcoin, ethereum, DeFi',
 }

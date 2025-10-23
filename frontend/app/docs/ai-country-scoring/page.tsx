@@ -25,7 +25,7 @@ export default function AIScoringDoc() {
               Understanding AI Country Scoring
             </h1>
             <p className="text-xl text-slate-600 dark:text-slate-400">
-              Learn how we score 163 countries on crypto tax rates and nomad quality of life.
+              Learn how we score 167 countries on crypto tax rates and nomad quality of life.
             </p>
             <div className="flex items-center gap-4 mt-4 text-sm text-slate-500 dark:text-slate-400">
               <span>8 min read</span>
@@ -37,7 +37,7 @@ export default function AIScoringDoc() {
           <div className="prose prose-lg dark:prose-invert max-w-none">
             <h2 className="text-3xl font-bold text-slate-900 dark:text-white mt-12 mb-6">What is AI Country Scoring?</h2>
             <p className="text-slate-700 dark:text-slate-300 mb-6">
-              CryptoNomadHub's AI Country Scoring is a <strong>unique dual-scoring system</strong> that evaluates each of the 163 countries on two critical dimensions:
+              CryptoNomadHub's AI Country Scoring is a <strong>unique dual-scoring system</strong> that evaluates each of the 167 countries on two critical dimensions:
             </p>
 
             <div className="grid md:grid-cols-2 gap-6 not-prose my-8">
@@ -296,7 +296,7 @@ export default function AIScoringDoc() {
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-8 mt-12">
               <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">Explore AI Country Scores</h3>
               <p className="text-slate-700 dark:text-slate-300 mb-4">
-                View all 163 countries with AI scores on our interactive world map.
+                View all 167 countries with AI scores on our interactive world map.
               </p>
               <Link
                 href="/countries"

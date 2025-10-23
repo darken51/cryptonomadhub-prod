@@ -225,7 +225,7 @@ X-RateLimit-Reset: 1705320000`}
                   <code className="text-sm text-slate-900 dark:text-white">/countries</code>
                 </div>
                 <p className="text-sm text-slate-700 dark:text-slate-300">
-                  List all 163 countries with tax data and AI scores
+                  List all 167 countries with tax data and AI scores
                 </p>
               </div>
 

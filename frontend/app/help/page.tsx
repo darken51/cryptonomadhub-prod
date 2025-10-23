@@ -53,11 +53,11 @@ export default function HelpPage() {
       faqs: [
         {
           question: 'How many countries are covered?',
-          answer: 'We cover all 163 countries with verified crypto tax rates sourced from PwC, OECD, KPMG, Tax Foundation, government APIs, and our AI tax scraper.'
+          answer: 'We cover all 167 countries with verified crypto tax rates sourced from PwC, OECD, KPMG, Tax Foundation, government APIs, and our AI tax scraper.'
         },
         {
           question: 'How often is tax data updated?',
-          answer: 'Tax data is updated quarterly and whenever major regulatory changes occur. We monitor 163 countries continuously for policy updates.'
+          answer: 'Tax data is updated quarterly and whenever major regulatory changes occur. We monitor 167 countries continuously for policy updates.'
         },
         {
           question: 'What is AI Country Scoring?',
@@ -153,7 +153,7 @@ export default function HelpPage() {
         },
         {
           question: 'What payment methods do you accept?',
-          answer: 'Credit card, debit card, and crypto payments (USDC, USDT). All payments are processed securely through Stripe.'
+          answer: 'Credit card, debit card, and crypto payments (USDC, USDT). All payments are processed securely through Paddle.'
         },
         {
           question: 'Is there a refund policy?',

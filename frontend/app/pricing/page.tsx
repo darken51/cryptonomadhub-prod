@@ -17,7 +17,7 @@ export default function Pricing() {
       features: [
         { text: '5 tax simulations/month', included: true },
         { text: '20 AI chat messages/month', included: true },
-        { text: 'Access to 160+ countries data', included: true },
+        { text: 'Access to 167 countries data', included: true },
         { text: 'DeFi audits', included: false },
         { text: 'PDF exports', included: false },
       ],

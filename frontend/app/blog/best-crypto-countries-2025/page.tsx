@@ -37,7 +37,7 @@ export default function BestCryptoCountriesBlogPost() {
           <div className="prose prose-lg dark:prose-invert max-w-none">
             <div className="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl p-8 mb-8 border-2 border-emerald-200 dark:border-emerald-800">
               <p className="text-lg font-semibold text-slate-900 dark:text-white mb-0">
-                <strong>TL;DR:</strong> Our AI analyzed all 163 countries using 22 factors. The top 10 crypto-friendly destinations for 2025 are UAE, Singapore, Switzerland, Portugal, Malta, Bahamas, Estonia, Hong Kong, Slovenia, and Cyprus.
+                <strong>TL;DR:</strong> Our AI analyzed all 167 countries using 22 factors. The top 10 crypto-friendly destinations for 2025 are UAE, Singapore, Switzerland, Portugal, Malta, Bahamas, Estonia, Hong Kong, Slovenia, and Cyprus.
               </p>
             </div>
 

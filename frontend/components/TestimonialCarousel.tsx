@@ -53,7 +53,7 @@ const testimonials: Testimonial[] = [
     fromCountry: '🇫🇷 France',
     toCountry: '🇵🇹 Portugal',
     savings: '$25,000',
-    quote: 'As a digital nomad, optimizing my crypto taxes was crucial. This platform covers 160+ countries - no other tool comes close.',
+    quote: 'As a digital nomad, optimizing my crypto taxes was crucial. This platform covers 167 countries - no other tool comes close.',
     avatar: 'SD'
   }
 ]

@@ -16,7 +16,7 @@ export default function DocsPage() {
             "@context": "https://schema.org",
             "@type": "WebPage",
             "name": "Documentation - CryptoNomadHub",
-            "description": "Complete guides, API documentation, and tutorials for CryptoNomadHub. Learn how to optimize crypto taxes across 163 countries, use DeFi audit, and integrate with our API.",
+            "description": "Complete guides, API documentation, and tutorials for CryptoNomadHub. Learn how to optimize crypto taxes across 167 countries, use DeFi audit, and integrate with our API.",
             "url": "https://cryptonomadhub.com/docs"
           })
         }}
@@ -42,7 +42,7 @@ export default function DocsPage() {
             </h1>
 
             <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto mb-8">
-              Complete guides, API documentation, and tutorials to master crypto tax optimization across 163 countries.
+              Complete guides, API documentation, and tutorials to master crypto tax optimization across 167 countries.
             </p>
 
             <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -90,7 +90,7 @@ export default function DocsPage() {
               {
                 icon: Globe,
                 title: 'Country Tax Guide',
-                description: 'Understand tax regulations, residency rules, and reporting requirements for all 163 countries.',
+                description: 'Understand tax regulations, residency rules, and reporting requirements for all 167 countries.',
                 items: ['Tax rate tables', 'Residency rules', '183-day tracking', 'Tax treaties'],
                 gradient: 'from-blue-500 to-cyan-600',
                 href: '#country-guide'
@@ -182,7 +182,7 @@ export default function DocsPage() {
               },
               {
                 title: 'Understanding AI Country Scoring',
-                description: 'Learn how we score 163 countries on crypto tax rates and nomad quality of life.',
+                description: 'Learn how we score 167 countries on crypto tax rates and nomad quality of life.',
                 time: '8 min read',
                 badge: 'Core Concepts',
                 href: '/docs/ai-country-scoring'

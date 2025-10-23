@@ -141,7 +141,7 @@ export function LegalDisclaimer({ variant = 'compact', onAccept }: LegalDisclaim
               <li>You have read and agree to our <a href="/privacy" target="_blank" className="text-blue-600 hover:underline">Privacy Policy</a></li>
               <li>You understand this is NOT financial, tax, or legal advice</li>
               <li>You are solely responsible for your tax compliance</li>
-              <li>NomadCrypto Hub bears no liability for any tax penalties, audits, legal consequences, or financial losses</li>
+              <li>CryptoNomadHub bears no liability for any tax penalties, audits, legal consequences, or financial losses</li>
             </ul>
           </div>
         </div>

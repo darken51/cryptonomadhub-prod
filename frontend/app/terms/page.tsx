@@ -66,7 +66,7 @@ export default function TermsOfService() {
                 1. Agreement to Terms
               </h2>
               <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
-                By accessing or using NomadCrypto Hub ("Service"), you agree to be bound by these Terms of Service ("Terms").
+                By accessing or using CryptoNomadHub ("Service"), you agree to be bound by these Terms of Service ("Terms").
                 If you disagree with any part of the terms, you may not access the Service.
               </p>
             </motion.section>
@@ -77,14 +77,14 @@ export default function TermsOfService() {
                 2. Description of Service
               </h2>
               <p className="text-slate-700 dark:text-slate-300 mb-4 leading-relaxed">
-                NomadCrypto Hub provides:
+                CryptoNomadHub provides:
               </p>
               <ul className="list-disc pl-6 text-slate-700 dark:text-slate-300 space-y-2">
                 <li>Tax simulation tools for cryptocurrency taxation across multiple countries</li>
                 <li>DeFi transaction auditing and tax categorization</li>
                 <li>AI-powered tax assistance and guidance</li>
                 <li>PDF report generation</li>
-                <li>Access to tax regulation data for 98+ countries</li>
+                <li>Access to tax regulation data for 167 countries</li>
               </ul>
             </motion.section>
 
@@ -203,7 +203,7 @@ export default function TermsOfService() {
                 8. Intellectual Property
               </h2>
               <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
-                The Service and its original content, features, and functionality are owned by NomadCrypto Hub and are
+                The Service and its original content, features, and functionality are owned by CryptoNomadHub and are
                 protected by international copyright, trademark, and other intellectual property laws.
               </p>
             </motion.section>
@@ -263,7 +263,7 @@ export default function TermsOfService() {
                 12. Indemnification
               </h2>
               <p className="text-slate-700 dark:text-slate-300 mb-4 leading-relaxed">
-                You agree to defend, indemnify, and hold harmless NomadCrypto Hub, its owners, employees, contractors, and
+                You agree to defend, indemnify, and hold harmless CryptoNomadHub, its owners, employees, contractors, and
                 affiliates from any claims, damages, losses, liabilities, and expenses (including legal fees) arising from:
               </p>
               <ul className="list-disc pl-6 text-slate-700 dark:text-slate-300 space-y-2">
@@ -288,7 +288,7 @@ export default function TermsOfService() {
               <div className="space-y-4 text-slate-700 dark:text-slate-300">
                 <p className="font-semibold text-red-900 dark:text-red-200">TO THE MAXIMUM EXTENT PERMITTED BY LAW:</p>
                 <ul className="list-disc pl-6 space-y-2">
-                  <li>NomadCrypto Hub shall NOT be liable for any indirect, incidental, special, consequential, or punitive damages</li>
+                  <li>CryptoNomadHub shall NOT be liable for any indirect, incidental, special, consequential, or punitive damages</li>
                   <li>We are NOT liable for tax penalties, audits, legal issues, fines, or financial losses resulting from use of the Service</li>
                   <li>We are NOT liable for errors in blockchain data, transaction categorization, or tax calculations</li>
                   <li>We are NOT liable for outdated or incorrect tax regulations displayed in the Service</li>
@@ -365,7 +365,7 @@ export default function TermsOfService() {
               </h2>
               <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
                 These Terms, together with our Privacy Policy and any other legal notices published by us on the Service,
-                constitute the entire agreement between you and NomadCrypto Hub concerning the Service.
+                constitute the entire agreement between you and CryptoNomadHub concerning the Service.
               </p>
             </motion.section>
 
@@ -393,7 +393,7 @@ export default function TermsOfService() {
                   <li>You have read and understood our Privacy Policy</li>
                   <li>You understand this Service is NOT financial, tax, or legal advice</li>
                   <li>You are solely responsible for your tax compliance and will verify all information with licensed professionals</li>
-                  <li>You agree to indemnify and hold harmless NomadCrypto Hub from any claims or damages</li>
+                  <li>You agree to indemnify and hold harmless CryptoNomadHub from any claims or damages</li>
                   <li>You accept all limitations of liability and disclaimers stated herein</li>
                 </ul>
                 <p className="mt-6 font-bold text-lg text-violet-700 dark:text-fuchsia-400">

@@ -99,7 +99,7 @@ const solutionsMenu: MegaMenuSection[] = [
     items: [
       {
         title: 'For Digital Nomads',
-        description: 'Optimize taxes across 160+ countries',
+        description: 'Optimize taxes across 167 countries',
         icon: Globe,
         href: '/solutions/nomads'
       },

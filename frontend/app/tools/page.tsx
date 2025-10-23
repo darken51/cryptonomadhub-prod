@@ -72,7 +72,7 @@ const cryptoCards: CryptoCard[] = [
     tagline: 'Global USD accounts with crypto rewards',
     features: [
       'Accepted at 150M+ merchants and ATMs worldwide',
-      'Available in 160+ countries (including US, Brazil, UAE, Japan)',
+      'Available in 167 countries (including US, Brazil, UAE, Japan)',
       '4 card tiers: Standard (Free), Premium ($1k/year), Limited ($5k), Luxe ($10k/year)',
       'Earn 3-10% rewards on card spend (tier-dependent)',
       'Stablecoin-powered banking (USDC, USDT)',
@@ -87,7 +87,7 @@ const cryptoCards: CryptoCard[] = [
     bonus: 'Earn up to 10% rewards in 2025',
     affiliateLink: 'https://www.kast.xyz',
     affiliateBonus: 'You get: High rewards tier | We earn: Referral commission',
-    supported_countries: '160+ countries worldwide',
+    supported_countries: '167 countries worldwide',
     fees: 'Free (Standard) to $10k/year (Luxe)',
     supported_crypto: ['USDC', 'USDT', 'SOL', 'ETH', 'BTC'],
     kyc_required: true,

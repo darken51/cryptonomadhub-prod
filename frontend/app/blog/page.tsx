@@ -83,7 +83,7 @@ export default function BlogPage() {
     },
     {
       title: 'Best Crypto-Friendly Countries for 2025',
-      excerpt: 'Our AI analyzed 163 countries. Here are the top 10 destinations for crypto holders based on tax rates, regulations, and quality of life.',
+      excerpt: 'Our AI analyzed 167 countries. Here are the top 10 destinations for crypto holders based on tax rates, regulations, and quality of life.',
       category: 'Rankings',
       date: '2025-07-05',
       readTime: '11 min read',
@@ -155,7 +155,7 @@ export default function BlogPage() {
             "@context": "https://schema.org",
             "@type": "Blog",
             "name": "CryptoNomadHub Blog",
-            "description": "Crypto tax strategies, country comparisons, DeFi guides, and tax news for digital nomads and crypto traders. Expert insights on optimizing taxes across 163 countries.",
+            "description": "Crypto tax strategies, country comparisons, DeFi guides, and tax news for digital nomads and crypto traders. Expert insights on optimizing taxes across 167 countries.",
             "url": "https://cryptonomadhub.com/blog"
           })
         }}

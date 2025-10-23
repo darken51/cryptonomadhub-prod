@@ -279,7 +279,7 @@ export default function Day183RuleBlogPost() {
             <div className="bg-gradient-to-r from-rose-50 to-pink-50 dark:from-rose-900/20 dark:to-pink-900/20 rounded-xl p-8 mt-12">
               <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">Track Your Days Automatically</h3>
               <p className="text-slate-700 dark:text-slate-300 mb-4">
-                CryptoNomadHub's Residency Tracker monitors your days in 163 countries and alerts you before you trigger tax residency.
+                CryptoNomadHub's Residency Tracker monitors your days in 167 countries and alerts you before you trigger tax residency.
               </p>
               <Link
                 href="/auth/register"
