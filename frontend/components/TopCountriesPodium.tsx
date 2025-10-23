@@ -64,13 +64,13 @@ function TopCountriesPodium({ countries }: TopCountriesPodiumProps) {
     const positions = [1, 0, 2]
 
     return (
-      <div className="flex items-end justify-center gap-4 mb-8">
+      <div className="flex items-end justify-center gap-2 sm:gap-4 mb-8 overflow-x-auto px-2">
         {podiumOrder.map((country, idx) => {
           const position = positions[idx]
           return (
             <motion.div
               key={country.country_code}
-              className="flex flex-col items-center cursor-pointer"
+              className="flex flex-col items-center cursor-pointer flex-shrink-0"
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: idx * 0.2 }}
@@ -78,7 +78,7 @@ function TopCountriesPodium({ countries }: TopCountriesPodiumProps) {
               onClick={() => router.push(`/countries/${country.country_code.toLowerCase()}`)}
             >
               {/* Country card on top */}
-              <div className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-lg mb-2 min-w-[160px] border-2 border-slate-200 dark:border-slate-700 hover:border-violet-400 dark:hover:border-violet-600 transition-colors">
+              <div className="bg-white dark:bg-slate-800 rounded-xl p-3 sm:p-4 shadow-lg mb-2 w-[130px] sm:min-w-[160px] border-2 border-slate-200 dark:border-slate-700 hover:border-violet-400 dark:hover:border-violet-600 transition-colors">
                 <div className="text-center">
                   <div className="text-4xl mb-2">{getMedalIcon(position)}</div>
                   {country.flag_emoji && (

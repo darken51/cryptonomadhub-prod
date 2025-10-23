@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   ComposableMap,
@@ -55,6 +55,16 @@ export default function WorldTaxMap({ countries }: WorldTaxMapProps) {
   const [tooltipContent, setTooltipContent] = useState<string>('')
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
   const [showTooltip, setShowTooltip] = useState(false)
+  const [selectedCountryCode, setSelectedCountryCode] = useState<string | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
+
+  // Detect mobile on mount
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768)
+    const handleResize = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   // Create a map of ISO codes to country data
   const countryDataMap = new Map<string, Country>()
@@ -260,13 +270,20 @@ export default function WorldTaxMap({ countries }: WorldTaxMapProps) {
                         fill={fillColor}
                         stroke="#FFF"
                         strokeWidth={0.5}
-                        onMouseEnter={(event) => handleMouseEnter(geo, event)}
-                        onMouseMove={handleMouseMove}
-                        onMouseLeave={handleMouseLeave}
-                        onClick={() => {
+                        onMouseEnter={(event) => !isMobile && handleMouseEnter(geo, event)}
+                        onMouseMove={(event) => !isMobile && handleMouseMove(event)}
+                        onMouseLeave={() => !isMobile && handleMouseLeave()}
+                        onClick={(event) => {
                           if (country) {
-                            // Navigate to country detail page
-                            router.push(`/countries/${country.country_code.toLowerCase()}`)
+                            if (isMobile) {
+                              // On mobile: show fixed popup instead of navigating
+                              event.stopPropagation()
+                              setSelectedCountryCode(country.country_code)
+                              handleMouseEnter(geo, event as any)
+                            } else {
+                              // On desktop: navigate directly
+                              router.push(`/countries/${country.country_code.toLowerCase()}`)
+                            }
                           }
                         }}
                         style={{
@@ -292,24 +309,64 @@ export default function WorldTaxMap({ countries }: WorldTaxMapProps) {
           </ComposableMap>
         </div>
 
-        {/* Custom Tooltip */}
+        {/* Custom Tooltip - Desktop: follows cursor, Mobile: fixed popup */}
         {showTooltip && tooltipContent && (
-          <div
-            className="fixed z-50 pointer-events-none"
-            style={{
-              left: tooltipPosition.x + 15,
-              top: tooltipPosition.y + 15,
-            }}
-          >
-            <div
-              className="bg-gray-900 dark:bg-gray-800 text-white px-4 py-3 rounded-lg shadow-xl border border-gray-700 max-w-xs"
-              dangerouslySetInnerHTML={{ __html: tooltipContent }}
-            />
-          </div>
+          <>
+            {isMobile ? (
+              /* Mobile: Fixed popup with close button and navigation */
+              <>
+                <div
+                  className="fixed inset-0 bg-black/50 z-40"
+                  onClick={() => {
+                    setShowTooltip(false)
+                    setSelectedCountryCode(null)
+                  }}
+                />
+                <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[90%] max-w-sm">
+                  <div className="bg-gray-900 dark:bg-gray-800 text-white px-4 py-4 rounded-lg shadow-2xl border border-gray-700">
+                    <div dangerouslySetInnerHTML={{ __html: tooltipContent }} />
+                    {selectedCountryCode && (
+                      <div className="mt-4 pt-4 border-t border-gray-700 flex gap-2">
+                        <button
+                          onClick={() => router.push(`/countries/${selectedCountryCode.toLowerCase()}`)}
+                          className="flex-1 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white py-2 px-4 rounded-lg font-semibold transition-all"
+                        >
+                          Voir détails →
+                        </button>
+                        <button
+                          onClick={() => {
+                            setShowTooltip(false)
+                            setSelectedCountryCode(null)
+                          }}
+                          className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+                        >
+                          Fermer
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </>
+            ) : (
+              /* Desktop: Tooltip follows cursor */
+              <div
+                className="fixed z-50 pointer-events-none"
+                style={{
+                  left: tooltipPosition.x + 15,
+                  top: tooltipPosition.y + 15,
+                }}
+              >
+                <div
+                  className="bg-gray-900 dark:bg-gray-800 text-white px-4 py-3 rounded-lg shadow-xl border border-gray-700 max-w-xs"
+                  dangerouslySetInnerHTML={{ __html: tooltipContent }}
+                />
+              </div>
+            )}
+          </>
         )}
 
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-4 text-center">
-          Hover over countries to see detailed tax rates • {countryDataMap.size} countries with data
+          {isMobile ? 'Tap' : 'Hover over'} countries to see detailed tax rates • {countryDataMap.size} countries with data
         </p>
       </div>
     </div>
