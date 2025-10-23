@@ -170,40 +170,79 @@ export default function AuditReportPage() {
               </div>
             </div>
 
-            <button
-              onClick={async () => {
-                try {
-                  const response = await fetch(
-                    `${process.env.NEXT_PUBLIC_API_URL}/defi/audit/${auditId}/export/pdf`,
-                    {
-                      headers: {
-                        Authorization: `Bearer ${token}`
+            <div className="flex gap-3">
+              <button
+                onClick={async () => {
+                  try {
+                    const response = await fetch(
+                      `${process.env.NEXT_PUBLIC_API_URL}/defi/audit/${auditId}/export/csv`,
+                      {
+                        headers: {
+                          Authorization: `Bearer ${token}`
+                        }
                       }
+                    )
+
+                    if (!response.ok) {
+                      throw new Error('Failed to download CSV')
                     }
-                  )
 
-                  if (!response.ok) {
-                    throw new Error('Failed to download PDF')
+                    const blob = await response.blob()
+                    const url = window.URL.createObjectURL(blob)
+                    const a = document.createElement('a')
+                    a.href = url
+                    a.download = `audit-report-${auditId}.csv`
+                    document.body.appendChild(a)
+                    a.click()
+                    window.URL.revokeObjectURL(url)
+                    document.body.removeChild(a)
+                    showToast('CSV exported successfully', 'success')
+                  } catch (error: any) {
+                    showToast(error.message || 'Failed to download CSV', 'error')
                   }
+                }}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 dark:bg-emerald-500 text-white rounded-lg hover:bg-emerald-700 dark:hover:bg-emerald-600 transition shadow-md hover:shadow-lg"
+              >
+                <Download className="w-4 h-4" />
+                Export CSV
+              </button>
 
-                  const blob = await response.blob()
-                  const url = window.URL.createObjectURL(blob)
-                  const a = document.createElement('a')
-                  a.href = url
-                  a.download = `audit-report-${auditId}.pdf`
-                  document.body.appendChild(a)
-                  a.click()
-                  window.URL.revokeObjectURL(url)
-                  document.body.removeChild(a)
-                } catch (error: any) {
-                  showToast(error.message || 'Failed to download PDF', 'error')
-                }
-              }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition"
-            >
-              <Download className="w-4 h-4" />
-              Export PDF
-            </button>
+              <button
+                onClick={async () => {
+                  try {
+                    const response = await fetch(
+                      `${process.env.NEXT_PUBLIC_API_URL}/defi/audit/${auditId}/export/pdf`,
+                      {
+                        headers: {
+                          Authorization: `Bearer ${token}`
+                        }
+                      }
+                    )
+
+                    if (!response.ok) {
+                      throw new Error('Failed to download PDF')
+                    }
+
+                    const blob = await response.blob()
+                    const url = window.URL.createObjectURL(blob)
+                    const a = document.createElement('a')
+                    a.href = url
+                    a.download = `audit-report-${auditId}.pdf`
+                    document.body.appendChild(a)
+                    a.click()
+                    window.URL.revokeObjectURL(url)
+                    document.body.removeChild(a)
+                    showToast('PDF exported successfully', 'success')
+                  } catch (error: any) {
+                    showToast(error.message || 'Failed to download PDF', 'error')
+                  }
+                }}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition shadow-md hover:shadow-lg"
+              >
+                <Download className="w-4 h-4" />
+                Export PDF
+              </button>
+            </div>
           </div>
         </div>
 
