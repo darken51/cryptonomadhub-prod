@@ -228,26 +228,12 @@ class BlockchainParser:
         """
         Convert Moralis transaction → legacy format
 
-        Legacy format requires:
-        {
-            "tx_hash": str,
-            "chain": str,
-            "block_number": int,
-            "timestamp": datetime,
-            "protocol_name": str,
-            "protocol_type": str,  # dex, lending, staking, other
-            "transaction_type": str,  # swap, stake, lend, etc.
-            "token_in": str | None,
-            "amount_in": float | None,
-            "usd_value_in": float | None,
-            "token_out": str | None,
-            "amount_out": float | None,
-            "usd_value_out": float | None,
-            "price_in_estimated": bool,
-            "price_out_estimated": bool,
-            "gas_fee_usd": float,
-            "protocol_fee_usd": float,
-        }
+        Moralis format (v2):
+        - erc20_transfers[] - array of ERC20 token transfers
+        - native_transfers[] - array of native token (ETH) transfers
+        - nft_transfers[] - array of NFT transfers
+        - category - "token send", "token receive", "token swap", etc.
+        - summary - human-readable description
         """
 
         try:
@@ -255,53 +241,106 @@ class BlockchainParser:
             timestamp_str = tx.get('block_timestamp', '')
             timestamp = datetime.fromisoformat(timestamp_str.replace('Z', '+00:00'))
 
-            # Determine transaction direction (handle None values)
-            to_addr = (tx.get('to_address') or '').lower()
-            from_addr = (tx.get('from_address') or '').lower()
-            user_addr = wallet_address.lower()
-
-            is_receiving = to_addr == user_addr
-            is_sending = from_addr == user_addr
-
-            # Token info
-            token_symbol = tx.get('token_symbol') or tx.get('native_token', {}).get('symbol', 'ETH')
-            decimals = int(tx.get('token_decimals', 18))
-            value = float(tx.get('value', 0)) / (10 ** decimals) if tx.get('value') else 0
-            value_usd = float(tx.get('value_usd', 0))
-
             # Category mapping
             category = tx.get('category', 'unknown')
             protocol_type = self._map_category_to_protocol_type(category)
-            transaction_type = self._map_category_to_transaction_type(category, is_receiving, is_sending)
 
-            # Gas fee
-            gas_price = float(tx.get('gas_price', 0))
-            gas_used = float(tx.get('receipt_gas_used', 0))
-            native_price_usd = float(tx.get('native_price', {}).get('value', 0))
-            gas_fee_usd = (gas_price * gas_used / 1e18) * native_price_usd
+            # Extract token transfers
+            erc20_transfers = tx.get('erc20_transfers', [])
+            native_transfers = tx.get('native_transfers', [])
+
+            # Initialize defaults
+            token_in = None
+            amount_in = None
+            usd_value_in = None
+            token_out = None
+            amount_out = None
+            usd_value_out = None
+
+            # Process ERC20 transfers
+            for transfer in erc20_transfers:
+                direction = transfer.get('direction', '')
+                token_symbol = transfer.get('token_symbol', 'UNKNOWN')
+                amount = float(transfer.get('value_formatted', 0))
+
+                # Try to get USD value from Moralis first
+                usd_value = float(transfer.get('value_usd', 0))
+
+                # If Moralis doesn't provide USD, try PriceService
+                # Note: This will be fetched later by DeFiAuditService using PriceService
+                # For now, mark as 0 and estimated
+
+                if direction == 'send':
+                    token_in = token_symbol
+                    amount_in = amount
+                    usd_value_in = usd_value
+                elif direction == 'receive':
+                    token_out = token_symbol
+                    amount_out = amount
+                    usd_value_out = usd_value
+
+            # Process native transfers (ETH, MATIC, etc.)
+            for transfer in native_transfers:
+                direction = transfer.get('direction', '')
+                amount = float(transfer.get('value_formatted', 0))
+                usd_value = float(transfer.get('value_usd', 0))
+
+                # Native token symbol depends on chain
+                native_symbol = {
+                    'ethereum': 'ETH',
+                    'polygon': 'MATIC',
+                    'bsc': 'BNB',
+                    'arbitrum': 'ETH',
+                    'optimism': 'ETH',
+                    'base': 'ETH',
+                }.get(chain.lower(), 'ETH')
+
+                if direction == 'send':
+                    token_in = native_symbol
+                    amount_in = amount
+                    usd_value_in = usd_value
+                elif direction == 'receive':
+                    token_out = native_symbol
+                    amount_out = amount
+                    usd_value_out = usd_value
+
+            # Determine transaction type
+            transaction_type = self._map_category_to_transaction_type(
+                category,
+                is_receiving=(token_out is not None),
+                is_sending=(token_in is not None)
+            )
+
+            # Gas fee (Moralis provides this directly!)
+            gas_fee_usd = float(tx.get('transaction_fee_usd', 0))
+
+            # Protocol name from to_address_label or category
+            protocol_name = tx.get('to_address_label') or self._detect_protocol_name(category)
 
             return {
                 "tx_hash": tx['hash'],
                 "chain": chain,
                 "block_number": int(tx.get('block_number', 0)),
                 "timestamp": timestamp,
-                "protocol_name": tx.get('protocol_name') or self._detect_protocol_name(category),
+                "protocol_name": protocol_name,
                 "protocol_type": protocol_type,
                 "transaction_type": transaction_type,
-                "token_in": token_symbol if is_sending else None,
-                "amount_in": value if is_sending else None,
-                "usd_value_in": value_usd if is_sending else None,
-                "token_out": token_symbol if is_receiving else None,
-                "amount_out": value if is_receiving else None,
-                "usd_value_out": value_usd if is_receiving else None,
-                "price_in_estimated": False,  # ✅ Moralis uses real prices!
-                "price_out_estimated": False,
+                "token_in": token_in,
+                "amount_in": amount_in,
+                "usd_value_in": usd_value_in,
+                "token_out": token_out,
+                "amount_out": amount_out,
+                "usd_value_out": usd_value_out,
+                "price_in_estimated": True,  # TODO: fetch real prices
+                "price_out_estimated": True,
                 "gas_fee_usd": gas_fee_usd,
                 "protocol_fee_usd": 0.0,
             }
 
         except Exception as e:
             logger.error(f"[MORALIS] Error converting transaction {tx.get('hash')}: {e}")
+            import traceback
+            traceback.print_exc()
             return None
 
     def _convert_defi_position_to_tx(
