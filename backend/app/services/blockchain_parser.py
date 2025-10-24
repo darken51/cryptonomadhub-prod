@@ -886,6 +886,10 @@ class BlockchainParser:
 
             # Return as deposit/purchase transaction
             return {
+                "tx_hash": token_tx.get("hash"),  # Add tx_hash
+                "chain": chain,
+                "block_number": int(token_tx.get("blockNumber", 0)),
+                "timestamp": timestamp,
                 "transaction_type": "deposit_from_exchange",
                 "protocol_type": "exchange",
                 "protocol_name": exchange_name,
