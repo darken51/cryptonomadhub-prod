@@ -46,6 +46,11 @@ class BlockchainParser:
         "gnosis": "0x64",
         "moonbeam": "0x504",
         "moonriver": "0x505",
+        # Layer 2s
+        "zora": "0x76adf1",
+        "linea": "0xe708",
+        "scroll": "0x82750",
+        "zksync": "0x144",
         # Testnets
         "sepolia": "0xaa36a7",
         "holesky": "0x4268",
