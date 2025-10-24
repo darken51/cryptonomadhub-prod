@@ -17,6 +17,7 @@ import logging
 
 # Import legacy parser
 from app.services.blockchain_parser import BlockchainParser as LegacyParser
+from app.services.price_service import PriceService
 
 logger = logging.getLogger(__name__)
 
@@ -65,6 +66,9 @@ class BlockchainParser:
 
         # Always initialize legacy parser (for Solana + fallback)
         self.legacy_parser = LegacyParser(api_keys)
+
+        # Initialize price service for USD calculations
+        self.price_service = PriceService()
 
         # Check if Moralis is available
         self.moralis_key = os.getenv("MORALIS_API_KEY")
@@ -266,9 +270,19 @@ class BlockchainParser:
                 # Try to get USD value from Moralis first
                 usd_value = float(transfer.get('value_usd', 0))
 
-                # If Moralis doesn't provide USD, try PriceService
-                # Note: This will be fetched later by DeFiAuditService using PriceService
-                # For now, mark as 0 and estimated
+                # If Moralis doesn't provide USD value, fetch from PriceService
+                if usd_value == 0 and amount > 0:
+                    try:
+                        price = self.price_service.get_historical_price(
+                            token_symbol=token_symbol,
+                            timestamp=timestamp
+                        )
+                        if price:
+                            usd_value = amount * float(price)  # Convert Decimal to float
+                            logger.info(f"[PRICE] ✅ {token_symbol}: ${price:.4f} × {amount:.4f} = ${usd_value:.2f}")
+                    except Exception as e:
+                        logger.warning(f"[PRICE] ❌ {token_symbol}: {e}")
+                        usd_value = 0
 
                 if direction == 'send':
                     token_in = token_symbol
@@ -295,6 +309,20 @@ class BlockchainParser:
                     'base': 'ETH',
                 }.get(chain.lower(), 'ETH')
 
+                # If Moralis doesn't provide USD value, fetch from PriceService
+                if usd_value == 0 and amount > 0:
+                    try:
+                        price = self.price_service.get_historical_price(
+                            token_symbol=native_symbol,
+                            timestamp=timestamp
+                        )
+                        if price:
+                            usd_value = amount * float(price)  # Convert Decimal to float
+                            logger.info(f"[PRICE] ✅ {native_symbol}: ${price:.4f} × {amount:.4f} = ${usd_value:.2f}")
+                    except Exception as e:
+                        logger.warning(f"[PRICE] ❌ {native_symbol}: {e}")
+                        usd_value = 0
+
                 if direction == 'send':
                     token_in = native_symbol
                     amount_in = amount
@@ -317,6 +345,26 @@ class BlockchainParser:
             # Protocol name from to_address_label or category
             protocol_name = tx.get('to_address_label') or self._detect_protocol_name(category)
 
+            # Determine if prices are estimated
+            # If we got USD value from Moralis directly, it's real-time accurate
+            # If we fetched from PriceService, it's historical estimate
+            price_in_estimated = False
+            price_out_estimated = False
+
+            # Check ERC20 transfers for estimation flag
+            for transfer in erc20_transfers:
+                if transfer.get('direction') == 'send' and float(transfer.get('value_usd', 0)) == 0:
+                    price_in_estimated = True
+                elif transfer.get('direction') == 'receive' and float(transfer.get('value_usd', 0)) == 0:
+                    price_out_estimated = True
+
+            # Check native transfers for estimation flag
+            for transfer in native_transfers:
+                if transfer.get('direction') == 'send' and float(transfer.get('value_usd', 0)) == 0:
+                    price_in_estimated = True
+                elif transfer.get('direction') == 'receive' and float(transfer.get('value_usd', 0)) == 0:
+                    price_out_estimated = True
+
             return {
                 "tx_hash": tx['hash'],
                 "chain": chain,
@@ -331,8 +379,8 @@ class BlockchainParser:
                 "token_out": token_out,
                 "amount_out": amount_out,
                 "usd_value_out": usd_value_out,
-                "price_in_estimated": True,  # TODO: fetch real prices
-                "price_out_estimated": True,
+                "price_in_estimated": price_in_estimated,
+                "price_out_estimated": price_out_estimated,
                 "gas_fee_usd": gas_fee_usd,
                 "protocol_fee_usd": 0.0,
             }
