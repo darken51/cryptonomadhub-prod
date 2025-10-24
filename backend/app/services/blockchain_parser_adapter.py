@@ -203,7 +203,10 @@ class BlockchainParser:
                 params={"chain": chain_id, "address": wallet_address}
             )
 
-            for position in defi_result.get('result', []):
+            # Handle both dict and list responses from Moralis
+            positions = defi_result.get('result', []) if isinstance(defi_result, dict) else defi_result
+
+            for position in positions:
                 position_tx = self._convert_defi_position_to_tx(
                     position, chain, wallet_address
                 )
@@ -252,9 +255,9 @@ class BlockchainParser:
             timestamp_str = tx.get('block_timestamp', '')
             timestamp = datetime.fromisoformat(timestamp_str.replace('Z', '+00:00'))
 
-            # Determine transaction direction
-            to_addr = tx.get('to_address', '').lower()
-            from_addr = tx.get('from_address', '').lower()
+            # Determine transaction direction (handle None values)
+            to_addr = (tx.get('to_address') or '').lower()
+            from_addr = (tx.get('from_address') or '').lower()
             user_addr = wallet_address.lower()
 
             is_receiving = to_addr == user_addr
