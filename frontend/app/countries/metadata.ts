@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: '167 Countries Crypto Tax Rates 2025 - 0% Tax Guide | CryptoNomadHub',
-  description: 'Compare crypto tax rates: 167 countries with short/long-term CGT, staking, DeFi. Find 0% tax jurisdictions (UAE, Portugal, Singapore). Updated daily with verified data from OECD, PwC, KPMG.',
+  description: 'Browse verified crypto tax rules for 167+ countries: short/long-term CGT, staking, mining, reporting. Find 0% tax jurisdictions (UAE, Portugal, Singapore). Updated 2025 with data from OECD, PwC, KPMG.',
   keywords: [
     'crypto tax rates by country',
     'cryptocurrency taxation',

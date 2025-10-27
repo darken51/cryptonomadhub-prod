@@ -1,8 +1,8 @@
 import { PublicPageLayout } from '@/components/PublicPageLayout'
 import CountriesClient from './CountriesClient'
 
-// Force dynamic rendering to ensure API is called at request time, not build time
-export const dynamic = 'force-dynamic'
+// Use ISR (Incremental Static Regeneration) for better performance
+export const revalidate = 3600 // Revalidate every hour
 
 interface AIAnalysis {
   crypto_score: number
@@ -57,6 +57,30 @@ interface Country {
   ai_analysis?: AIAnalysis
 }
 
+// Minimal static fallback data for SSR (ensures Google sees content even if API fails)
+const STATIC_FALLBACK_COUNTRIES: Country[] = [
+  { country_code: 'AE', country_name: 'United Arab Emirates', flag_emoji: '🇦🇪', cgt_short_rate: 0, cgt_long_rate: 0, crypto_short_rate: 0, crypto_long_rate: 0, crypto_legal_status: 'legal', data_quality: 'high' },
+  { country_code: 'PT', country_name: 'Portugal', flag_emoji: '🇵🇹', cgt_short_rate: 28, cgt_long_rate: 28, crypto_short_rate: 0, crypto_long_rate: 0, crypto_legal_status: 'legal', data_quality: 'high' },
+  { country_code: 'SG', country_name: 'Singapore', flag_emoji: '🇸🇬', cgt_short_rate: 0, cgt_long_rate: 0, crypto_short_rate: 0, crypto_long_rate: 0, crypto_legal_status: 'legal', data_quality: 'high' },
+  { country_code: 'DE', country_name: 'Germany', flag_emoji: '🇩🇪', cgt_short_rate: 25, cgt_long_rate: 0, crypto_short_rate: 25, crypto_long_rate: 0, crypto_legal_status: 'legal', data_quality: 'high', holding_period_months: 12 },
+  { country_code: 'CH', country_name: 'Switzerland', flag_emoji: '🇨🇭', cgt_short_rate: 0, cgt_long_rate: 0, crypto_short_rate: 0, crypto_long_rate: 0, crypto_legal_status: 'legal', data_quality: 'high' },
+  { country_code: 'MY', country_name: 'Malaysia', flag_emoji: '🇲🇾', cgt_short_rate: 0, cgt_long_rate: 0, crypto_short_rate: 0, crypto_long_rate: 0, crypto_legal_status: 'legal', data_quality: 'medium' },
+  { country_code: 'MT', country_name: 'Malta', flag_emoji: '🇲🇹', cgt_short_rate: 0, cgt_long_rate: 0, crypto_short_rate: 0, crypto_long_rate: 0, crypto_legal_status: 'legal', data_quality: 'high' },
+  { country_code: 'BH', country_name: 'Bahrain', flag_emoji: '🇧🇭', cgt_short_rate: 0, cgt_long_rate: 0, crypto_short_rate: 0, crypto_long_rate: 0, crypto_legal_status: 'legal', data_quality: 'medium' },
+  { country_code: 'HK', country_name: 'Hong Kong', flag_emoji: '🇭🇰', cgt_short_rate: 0, cgt_long_rate: 0, crypto_short_rate: 0, crypto_long_rate: 0, crypto_legal_status: 'legal', data_quality: 'high' },
+  { country_code: 'EE', country_name: 'Estonia', flag_emoji: '🇪🇪', cgt_short_rate: 20, cgt_long_rate: 0, crypto_short_rate: 20, crypto_long_rate: 0, crypto_legal_status: 'legal', data_quality: 'high' },
+  { country_code: 'US', country_name: 'United States', flag_emoji: '🇺🇸', cgt_short_rate: 37, cgt_long_rate: 20, crypto_short_rate: 37, crypto_long_rate: 20, crypto_legal_status: 'legal', data_quality: 'high' },
+  { country_code: 'GB', country_name: 'United Kingdom', flag_emoji: '🇬🇧', cgt_short_rate: 20, cgt_long_rate: 20, crypto_short_rate: 20, crypto_long_rate: 20, crypto_legal_status: 'legal', data_quality: 'high' },
+  { country_code: 'FR', country_name: 'France', flag_emoji: '🇫🇷', cgt_short_rate: 30, cgt_long_rate: 30, crypto_short_rate: 30, crypto_long_rate: 30, crypto_legal_status: 'legal', data_quality: 'high' },
+  { country_code: 'ES', country_name: 'Spain', flag_emoji: '🇪🇸', cgt_short_rate: 26, cgt_long_rate: 26, crypto_short_rate: 26, crypto_long_rate: 26, crypto_legal_status: 'legal', data_quality: 'high' },
+  { country_code: 'IT', country_name: 'Italy', flag_emoji: '🇮🇹', cgt_short_rate: 26, cgt_long_rate: 26, crypto_short_rate: 26, crypto_long_rate: 26, crypto_legal_status: 'legal', data_quality: 'high' },
+  { country_code: 'JP', country_name: 'Japan', flag_emoji: '🇯🇵', cgt_short_rate: 55, cgt_long_rate: 55, crypto_short_rate: 55, crypto_long_rate: 55, crypto_legal_status: 'legal', data_quality: 'high' },
+  { country_code: 'AU', country_name: 'Australia', flag_emoji: '🇦🇺', cgt_short_rate: 45, cgt_long_rate: 22.5, crypto_short_rate: 45, crypto_long_rate: 22.5, crypto_legal_status: 'legal', data_quality: 'high' },
+  { country_code: 'CA', country_name: 'Canada', flag_emoji: '🇨🇦', cgt_short_rate: 26.5, cgt_long_rate: 13.25, crypto_short_rate: 26.5, crypto_long_rate: 13.25, crypto_legal_status: 'legal', data_quality: 'high' },
+  { country_code: 'BR', country_name: 'Brazil', flag_emoji: '🇧🇷', cgt_short_rate: 15, cgt_long_rate: 15, crypto_short_rate: 15, crypto_long_rate: 15, crypto_legal_status: 'legal', data_quality: 'medium' },
+  { country_code: 'MX', country_name: 'Mexico', flag_emoji: '🇲🇽', cgt_short_rate: 30, cgt_long_rate: 30, crypto_short_rate: 30, crypto_long_rate: 30, crypto_legal_status: 'legal', data_quality: 'medium' },
+]
+
 async function getCountries(): Promise<Country[]> {
   try {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
@@ -65,21 +89,30 @@ async function getCountries(): Promise<Country[]> {
     console.log('[SSR] Fetching countries from:', url)
 
     const response = await fetch(url, {
-      cache: 'no-store' // Always fetch fresh data for SSR
+      next: { revalidate: 3600 }, // Cache for 1 hour
+      headers: {
+        'Accept': 'application/json',
+      }
     })
 
     if (!response.ok) {
-      console.error('[SSR] Failed to fetch countries:', response.status, response.statusText)
-      throw new Error(`API returned ${response.status}`)
+      console.error('[SSR] API failed:', response.status, '- Using static fallback (20 countries)')
+      return STATIC_FALLBACK_COUNTRIES
     }
 
     const data = await response.json()
     console.log('[SSR] Successfully fetched', data.length, 'countries')
+
+    // If API returns empty, use fallback
+    if (!data || data.length === 0) {
+      console.warn('[SSR] API returned empty data - Using static fallback')
+      return STATIC_FALLBACK_COUNTRIES
+    }
+
     return data.sort((a: Country, b: Country) => a.country_name.localeCompare(b.country_name))
   } catch (error) {
-    console.error('[SSR] Error fetching countries:', error)
-    // Return empty array but log the error clearly
-    return []
+    console.error('[SSR] Error fetching countries:', error, '- Using static fallback')
+    return STATIC_FALLBACK_COUNTRIES
   }
 }
 
