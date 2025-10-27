@@ -3,10 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { useAuth } from '@/components/providers/AuthProvider'
-import { Header } from '@/components/Header'
-import { AppHeader } from '@/components/AppHeader'
-import { Footer } from '@/components/Footer'
+import { PublicPageLayout } from '@/components/PublicPageLayout'
 import { ArrowLeft, Search, TrendingDown, Info } from 'lucide-react'
 import WorldTaxMap from '@/components/WorldTaxMap'
 import CountryScoreCard from '@/components/CountryScoreCard'
@@ -70,9 +67,6 @@ interface Country {
 }
 
 export default function CountriesPage() {
-  const { token, user } = useAuth()
-  const isAuthenticated = !!token
-
   const [countries, setCountries] = useState<Country[]>([])
   const [filteredCountries, setFilteredCountries] = useState<Country[]>([])
   const [searchQuery, setSearchQuery] = useState('')
@@ -230,10 +224,7 @@ export default function CountriesPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-slate-950">
-      {/* Show AppHeader for logged-in users, Header for visitors */}
-      {isAuthenticated ? <AppHeader /> : <Header />}
-      <div className="flex-1 bg-slate-50 dark:bg-slate-900 py-4 sm:py-8">
+    <PublicPageLayout contentClassName="bg-slate-50 dark:bg-slate-900 py-4 sm:py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Page Title */}
           <motion.div
@@ -628,9 +619,6 @@ export default function CountriesPage() {
           </p>
         </motion.div>
       </div>
-      </div>
-      {/* Show Footer only for non-authenticated users */}
-      {!isAuthenticated && <Footer />}
-    </div>
+    </PublicPageLayout>
   )
 }

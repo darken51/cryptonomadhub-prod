@@ -2,8 +2,7 @@
 
 import Link from 'next/link'
 import { Globe, MessageCircle, Activity, DollarSign, Calculator, RefreshCw, ArrowRight, Shield, Lock, CheckCircle, Sparkles, TrendingUp, Zap, LineChart, FileText, AlertTriangle, Trophy, BarChart3, Layers, Target } from 'lucide-react'
-import { Header } from '@/components/Header'
-import { Footer } from '@/components/Footer'
+import { PublicPageLayout } from '@/components/PublicPageLayout'
 import { LegalDisclaimer } from '@/components/LegalDisclaimer'
 import { AnimatedCounter } from '@/components/AnimatedCounter'
 import { ComparisonTable } from '@/components/ComparisonTable'
@@ -17,7 +16,7 @@ export default function Home() {
   const { ref: statsRef, inView: statsInView } = useInView({ threshold: 0.3, triggerOnce: true })
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-slate-950">
+    <PublicPageLayout>
       {/* SEO Schema.org Structured Data */}
       <script
         type="application/ld+json"
@@ -56,8 +55,6 @@ export default function Home() {
           })
         }}
       />
-
-      <Header />
 
       {/* HERO SECTION */}
       <section
@@ -881,8 +878,6 @@ export default function Home() {
         </div>
       </section>
 
-      <Footer />
-
       <style jsx>{`
         @keyframes gradient {
           0%, 100% {
@@ -925,6 +920,6 @@ export default function Home() {
           animation-delay: 4s;
         }
       `}</style>
-    </div>
+    </PublicPageLayout>
   )
 }
