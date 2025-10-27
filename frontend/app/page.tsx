@@ -572,6 +572,104 @@ export default function Home() {
         </div>
       </section>
 
+      {/* CRYPTO TOOLS & CARDS CTA */}
+      <section className="py-20 md:py-32 px-4 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full filter blur-3xl animate-blob"></div>
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full filter blur-3xl animate-blob animation-delay-2000"></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <div className="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm font-bold mb-6">
+                💳 SPEND YOUR CRYPTO GLOBALLY
+              </div>
+
+              <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+                After Optimizing Taxes, You Need the Right Tools
+              </h2>
+
+              <p className="text-xl text-white/90 mb-8">
+                Crypto debit cards with USDT/USDC support, offshore banking, and up to 10% rewards. Virtual & physical Visa/Mastercard accepted at 150M+ merchants worldwide.
+              </p>
+
+              <div className="space-y-4 mb-8">
+                {[
+                  { icon: '🌍', text: 'RedotPay: 5M+ users, global coverage' },
+                  { icon: '🎁', text: 'Kast: Up to 10% rewards in 167 countries' },
+                  { icon: '👑', text: 'Ultimo: Offshore banking with Platinum Visa' },
+                  { icon: '🏝️', text: 'Palau Digital Residency for KYC' }
+                ].map((feature, idx) => (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.1 }}
+                    className="flex items-center gap-3"
+                  >
+                    <span className="text-2xl">{feature.icon}</span>
+                    <span className="text-white/90 text-lg">{feature.text}</span>
+                  </motion.div>
+                ))}
+              </div>
+
+              <Link
+                href="/tools"
+                className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-blue-600 bg-white hover:bg-slate-50 rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all"
+              >
+                <CreditCard className="w-5 h-5 mr-2" />
+                Explore Crypto Cards & Tools
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Link>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="relative"
+            >
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border-2 border-white/20 shadow-2xl">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl p-6 text-white">
+                    <div className="text-3xl mb-2">💳</div>
+                    <div className="text-sm opacity-80 mb-1">Crypto Cards</div>
+                    <div className="text-2xl font-bold">3 Options</div>
+                    <div className="text-xs opacity-70 mt-2">USDT/USDC supported</div>
+                  </div>
+                  <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl p-6 text-white">
+                    <div className="text-3xl mb-2">🌍</div>
+                    <div className="text-sm opacity-80 mb-1">Global Coverage</div>
+                    <div className="text-2xl font-bold">167+</div>
+                    <div className="text-xs opacity-70 mt-2">Countries supported</div>
+                  </div>
+                  <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl p-6 text-white">
+                    <div className="text-3xl mb-2">🎁</div>
+                    <div className="text-sm opacity-80 mb-1">Max Rewards</div>
+                    <div className="text-2xl font-bold">10%</div>
+                    <div className="text-xs opacity-70 mt-2">On card spending</div>
+                  </div>
+                  <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl p-6 text-white">
+                    <div className="text-3xl mb-2">👑</div>
+                    <div className="text-sm opacity-80 mb-1">Offshore</div>
+                    <div className="text-2xl font-bold">Banking</div>
+                    <div className="text-xs opacity-70 mt-2">Privacy + protection</div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* DATA QUALITY & TRANSPARENCY */}
       <section className="py-20 md:py-32 px-4 bg-white dark:bg-slate-950">
         <div className="max-w-7xl mx-auto">

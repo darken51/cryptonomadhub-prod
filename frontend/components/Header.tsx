@@ -6,7 +6,7 @@ import {
   Menu, X, ChevronDown,
   Globe, MessageCircle, Activity, Calculator, DollarSign, RefreshCw,
   BookOpen, FileText, HelpCircle, Briefcase, Users, Building,
-  TrendingUp, Shield, Zap, Trophy, BarChart3, LineChart, LayoutDashboard
+  TrendingUp, Shield, Zap, Trophy, BarChart3, LineChart, LayoutDashboard, CreditCard
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -89,6 +89,13 @@ const featuresMenu: MegaMenuSection[] = [
         description: 'Overview with smart notifications',
         icon: LayoutDashboard,
         href: '/features/dashboard'
+      },
+      {
+        title: 'Crypto Tools & Cards',
+        description: 'Best crypto debit cards & residency',
+        icon: CreditCard,
+        href: '/tools',
+        badge: 'New'
       }
     ]
   }
