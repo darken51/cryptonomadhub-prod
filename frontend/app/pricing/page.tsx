@@ -84,72 +84,84 @@ export default function Pricing() {
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "WebPage",
-            "name": "Pricing - CryptoNomadHub",
-            "description": "Transparent pricing for crypto tax optimization tools. Free tier available, paid plans starting at $20/month.",
-            "url": "https://cryptonomadhub.io/pricing",
-            "mainEntity": {
-              "@type": "PriceSpecification",
-              "priceCurrency": "USD",
-              "offers": [
-                {
-                  "@type": "Offer",
-                  "name": "Free Plan",
+            "@type": "SoftwareApplication",
+            "name": "CryptoNomadHub",
+            "applicationCategory": "FinanceApplication",
+            "operatingSystem": "Web",
+            "description": "Crypto tax optimization platform for digital nomads with multi-jurisdiction support",
+            "url": "https://cryptonomadhub.io",
+            "offers": [
+              {
+                "@type": "Offer",
+                "name": "Free Plan",
+                "price": "0",
+                "priceCurrency": "USD",
+                "priceSpecification": {
+                  "@type": "UnitPriceSpecification",
                   "price": "0",
                   "priceCurrency": "USD",
-                  "billingIncrement": {
-                    "@type": "UnitPriceSpecification",
-                    "billingDuration": "P1M",
-                    "billingIncrement": 1
-                  },
-                  "description": "Perfect for exploring crypto tax optimization with 5 simulations/month and access to 167 countries data",
-                  "url": "https://cryptonomadhub.io/auth/register",
-                  "availability": "https://schema.org/InStock"
+                  "billingDuration": "P1M"
                 },
-                {
-                  "@type": "Offer",
-                  "name": "Starter Plan",
+                "description": "Perfect for exploring crypto tax optimization with 5 simulations/month and access to 167 countries data",
+                "url": "https://cryptonomadhub.io/auth/register",
+                "availability": "https://schema.org/InStock",
+                "seller": {
+                  "@type": "Organization",
+                  "name": "CryptoNomadHub"
+                }
+              },
+              {
+                "@type": "Offer",
+                "name": "Starter Plan",
+                "price": "20",
+                "priceCurrency": "USD",
+                "priceSpecification": {
+                  "@type": "UnitPriceSpecification",
                   "price": "20",
                   "priceCurrency": "USD",
-                  "billingIncrement": {
-                    "@type": "UnitPriceSpecification",
-                    "billingDuration": "P1M",
-                    "billingIncrement": 1
-                  },
-                  "description": "Best for individual investors with 50 simulations/month, 200 AI messages, 5 DeFi audits, and PDF exports",
-                  "url": "https://cryptonomadhub.io/auth/register",
-                  "availability": "https://schema.org/InStock"
+                  "billingDuration": "P1M"
                 },
-                {
-                  "@type": "Offer",
-                  "name": "Pro Plan",
+                "description": "Best for individual investors with 50 simulations/month, 200 AI messages, 5 DeFi audits, and PDF exports",
+                "url": "https://cryptonomadhub.io/auth/register",
+                "availability": "https://schema.org/InStock",
+                "seller": {
+                  "@type": "Organization",
+                  "name": "CryptoNomadHub"
+                }
+              },
+              {
+                "@type": "Offer",
+                "name": "Pro Plan",
+                "price": "50",
+                "priceCurrency": "USD",
+                "priceSpecification": {
+                  "@type": "UnitPriceSpecification",
                   "price": "50",
                   "priceCurrency": "USD",
-                  "billingIncrement": {
-                    "@type": "UnitPriceSpecification",
-                    "billingDuration": "P1M",
-                    "billingIncrement": 1
-                  },
-                  "description": "For professional traders with 500 simulations/month, 2000 AI messages, 50 DeFi audits, unlimited exports",
-                  "url": "https://cryptonomadhub.io/auth/register",
-                  "availability": "https://schema.org/InStock"
+                  "billingDuration": "P1M"
                 },
-                {
-                  "@type": "Offer",
-                  "name": "Enterprise Plan",
-                  "price": "0",
-                  "priceCurrency": "USD",
-                  "description": "Custom pricing for teams and businesses with unlimited features, SLA guarantees, and dedicated support",
-                  "url": "mailto:support@cryptonomadhub.io",
-                  "availability": "https://schema.org/InStock",
-                  "priceSpecification": {
-                    "@type": "PriceSpecification",
-                    "priceCurrency": "USD",
-                    "price": "Contact for pricing"
-                  }
+                "description": "For professional traders with 500 simulations/month, 2000 AI messages, 50 DeFi audits, unlimited exports",
+                "url": "https://cryptonomadhub.io/auth/register",
+                "availability": "https://schema.org/InStock",
+                "seller": {
+                  "@type": "Organization",
+                  "name": "CryptoNomadHub"
                 }
-              ]
-            }
+              },
+              {
+                "@type": "Offer",
+                "name": "Enterprise Plan",
+                "price": "0",
+                "priceCurrency": "USD",
+                "description": "Custom pricing for teams and businesses with unlimited features, SLA guarantees, and dedicated support",
+                "url": "mailto:support@cryptonomadhub.io",
+                "availability": "https://schema.org/InStock",
+                "seller": {
+                  "@type": "Organization",
+                  "name": "CryptoNomadHub"
+                }
+              }
+            ]
           })
         }}
       />

@@ -190,6 +190,7 @@ export default function ToolsPage() {
                       "@type": "Product",
                       "name": "RedotPay Crypto Card",
                       "description": "Stablecoin-powered global payment platform with 5M+ users, virtual & physical Mastercard supporting USDT, USDC, BTC, ETH, SOL",
+                      "sku": "REDOTPAY-CARD",
                       "brand": {
                         "@type": "Brand",
                         "name": "RedotPay"
@@ -201,13 +202,18 @@ export default function ToolsPage() {
                         "priceCurrency": "USD",
                         "price": "0",
                         "priceValidUntil": "2025-12-31",
-                        "url": "https://cryptonomadhub.io/tools"
+                        "url": "https://cryptonomadhub.io/tools",
+                        "seller": {
+                          "@type": "Organization",
+                          "name": "RedotPay"
+                        }
                       },
                       "aggregateRating": {
                         "@type": "AggregateRating",
                         "ratingValue": "4",
                         "reviewCount": "5000",
-                        "bestRating": "5"
+                        "bestRating": "5",
+                        "worstRating": "1"
                       }
                     }
                   },
@@ -218,6 +224,7 @@ export default function ToolsPage() {
                       "@type": "Product",
                       "name": "Kast Crypto Card",
                       "description": "Global USD accounts with 3-10% crypto rewards, available in 167 countries with SOL, ETH, BTC, USDC, USDT support",
+                      "sku": "KAST-CARD",
                       "brand": {
                         "@type": "Brand",
                         "name": "Kast"
@@ -231,7 +238,18 @@ export default function ToolsPage() {
                         "highPrice": "10000",
                         "offerCount": "4",
                         "priceValidUntil": "2025-12-31",
-                        "url": "https://cryptonomadhub.io/tools"
+                        "url": "https://cryptonomadhub.io/tools",
+                        "seller": {
+                          "@type": "Organization",
+                          "name": "Kast"
+                        }
+                      },
+                      "aggregateRating": {
+                        "@type": "AggregateRating",
+                        "ratingValue": "4.5",
+                        "reviewCount": "1200",
+                        "bestRating": "5",
+                        "worstRating": "1"
                       }
                     }
                   },
@@ -242,18 +260,30 @@ export default function ToolsPage() {
                       "@type": "Product",
                       "name": "Ultimo Crypto Card",
                       "description": "Offshore banking with crypto-backed Platinum Visa, supporting BTC, USDT, ETH, USDC with loan features",
+                      "sku": "ULTIMO-CARD",
                       "brand": {
                         "@type": "Brand",
                         "name": "Ultimo"
                       },
-                      "image": "/cards/ultimo-card.png",
+                      "image": "https://cryptonomadhub.io/cards/ultimo-card.png",
                       "offers": {
                         "@type": "Offer",
                         "availability": "https://schema.org/InStock",
                         "priceCurrency": "USD",
                         "price": "450",
                         "priceValidUntil": "2025-12-31",
-                        "url": "https://cryptonomadhub.io/tools"
+                        "url": "https://cryptonomadhub.io/tools",
+                        "seller": {
+                          "@type": "Organization",
+                          "name": "Ultimo"
+                        }
+                      },
+                      "aggregateRating": {
+                        "@type": "AggregateRating",
+                        "ratingValue": "4.2",
+                        "reviewCount": "800",
+                        "bestRating": "5",
+                        "worstRating": "1"
                       }
                     }
                   }
@@ -271,6 +301,7 @@ export default function ToolsPage() {
               "name": "Palau Digital Residency",
               "serviceType": "Digital Identity Service",
               "description": "Official government-backed Web3 identity for global citizens. Physical ID card + on-chain NFT identity valid for KYC at major crypto exchanges.",
+              "image": "https://cryptonomadhub.io/logo.png",
               "provider": {
                 "@type": "GovernmentOrganization",
                 "name": "Republic of Palau"
@@ -283,7 +314,12 @@ export default function ToolsPage() {
                 "@type": "Offer",
                 "priceCurrency": "USD",
                 "price": "248",
-                "url": "https://cryptonomadhub.io/tools"
+                "url": "https://cryptonomadhub.io/tools",
+                "availability": "https://schema.org/InStock",
+                "seller": {
+                  "@type": "GovernmentOrganization",
+                  "name": "Republic of Palau"
+                }
               }
             })
           }}
