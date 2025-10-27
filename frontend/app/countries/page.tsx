@@ -237,7 +237,7 @@ export default function CountriesPage() {
               Country Tax Regulations
             </h1>
             <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl">
-              Browse crypto tax rates for {countries.length}+ countries with verified data and real-time updates
+              Browse crypto tax rates for {isLoading ? '167' : countries.length}+ countries with verified data and real-time updates
             </p>
           </motion.div>
 
@@ -276,7 +276,7 @@ export default function CountriesPage() {
                 onChange={(e) => setFilterType(e.target.value as any)}
                 className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-900 dark:text-white transition-all"
               >
-                <option value="all">All Countries ({countries.length})</option>
+                <option value="all">All Countries ({isLoading ? '...' : countries.length})</option>
                 <option value="crypto-friendly">Crypto-Friendly (&lt;10% tax)</option>
                 <option value="has-crypto-data">Has Crypto-Specific Data</option>
               </select>
@@ -307,7 +307,7 @@ export default function CountriesPage() {
               </span>
             </label>
             <span className="text-sm text-slate-600 dark:text-slate-400">
-              ({filteredCountries.length} countries)
+              ({isLoading ? '...' : filteredCountries.length} countries)
             </span>
           </div>
         </motion.div>
