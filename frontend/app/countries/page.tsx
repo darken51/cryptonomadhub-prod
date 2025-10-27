@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { useAuth } from '@/components/providers/AuthProvider'
-import { AppHeader } from '@/components/AppHeader'
+import { Header } from '@/components/Header'
+import { Footer } from '@/components/Footer'
 import { ArrowLeft, Search, TrendingDown, Info } from 'lucide-react'
 import WorldTaxMap from '@/components/WorldTaxMap'
 import CountryScoreCard from '@/components/CountryScoreCard'
@@ -68,7 +68,6 @@ interface Country {
 }
 
 export default function CountriesPage() {
-  const { token } = useAuth()
   const [countries, setCountries] = useState<Country[]>([])
   const [filteredCountries, setFilteredCountries] = useState<Country[]>([])
   const [searchQuery, setSearchQuery] = useState('')
@@ -226,9 +225,9 @@ export default function CountriesPage() {
   }
 
   return (
-    <>
-      <AppHeader />
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-900 py-4 sm:py-8">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-slate-950">
+      <Header />
+      <div className="flex-1 bg-slate-50 dark:bg-slate-900 py-4 sm:py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Page Title */}
           <motion.div
@@ -623,7 +622,8 @@ export default function CountriesPage() {
           </p>
         </motion.div>
       </div>
+      </div>
+      <Footer />
     </div>
-    </>
   )
 }
