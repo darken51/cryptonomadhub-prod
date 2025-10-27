@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Globe, MessageCircle, Activity, DollarSign, Calculator, RefreshCw, ArrowRight, Shield, Lock, CheckCircle, Sparkles, TrendingUp, Zap, LineChart, FileText, AlertTriangle, Trophy, BarChart3, Layers, Target } from 'lucide-react'
+import { Globe, MessageCircle, Activity, DollarSign, Calculator, RefreshCw, ArrowRight, Shield, Lock, CheckCircle, Sparkles, TrendingUp, Zap, LineChart, FileText, AlertTriangle, Trophy, BarChart3, Layers, Target, CreditCard } from 'lucide-react'
 import { PublicPageLayout } from '@/components/PublicPageLayout'
 import { LegalDisclaimer } from '@/components/LegalDisclaimer'
 import { AnimatedCounter } from '@/components/AnimatedCounter'

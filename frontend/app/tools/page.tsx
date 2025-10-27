@@ -169,39 +169,39 @@ export default function ToolsPage() {
 
   return (
     <PublicPageLayout>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebPage",
-            "name": "Crypto Cards & Tools - Best Crypto Debit Cards 2025",
-            "description": "Compare the best crypto debit cards: RedotPay (5M+ users), Kast (10% rewards), and Ultimo (offshore banking). Virtual & physical Visa/Mastercard with USDT, USDC, BTC, ETH support. Global coverage with Apple Pay & Google Pay.",
-            "url": "https://cryptonomadhub.com/tools",
-            "mainEntity": {
-              "@type": "ItemList",
-              "itemListElement": [
-                {
-                  "@type": "FinancialProduct",
-                  "name": "RedotPay Crypto Card",
-                  "description": "Stablecoin-powered global payment platform with 5M+ users"
-                },
-                {
-                  "@type": "FinancialProduct",
-                  "name": "Kast Crypto Card",
-                  "description": "Global USD accounts with up to 10% crypto rewards"
-                },
-                {
-                  "@type": "FinancialProduct",
-                  "name": "Ultimo Crypto Card",
-                  "description": "Offshore banking with crypto-backed Platinum Visa"
-                }
-              ]
-            }
-          })
-        }}
-      />
       <div className="bg-gray-50 dark:bg-gray-900 py-8">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebPage",
+              "name": "Crypto Cards & Tools - Best Crypto Debit Cards 2025",
+              "description": "Compare the best crypto debit cards: RedotPay (5M+ users), Kast (10% rewards), and Ultimo (offshore banking). Virtual & physical Visa/Mastercard with USDT, USDC, BTC, ETH support. Global coverage with Apple Pay & Google Pay.",
+              "url": "https://cryptonomadhub.com/tools",
+              "mainEntity": {
+                "@type": "ItemList",
+                "itemListElement": [
+                  {
+                    "@type": "FinancialProduct",
+                    "name": "RedotPay Crypto Card",
+                    "description": "Stablecoin-powered global payment platform with 5M+ users"
+                  },
+                  {
+                    "@type": "FinancialProduct",
+                    "name": "Kast Crypto Card",
+                    "description": "Global USD accounts with up to 10% crypto rewards"
+                  },
+                  {
+                    "@type": "FinancialProduct",
+                    "name": "Ultimo Crypto Card",
+                    "description": "Offshore banking with crypto-backed Platinum Visa"
+                  }
+                ]
+              }
+            })
+          }}
+        />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Page Title */}
           <div className="mb-8">
@@ -593,7 +593,7 @@ export default function ToolsPage() {
               <li><strong>Stablecoin Support:</strong> USDT and USDC for stable spending power</li>
               <li><strong>Low Fees:</strong> Competitive loading, transaction, and withdrawal fees</li>
               <li><strong>Rewards Programs:</strong> Cashback or rewards on card spend (up to 10%)</li>
-              <li><strong>Apple Pay & Google Pay:</strong> Contactless payment integration</li>
+              <li><strong>Apple Pay &amp; Google Pay:</strong> Contactless payment integration</li>
               <li><strong>Offshore Banking:</strong> Privacy and asset protection for high-net-worth individuals</li>
             </ul>
             <p className="text-gray-700 dark:text-gray-300">
@@ -602,6 +602,7 @@ export default function ToolsPage() {
               card access with physical cards shipped worldwide.
             </p>
           </div>
+        </div>
         </div>
       </div>
 
