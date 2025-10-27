@@ -2,13 +2,11 @@
 
 import Link from 'next/link'
 import { ArrowLeft, Shield, Calendar, AlertTriangle, CheckCircle } from 'lucide-react'
-import { Header } from '@/components/Header'
-import { Footer } from '@/components/Footer'
+import { PublicPageLayout } from '@/components/PublicPageLayout'
 
 export default function WashSaleRuleBlogPost() {
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-slate-950">
-      <Header />
+    <PublicPageLayout>
 
       <article className="flex-1 py-12 px-4">
         <div className="max-w-4xl mx-auto">
@@ -305,7 +303,6 @@ export default function WashSaleRuleBlogPost() {
         </div>
       </article>
 
-      <Footer />
-    </div>
+      </PublicPageLayout>
   )
 }

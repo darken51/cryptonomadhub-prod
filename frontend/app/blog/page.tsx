@@ -3,8 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, FileText, Clock, Tag, TrendingUp, Globe, DollarSign, Shield, Calendar } from 'lucide-react'
-import { Header } from '@/components/Header'
-import { Footer } from '@/components/Footer'
+import { PublicPageLayout } from '@/components/PublicPageLayout'
 import { motion } from 'framer-motion'
 
 export default function BlogPage() {
@@ -160,9 +159,6 @@ export default function BlogPage() {
           })
         }}
       />
-
-      <Header />
-
       {/* Hero */}
       <section className="relative bg-gradient-to-b from-violet-50 via-purple-50 to-white dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 pt-20 pb-24 md:pt-32 md:pb-32 px-4">
         <div className="max-w-7xl mx-auto">
@@ -320,9 +316,6 @@ export default function BlogPage() {
             </p>
           </div>
         </div>
-      </section>
-
-      <Footer />
-    </div>
+      </section>    </div>
   )
 }

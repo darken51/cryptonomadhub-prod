@@ -2,13 +2,12 @@
 
 import Link from 'next/link'
 import { ArrowRight, Globe, Map, TrendingUp, Shield, CheckCircle, Heart, Plane, Home, DollarSign, Trophy } from 'lucide-react'
-import { Header } from '@/components/Header'
-import { Footer } from '@/components/Footer'
+import { PublicPageLayout } from '@/components/PublicPageLayout'
 import { motion } from 'framer-motion'
 
 export default function DigitalNomadsPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-slate-950">
+    <PublicPageLayout>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -21,9 +20,6 @@ export default function DigitalNomadsPage() {
           })
         }}
       />
-
-      <Header />
-
       {/* Hero */}
       <section className="relative bg-gradient-to-b from-cyan-50 via-blue-50 to-white dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 pt-20 pb-24 md:pt-32 md:pb-32 px-4">
         <div className="max-w-7xl mx-auto">
@@ -273,8 +269,6 @@ export default function DigitalNomadsPage() {
           </p>
         </div>
       </section>
-
-      <Footer />
-    </div>
+    </PublicPageLayout>
   )
 }

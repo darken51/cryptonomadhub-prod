@@ -2,14 +2,12 @@
 
 import Link from 'next/link'
 import { ArrowRight, Trophy, TrendingUp, Shield, Sparkles, CheckCircle, Globe, Heart, Wallet, Scale, Map, DollarSign } from 'lucide-react'
-import { Header } from '@/components/Header'
-import { Footer } from '@/components/Footer'
+import { PublicPageLayout } from '@/components/PublicPageLayout'
 import { motion } from 'framer-motion'
 
 export default function AIScoringPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-slate-950">
-      <Header />
+    <PublicPageLayout>
 
       {/* Hero Section */}
       <section className="relative bg-gradient-to-b from-violet-50 via-fuchsia-50 to-white dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 pt-20 pb-24 md:pt-32 md:pb-32 px-4">
@@ -267,7 +265,6 @@ export default function AIScoringPage() {
         </div>
       </section>
 
-      <Footer />
-    </div>
+      </PublicPageLayout>
   )
 }

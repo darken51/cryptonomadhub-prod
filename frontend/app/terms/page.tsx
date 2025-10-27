@@ -2,8 +2,7 @@
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Header } from '@/components/Header'
-import { Footer } from '@/components/Footer'
+import { PublicPageLayout } from '@/components/PublicPageLayout'
 import { ArrowLeft, AlertTriangle, ShieldAlert, Info, FileText } from 'lucide-react'
 
 const fadeInUp = {
@@ -22,9 +21,7 @@ const staggerContainer = {
 
 export default function TermsOfService() {
   return (
-    <>
-      <Header />
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-violet-50/30 to-fuchsia-50/30 dark:from-slate-950 dark:via-violet-950/20 dark:to-fuchsia-950/20">
+    <PublicPageLayout contentClassName="bg-gradient-to-br from-slate-50 via-violet-50/30 to-fuchsia-50/30 dark:from-slate-950 dark:via-violet-950/20 dark:to-fuchsia-950/20">
         {/* Hero Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -403,8 +400,6 @@ export default function TermsOfService() {
             </motion.section>
           </motion.div>
         </main>
-      </div>
-      <Footer />
-    </>
+    </PublicPageLayout>
   )
 }

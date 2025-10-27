@@ -2,14 +2,12 @@
 
 import Link from 'next/link'
 import { ArrowRight, BarChart3, CheckCircle } from 'lucide-react'
-import { Header } from '@/components/Header'
-import { Footer } from '@/components/Footer'
+import { PublicPageLayout } from '@/components/PublicPageLayout'
 import { motion } from 'framer-motion'
 
 export default function MultiCountryComparePage() {
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-slate-950">
-      <Header />
+    <PublicPageLayout>
       <section className="relative bg-gradient-to-b from-purple-50 via-fuchsia-50 to-white dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 pt-20 pb-24 md:pt-32 md:pb-32 px-4">
         <div className="max-w-7xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
@@ -51,7 +49,6 @@ export default function MultiCountryComparePage() {
           </div>
         </div>
       </section>
-      <Footer />
-    </div>
+      </PublicPageLayout>
   )
 }
