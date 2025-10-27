@@ -122,6 +122,7 @@ const cryptoCards: CryptoCard[] = [
     fees: '$450 issuance + $150 deposit, $50/year maintenance, $10 renewal/4 years',
     supported_crypto: ['BTC', 'USDT', 'ETH', 'USDC'],
     kyc_required: true,
+    cardImage: '/cards/ultimo-card.png',
   },
 ]
 
