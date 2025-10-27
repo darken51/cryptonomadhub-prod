@@ -219,51 +219,47 @@ export default function HelpPage() {
       {/* Quick Links */}
       <section className="py-12 px-4 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 gap-6">
             {[
-              {
-                icon: MessageCircle,
-                title: 'Live Chat Support',
-                description: 'Chat with our team in real-time',
-                action: 'Start Chat',
-                gradient: 'from-emerald-500 to-teal-600'
-              },
               {
                 icon: Mail,
                 title: 'Email Support',
                 description: 'Get help via email within 24h',
                 action: 'Send Email',
-                gradient: 'from-blue-500 to-cyan-600'
+                gradient: 'from-blue-500 to-cyan-600',
+                href: 'mailto:contact@cryptonomadhub.io'
               },
               {
                 icon: BookOpen,
                 title: 'Documentation',
                 description: 'Browse complete guides and tutorials',
                 action: 'View Docs',
-                gradient: 'from-violet-500 to-purple-600'
+                gradient: 'from-violet-500 to-purple-600',
+                href: '/docs'
               }
             ].map((link, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1 }}
-                className="bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl transition-all cursor-pointer group"
-              >
-                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${link.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                  <link.icon className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
-                  {link.title}
-                </h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-                  {link.description}
-                </p>
-                <button className="text-sm font-semibold text-cyan-600 dark:text-blue-400 hover:gap-2 flex items-center gap-1 transition-all">
-                  {link.action}
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </motion.div>
+              <Link key={idx} href={link.href}>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                  className="bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-lg hover:shadow-xl transition-all cursor-pointer group"
+                >
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${link.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                    <link.icon className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
+                    {link.title}
+                  </h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                    {link.description}
+                  </p>
+                  <div className="text-sm font-semibold text-cyan-600 dark:text-blue-400 hover:gap-2 flex items-center gap-1 transition-all">
+                    {link.action}
+                    <ArrowRight className="w-4 h-4" />
+                  </div>
+                </motion.div>
+              </Link>
             ))}
           </div>
         </div>
@@ -359,14 +355,10 @@ export default function HelpPage() {
             Our support team is here to help you succeed
           </p>
 
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <button className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-cyan-600 bg-white hover:bg-slate-50 rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all">
-              <MessageCircle className="w-5 h-5 mr-2" />
-              Start Live Chat
-            </button>
+          <div className="flex justify-center">
             <Link
-              href="mailto:support@cryptonomadhub.io"
-              className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-white bg-white/20 hover:bg-white/30 backdrop-blur-sm border-2 border-white/50 rounded-xl transition-all"
+              href="mailto:contact@cryptonomadhub.io"
+              className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-cyan-600 bg-white hover:bg-slate-50 rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all"
             >
               <Mail className="w-5 h-5 mr-2" />
               Email Support
@@ -374,7 +366,7 @@ export default function HelpPage() {
           </div>
 
           <p className="text-white/80 text-sm mt-6">
-            Average response time: 2 hours • Available 24/7
+            Average response time: 24 hours
           </p>
         </div>
       </section>
