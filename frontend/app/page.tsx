@@ -445,8 +445,8 @@ export default function Home() {
                     className="absolute top-8 left-8 bg-slate-900 text-white px-4 py-3 rounded-lg shadow-xl border border-white/20 text-sm"
                   >
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xl">🇵🇹</span>
-                      <span className="font-bold">Portugal</span>
+                      <span className="text-xl">🇦🇪</span>
+                      <span className="font-bold">Dubai (UAE)</span>
                     </div>
                     <div className="space-y-1 text-xs text-slate-300">
                       <div>Crypto Tax: <span className="text-emerald-400 font-bold">0%</span></div>
