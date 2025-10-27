@@ -68,12 +68,31 @@ export default function CountryDetailPage() {
   const [country, setCountry] = useState<Country | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [similarCountries, setSimilarCountries] = useState<Country[]>([])
 
   useEffect(() => {
     if (country_code) {
       fetchCountryData()
     }
   }, [country_code])
+
+  // Update document title with country-specific info
+  useEffect(() => {
+    if (country) {
+      const cryptoRate = country.crypto_short_rate !== null && country.crypto_short_rate !== undefined
+        ? `${country.crypto_short_rate}%`
+        : `${country.cgt_short_rate}%`
+
+      let titleSuffix = ''
+      if (country.crypto_short_rate === 0 || (country.crypto_short_rate === null && country.cgt_short_rate === 0)) {
+        titleSuffix = ' - 0% Tax Guide'
+      } else if (country.holding_period_months) {
+        titleSuffix = ` - ${country.holding_period_months}m Holding Period`
+      }
+
+      document.title = `${country.country_name} Crypto Tax 2025${titleSuffix} | CryptoNomadHub`
+    }
+  }, [country])
 
   const fetchCountryData = async () => {
     try {
@@ -90,6 +109,19 @@ export default function CountryDetailPage() {
         setError('Country not found')
       } else {
         setCountry(foundCountry)
+
+        // Find similar countries based on crypto tax rate
+        const currentRate = foundCountry.crypto_short_rate ?? foundCountry.cgt_short_rate
+        const otherCountries = data
+          .filter(c => c.country_code !== foundCountry.country_code && c.crypto_legal_status !== 'banned')
+          .map(c => ({
+            ...c,
+            taxDiff: Math.abs((c.crypto_short_rate ?? c.cgt_short_rate) - currentRate)
+          }))
+          .sort((a, b) => a.taxDiff - b.taxDiff)
+          .slice(0, 3)
+
+        setSimilarCountries(otherCountries)
       }
     } catch (err) {
       console.error('Error fetching country:', err)
@@ -197,6 +229,36 @@ export default function CountryDetailPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 py-8">
+      {/* BreadcrumbList JSON-LD for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://cryptonomadhub.io"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Countries",
+                "item": "https://cryptonomadhub.io/countries"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": country.country_name,
+                "item": `https://cryptonomadhub.io/countries/${country_code.toLowerCase()}`
+              }
+            ]
+          })
+        }}
+      />
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back Button */}
         <Link
@@ -229,6 +291,13 @@ export default function CountryDetailPage() {
                 {getLegalStatusBadge(country.crypto_legal_status)}
                 {getDataQualityBadge(country.data_quality)}
               </div>
+              {/* Last Updated Badge */}
+              {country.updated_at && (
+                <div className="flex items-center gap-2 mt-3 text-sm text-slate-600 dark:text-slate-400">
+                  <Calendar className="w-4 h-4" />
+                  <span>Last updated: {formatDate(country.updated_at)}</span>
+                </div>
+              )}
             </div>
           </div>
         </motion.div>
@@ -438,6 +507,53 @@ export default function CountryDetailPage() {
             </div>
           )}
         </motion.div>
+
+        {/* Compare with Similar Countries - Internal Linking for SEO */}
+        {similarCountries.length > 0 && (
+          <motion.div
+            className="mt-12 mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 shadow-lg">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                🔄 Compare with Similar Countries
+              </h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
+                Countries with comparable crypto tax rates to {country.country_name}
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {similarCountries.map((similar) => {
+                  const rate = similar.crypto_short_rate ?? similar.cgt_short_rate
+                  return (
+                    <Link
+                      key={similar.country_code}
+                      href={`/countries/${similar.country_code.toLowerCase()}`}
+                      className="group"
+                    >
+                      <div className="p-4 rounded-lg border-2 border-slate-200 dark:border-slate-700 hover:border-violet-400 dark:hover:border-violet-600 transition-colors bg-slate-50 dark:bg-slate-900">
+                        <div className="flex items-center gap-3 mb-2">
+                          {similar.flag_emoji && <span className="text-3xl">{similar.flag_emoji}</span>}
+                          <div className="flex-1">
+                            <p className="font-semibold text-slate-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
+                              {similar.country_name}
+                            </p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">{similar.country_code}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-2xl font-bold text-violet-600 dark:text-violet-400">{rate}%</span>
+                          <span className="text-xs text-slate-500 dark:text-slate-400">crypto tax</span>
+                        </div>
+                      </div>
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
+          </motion.div>
+        )}
 
         {/* CTA to Tools */}
         <motion.div

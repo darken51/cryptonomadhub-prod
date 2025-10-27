@@ -79,7 +79,80 @@ export default function Pricing() {
 
   return (
     <PublicPageLayout>
-      
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "Pricing - CryptoNomadHub",
+            "description": "Transparent pricing for crypto tax optimization tools. Free tier available, paid plans starting at $20/month.",
+            "url": "https://cryptonomadhub.io/pricing",
+            "mainEntity": {
+              "@type": "PriceSpecification",
+              "priceCurrency": "USD",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "name": "Free Plan",
+                  "price": "0",
+                  "priceCurrency": "USD",
+                  "billingIncrement": {
+                    "@type": "UnitPriceSpecification",
+                    "billingDuration": "P1M",
+                    "billingIncrement": 1
+                  },
+                  "description": "Perfect for exploring crypto tax optimization with 5 simulations/month and access to 167 countries data",
+                  "url": "https://cryptonomadhub.io/auth/register",
+                  "availability": "https://schema.org/InStock"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "Starter Plan",
+                  "price": "20",
+                  "priceCurrency": "USD",
+                  "billingIncrement": {
+                    "@type": "UnitPriceSpecification",
+                    "billingDuration": "P1M",
+                    "billingIncrement": 1
+                  },
+                  "description": "Best for individual investors with 50 simulations/month, 200 AI messages, 5 DeFi audits, and PDF exports",
+                  "url": "https://cryptonomadhub.io/auth/register",
+                  "availability": "https://schema.org/InStock"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "Pro Plan",
+                  "price": "50",
+                  "priceCurrency": "USD",
+                  "billingIncrement": {
+                    "@type": "UnitPriceSpecification",
+                    "billingDuration": "P1M",
+                    "billingIncrement": 1
+                  },
+                  "description": "For professional traders with 500 simulations/month, 2000 AI messages, 50 DeFi audits, unlimited exports",
+                  "url": "https://cryptonomadhub.io/auth/register",
+                  "availability": "https://schema.org/InStock"
+                },
+                {
+                  "@type": "Offer",
+                  "name": "Enterprise Plan",
+                  "price": "0",
+                  "priceCurrency": "USD",
+                  "description": "Custom pricing for teams and businesses with unlimited features, SLA guarantees, and dedicated support",
+                  "url": "mailto:support@cryptonomadhub.io",
+                  "availability": "https://schema.org/InStock",
+                  "priceSpecification": {
+                    "@type": "PriceSpecification",
+                    "priceCurrency": "USD",
+                    "price": "Contact for pricing"
+                  }
+                }
+              ]
+            }
+          })
+        }}
+      />
       <main className="flex-1 py-12 md:py-20 px-4">
         <div className="max-w-7xl mx-auto">
 

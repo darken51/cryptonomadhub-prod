@@ -7,7 +7,41 @@ import { PublicPageLayout } from '@/components/PublicPageLayout'
 export default function SolanaDeFiTaxesBlogPost() {
   return (
     <PublicPageLayout>
-
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Do I need to report every Jupiter swap?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. Every crypto-to-crypto swap (even SOL to USDC) is a taxable event that must be reported on Form 8949."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Is providing liquidity on Raydium taxable?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Adding liquidity is generally not taxable. Earning fees = taxable income. Removing liquidity = capital gain/loss."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "What about mSOL appreciation?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Not taxable until you unstake/sell. The gain is taxed when you convert mSOL back to SOL or sell it."
+                }
+              }
+            ]
+          })
+        }}
+      />
       <article className="flex-1 py-12 px-4">
         <div className="max-w-4xl mx-auto">
           <Link href="/blog" className="inline-flex items-center gap-2 text-violet-600 dark:text-purple-400 hover:underline mb-8">

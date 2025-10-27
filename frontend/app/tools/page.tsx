@@ -178,26 +178,112 @@ export default function ToolsPage() {
               "@type": "WebPage",
               "name": "Crypto Cards & Tools - Best Crypto Debit Cards 2025",
               "description": "Compare the best crypto debit cards: RedotPay (5M+ users), Kast (10% rewards), and Ultimo (offshore banking). Virtual & physical Visa/Mastercard with USDT, USDC, BTC, ETH support. Global coverage with Apple Pay & Google Pay.",
-              "url": "https://cryptonomadhub.com/tools",
+              "url": "https://cryptonomadhub.io/tools",
               "mainEntity": {
                 "@type": "ItemList",
+                "numberOfItems": 3,
                 "itemListElement": [
                   {
-                    "@type": "FinancialProduct",
-                    "name": "RedotPay Crypto Card",
-                    "description": "Stablecoin-powered global payment platform with 5M+ users"
+                    "@type": "ListItem",
+                    "position": 1,
+                    "item": {
+                      "@type": "Product",
+                      "name": "RedotPay Crypto Card",
+                      "description": "Stablecoin-powered global payment platform with 5M+ users, virtual & physical Mastercard supporting USDT, USDC, BTC, ETH, SOL",
+                      "brand": {
+                        "@type": "Brand",
+                        "name": "RedotPay"
+                      },
+                      "image": "https://staticsource1.redotpay.com/web/img/home/v3/card-physical.webp",
+                      "offers": {
+                        "@type": "Offer",
+                        "availability": "https://schema.org/InStock",
+                        "priceCurrency": "USD",
+                        "price": "0",
+                        "priceValidUntil": "2025-12-31",
+                        "url": "https://cryptonomadhub.io/tools"
+                      },
+                      "aggregateRating": {
+                        "@type": "AggregateRating",
+                        "ratingValue": "4",
+                        "reviewCount": "5000",
+                        "bestRating": "5"
+                      }
+                    }
                   },
                   {
-                    "@type": "FinancialProduct",
-                    "name": "Kast Crypto Card",
-                    "description": "Global USD accounts with up to 10% crypto rewards"
+                    "@type": "ListItem",
+                    "position": 2,
+                    "item": {
+                      "@type": "Product",
+                      "name": "Kast Crypto Card",
+                      "description": "Global USD accounts with 3-10% crypto rewards, available in 167 countries with SOL, ETH, BTC, USDC, USDT support",
+                      "brand": {
+                        "@type": "Brand",
+                        "name": "Kast"
+                      },
+                      "image": "https://cdn.prod.website-files.com/660c048ecf246f8d15a85d0a/687e25222224cbfa18ce4933_k-card-core.webp",
+                      "offers": {
+                        "@type": "AggregateOffer",
+                        "availability": "https://schema.org/InStock",
+                        "priceCurrency": "USD",
+                        "lowPrice": "0",
+                        "highPrice": "10000",
+                        "offerCount": "4",
+                        "priceValidUntil": "2025-12-31",
+                        "url": "https://cryptonomadhub.io/tools"
+                      }
+                    }
                   },
                   {
-                    "@type": "FinancialProduct",
-                    "name": "Ultimo Crypto Card",
-                    "description": "Offshore banking with crypto-backed Platinum Visa"
+                    "@type": "ListItem",
+                    "position": 3,
+                    "item": {
+                      "@type": "Product",
+                      "name": "Ultimo Crypto Card",
+                      "description": "Offshore banking with crypto-backed Platinum Visa, supporting BTC, USDT, ETH, USDC with loan features",
+                      "brand": {
+                        "@type": "Brand",
+                        "name": "Ultimo"
+                      },
+                      "image": "/cards/ultimo-card.png",
+                      "offers": {
+                        "@type": "Offer",
+                        "availability": "https://schema.org/InStock",
+                        "priceCurrency": "USD",
+                        "price": "450",
+                        "priceValidUntil": "2025-12-31",
+                        "url": "https://cryptonomadhub.io/tools"
+                      }
+                    }
                   }
                 ]
+              }
+            })
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Service",
+              "name": "Palau Digital Residency",
+              "serviceType": "Digital Identity Service",
+              "description": "Official government-backed Web3 identity for global citizens. Physical ID card + on-chain NFT identity valid for KYC at major crypto exchanges.",
+              "provider": {
+                "@type": "GovernmentOrganization",
+                "name": "Republic of Palau"
+              },
+              "areaServed": {
+                "@type": "Place",
+                "name": "Global (138 countries)"
+              },
+              "offers": {
+                "@type": "Offer",
+                "priceCurrency": "USD",
+                "price": "248",
+                "url": "https://cryptonomadhub.io/tools"
               }
             })
           }}
@@ -230,6 +316,26 @@ export default function ToolsPage() {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* SEO-rich descriptive section */}
+        <div className="prose dark:prose-invert max-w-none mb-12 bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+          <h2 className="text-2xl font-bold mb-4">Why Crypto Cards Matter for Digital Nomads</h2>
+          <p className="text-gray-700 dark:text-gray-300 mb-4">
+            <strong>RedotPay</strong> leads the stablecoin payment revolution with over 5 million users globally, offering seamless integration with Apple Pay and Google Pay.
+            Their Mastercard solution supports USDT, USDC, BTC, ETH, and SOL across both virtual and physical cards, making it ideal for travelers who need instant crypto-to-fiat conversion at
+            150M+ merchants worldwide. The platform's P2P marketplace and earn program provide additional utility beyond basic card spending.
+          </p>
+          <p className="text-gray-700 dark:text-gray-300 mb-4">
+            <strong>Kast</strong> revolutionizes crypto rewards with up to 10% cashback on card spending across 167 countries, featuring four tiers from free Standard cards to $10k/year Luxe membership.
+            Their KAST points system rewards staked SOL holders (0.5x to 2x multipliers) while supporting major cryptocurrencies including SOL, ETH, BTC, USDC, and USDT.
+            The VIP Concierge service for Premium+ tiers adds luxury travel perks for high-net-worth digital nomads.
+          </p>
+          <p className="text-gray-700 dark:text-gray-300">
+            <strong>Ultimo</strong> provides offshore banking solutions with a Platinum Visa accepted at 40M+ merchants, specializing in crypto-backed loans through their UltimoLoan feature.
+            This allows holders to borrow against BTC, USDT, ETH, and USDC without selling their holdings, preserving long-term positions while accessing liquidity.
+            The offshore account structure offers privacy-conscious nomads additional financial sovereignty with same-day USD loading and global ATM withdrawals.
+          </p>
         </div>
 
         {/* Crypto Cards Grid */}
