@@ -101,9 +101,12 @@ export function FAQAccordion() {
         <p className="text-slate-600 dark:text-slate-400 mb-4">
           Still have questions?
         </p>
-        <button className="text-violet-600 dark:text-fuchsia-400 hover:text-violet-700 dark:hover:text-fuchsia-300 font-semibold underline">
+        <a
+          href="mailto:support@cryptonomadhub.io"
+          className="text-violet-600 dark:text-fuchsia-400 hover:text-violet-700 dark:hover:text-fuchsia-300 font-semibold underline inline-block"
+        >
           Contact Support →
-        </button>
+        </a>
       </div>
     </div>
   )
