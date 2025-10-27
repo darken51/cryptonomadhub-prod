@@ -112,14 +112,6 @@ export default function DocsPage() {
                 href: '#tax-optimization'
               },
               {
-                icon: Code,
-                title: 'API Reference',
-                description: 'Integrate CryptoNomadHub into your applications with our REST API and webhooks.',
-                items: ['Authentication', 'Endpoints', 'Rate limits', 'Webhooks'],
-                gradient: 'from-rose-500 to-pink-600',
-                href: '#api-reference'
-              },
-              {
                 icon: Shield,
                 title: 'Security & Privacy',
                 description: 'Learn about data encryption, privacy controls, and best practices for account security.',
@@ -207,13 +199,6 @@ export default function DocsPage() {
                 time: '7 min read',
                 badge: 'Tax Strategy',
                 href: '/docs/wash-sale-detection'
-              },
-              {
-                title: 'API Authentication & Rate Limits',
-                description: 'Learn how to authenticate with our API and understand rate limits for developers.',
-                time: '6 min read',
-                badge: 'API',
-                href: '/docs/api-authentication'
               }
             ].map((doc, idx) => (
               <Link
@@ -247,66 +232,6 @@ export default function DocsPage() {
       </section>
 
       {/* API Preview */}
-      <section className="py-20 md:py-32 px-4 bg-white dark:bg-slate-950">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300 text-sm font-semibold mb-4">
-                <Code className="w-4 h-4" />
-                API
-              </div>
-              <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">
-                Build with Our API
-              </h2>
-              <p className="text-lg text-slate-600 dark:text-slate-400 mb-6">
-                Integrate crypto tax optimization into your applications. REST API with comprehensive documentation and code examples.
-              </p>
-              <ul className="space-y-3 mb-8">
-                {[
-                  'Country tax data endpoints',
-                  'DeFi audit automation',
-                  'Portfolio tracking integration',
-                  'Webhook notifications',
-                  'Rate limits: 1000 req/hour'
-                ].map((item, idx) => (
-                  <li key={idx} className="flex items-center gap-3">
-                    <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
-                    <span className="text-slate-700 dark:text-slate-300">{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="#api-reference"
-                className="inline-flex items-center gap-2 text-blue-600 dark:text-indigo-400 font-semibold hover:gap-3 transition-all"
-              >
-                View API Documentation
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-            </div>
-            <div className="bg-slate-900 dark:bg-slate-950 rounded-2xl p-6 border border-slate-700 shadow-2xl">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-3 h-3 bg-rose-500 rounded-full"></div>
-                <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
-                <div className="w-3 h-3 bg-emerald-500 rounded-full"></div>
-              </div>
-              <pre className="text-sm text-emerald-400 font-mono overflow-x-auto">
-{`GET /api/v1/countries/PT
-
-{
-  "country_code": "PT",
-  "name": "Portugal",
-  "crypto_tax_rate": 0,
-  "legal_status": "legal",
-  "ai_score": 88,
-  "nomad_score": 92,
-  "crypto_score": 85,
-  "residency_rule": "183 days"
-}`}
-              </pre>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* CTA */}
       <section className="py-20 md:py-32 px-4 bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600">
