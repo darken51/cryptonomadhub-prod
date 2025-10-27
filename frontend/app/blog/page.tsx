@@ -155,7 +155,7 @@ export default function BlogPage() {
             "@type": "Blog",
             "name": "CryptoNomadHub Blog",
             "description": "Crypto tax strategies, country comparisons, DeFi guides, and tax news for digital nomads and crypto traders. Expert insights on optimizing taxes across 167 countries.",
-            "url": "https://cryptonomadhub.com/blog"
+            "url": "https://cryptonomadhub.io/blog"
           })
         }}
       />

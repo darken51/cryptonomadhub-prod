@@ -1,8 +1,40 @@
+import { Metadata } from 'next'
 import { PublicPageLayout } from '@/components/PublicPageLayout'
 import CountriesClient from './CountriesClient'
 
 // Use ISR (Incremental Static Regeneration) for better performance
 export const revalidate = 3600 // Revalidate every hour
+
+export const metadata: Metadata = {
+  title: '167 Countries Crypto Tax Database | 43 with 0% Tax',
+  description: 'Compare crypto tax rates across 167 countries. Interactive map showing 0% tax jurisdictions including UAE, Portugal, Singapore, Germany. Filter by tax rate, legal status, and AI country scores.',
+  keywords: [
+    'crypto tax by country',
+    '0% crypto tax countries',
+    'best countries for crypto',
+    'UAE crypto tax',
+    'Portugal crypto tax',
+    'Singapore crypto tax',
+    'Germany holding period',
+    'tax-free crypto countries',
+    'crypto legal status',
+    'capital gains tax crypto worldwide'
+  ],
+  openGraph: {
+    title: '167 Countries Crypto Tax Database | 43 with 0% Tax',
+    description: 'Interactive world map of crypto tax rates. Find 0% tax countries, compare regulations, and see AI country scores.',
+    images: ['/og-image.png'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: '167 Countries Crypto Tax Database',
+    description: 'Interactive map: 43 countries with 0% crypto tax. Compare UAE, Portugal, Singapore, and more.',
+    images: ['/og-image.png'],
+  },
+  alternates: {
+    canonical: 'https://cryptonomadhub.io/countries',
+  },
+}
 
 interface AIAnalysis {
   crypto_score: number
