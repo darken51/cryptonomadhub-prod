@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Twitter, Github, Linkedin, Mail } from 'lucide-react'
+import { Mail } from 'lucide-react'
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
@@ -40,35 +40,8 @@ export function Footer() {
               </Link>
             </nav>
 
-            {/* Social Icons */}
+            {/* Contact */}
             <div className="flex items-center gap-3">
-              <a
-                href="https://twitter.com/cryptonomadhub"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 text-slate-500 hover:text-violet-600 dark:hover:text-fuchsia-400 transition-colors"
-                aria-label="Twitter"
-              >
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a
-                href="https://github.com/cryptonomadhub"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 text-slate-500 hover:text-violet-600 dark:hover:text-fuchsia-400 transition-colors"
-                aria-label="GitHub"
-              >
-                <Github className="w-5 h-5" />
-              </a>
-              <a
-                href="https://linkedin.com/company/cryptonomadhub"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 text-slate-500 hover:text-violet-600 dark:hover:text-fuchsia-400 transition-colors"
-                aria-label="LinkedIn"
-              >
-                <Linkedin className="w-5 h-5" />
-              </a>
               <a
                 href="mailto:contact@cryptonomadhub.io"
                 className="p-2 text-slate-500 hover:text-violet-600 dark:hover:text-fuchsia-400 transition-colors"

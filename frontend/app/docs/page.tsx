@@ -16,7 +16,7 @@ export default function DocsPage() {
             "@context": "https://schema.org",
             "@type": "WebPage",
             "name": "Documentation - CryptoNomadHub",
-            "description": "Complete guides, API documentation, and tutorials for CryptoNomadHub. Learn how to optimize crypto taxes across 167 countries, use DeFi audit, and integrate with our API.",
+            "description": "Complete guides and tutorials for CryptoNomadHub. Learn how to optimize crypto taxes across 167 countries, use DeFi audit, and track your crypto portfolio.",
             "url": "https://cryptonomadhub.com/docs"
           })
         }}
@@ -42,7 +42,7 @@ export default function DocsPage() {
             </h1>
 
             <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto mb-8">
-              Complete guides, API documentation, and tutorials to master crypto tax optimization across 167 countries.
+              Complete guides and tutorials to master crypto tax optimization across 167 countries.
             </p>
 
             <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -123,7 +123,7 @@ export default function DocsPage() {
                 icon: Shield,
                 title: 'Security & Privacy',
                 description: 'Learn about data encryption, privacy controls, and best practices for account security.',
-                items: ['Data encryption', 'API keys', '2FA setup', 'Privacy settings'],
+                items: ['Data encryption', 'Password security', 'Privacy settings', 'Secure practices'],
                 gradient: 'from-indigo-500 to-blue-600',
                 href: '#security'
               }

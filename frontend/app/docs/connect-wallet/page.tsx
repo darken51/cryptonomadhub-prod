@@ -228,7 +228,7 @@ export default function ConnectWalletDoc() {
                 </li>
                 <li className="flex items-start gap-3">
                   <AlertTriangle className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-1" />
-                  <span>Enable 2FA on your CryptoNomadHub account for extra security</span>
+                  <span>Use a strong unique password for your CryptoNomadHub account</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <AlertTriangle className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-1" />

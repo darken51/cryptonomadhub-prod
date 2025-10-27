@@ -133,8 +133,8 @@ export default function HelpPage() {
           answer: 'Form 8949, capital gains/losses, transaction history, cost basis reports, wash sale reports, and custom CSV/PDF exports for clients.'
         },
         {
-          question: 'Do you offer white-label solutions?',
-          answer: 'Contact our sales team for enterprise and white-label solutions. We can customize branding and integrate with your existing systems.'
+          question: 'Do you offer enterprise solutions?',
+          answer: 'Yes! Contact our sales team at contact@cryptonomadhub.io for custom enterprise pricing, dedicated support, and integration options.'
         }
       ]
     },

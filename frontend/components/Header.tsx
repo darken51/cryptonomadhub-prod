@@ -111,7 +111,7 @@ const solutionsMenu: MegaMenuSection[] = [
       },
       {
         title: 'For Accountants',
-        description: 'Client management & white-label',
+        description: 'Client management tools',
         icon: Briefcase,
         href: '/solutions/accountants'
       }
@@ -124,7 +124,7 @@ const resourcesMenu: MegaMenuSection[] = [
     items: [
       {
         title: 'Documentation',
-        description: 'Complete guides and API docs',
+        description: 'Complete guides and tutorials',
         icon: BookOpen,
         href: '/docs'
       },
