@@ -118,7 +118,7 @@ export default function CountriesClient({ initialCountries }: CountriesClientPro
     if (filterType === 'crypto-friendly') {
       filtered = filtered.filter(c =>
         !isCryptoBanned(c) && (
-          (c.crypto_short_rate !== null && c.crypto_short_rate < 10) ||
+          (c.crypto_short_rate !== null && c.crypto_short_rate !== undefined && c.crypto_short_rate < 10) ||
           (c.cgt_short_rate < 10)
         )
       )
