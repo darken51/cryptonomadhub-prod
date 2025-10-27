@@ -14,15 +14,15 @@ export default function Pricing() {
       name: 'Free',
       monthlyPrice: 0,
       annualPrice: 0,
-      description: 'Découvrez CryptoNomadHub gratuitement',
+      description: 'Get started with CryptoNomadHub',
       icon: Zap,
       features: [
-        { text: '167 countries database (lecture)', included: true },
-        { text: 'Comparaison 2 pays max', included: true },
-        { text: '3 tax simulations/mois', included: true },
-        { text: '2 DeFi audits/mois (no PDF)', included: true },
-        { text: '10 AI chat messages/mois', included: true },
-        { text: 'Export PDF', included: false },
+        { text: '167 countries database (read-only)', included: true },
+        { text: 'Compare up to 2 countries', included: true },
+        { text: '3 tax simulations/month', included: true },
+        { text: '2 DeFi audits/month (no PDF)', included: true },
+        { text: '10 AI chat messages/month', included: true },
+        { text: 'PDF export', included: false },
         { text: 'Cost basis tracking', included: false },
         { text: 'Wallet connect', included: false },
       ],
@@ -34,15 +34,15 @@ export default function Pricing() {
       monthlyPrice: 15,
       annualPrice: 144,
       badge: 'POPULAR',
-      description: 'Pour investisseurs crypto actifs',
+      description: 'For active crypto investors',
       icon: Crown,
       features: [
-        { text: 'Comparaison jusqu\'à 5 pays', included: true },
-        { text: '50 tax simulations/mois', included: true },
-        { text: '15 DeFi audits/mois + PDF', included: true },
-        { text: '100 AI chat messages/mois', included: true },
-        { text: 'Cost basis: 1 méthode (1k tx/an)', included: true },
-        { text: '3 wallets (sync 24h)', included: true },
+        { text: 'Compare up to 5 countries', included: true },
+        { text: '50 tax simulations/month', included: true },
+        { text: '15 DeFi audits/month + PDF', included: true },
+        { text: '100 AI chat messages/month', included: true },
+        { text: 'Cost basis: 1 method (1k tx/year)', included: true },
+        { text: '3 wallets (24h sync)', included: true },
         { text: 'Portfolio: 20 cryptos', included: true },
         { text: 'Email support', included: true },
       ],
@@ -55,17 +55,17 @@ export default function Pricing() {
       monthlyPrice: 39,
       annualPrice: 374,
       badge: 'BEST VALUE',
-      description: 'Pour traders pro & nomades',
+      description: 'For pro traders & digital nomads',
       icon: Rocket,
       features: [
-        { text: 'Comparaison jusqu\'à 10 pays', included: true },
-        { text: 'Tax simulations illimitées', included: true },
-        { text: '100 DeFi audits/mois + CSV/JSON', included: true },
-        { text: '500 AI messages/mois (contextualisés)', included: true },
-        { text: 'Cost basis: toutes méthodes (50k tx)', included: true },
-        { text: 'Tax Optimizer IA 🔥', included: true },
-        { text: '15 wallets (sync 24h)', included: true },
-        { text: 'Portfolio illimité + analytics', included: true },
+        { text: 'Compare up to 10 countries', included: true },
+        { text: 'Unlimited tax simulations', included: true },
+        { text: '100 DeFi audits/month + CSV', included: true },
+        { text: '500 AI messages/month (contextualized)', included: true },
+        { text: 'Cost basis: all methods (50k tx)', included: true },
+        { text: 'Tax Optimizer AI 🔥', included: true },
+        { text: '15 wallets (24h sync)', included: true },
+        { text: 'Unlimited portfolio + analytics', included: true },
         { text: 'Priority support', included: true },
       ],
       cta: 'Start 14-Day Trial',
@@ -75,18 +75,18 @@ export default function Pricing() {
       name: 'Enterprise',
       monthlyPrice: null,
       annualPrice: null,
-      customPrice: 'Sur devis',
-      description: 'Cabinets, équipes, institutions',
+      customPrice: 'Custom',
+      description: 'For firms, teams & institutions',
       icon: Building2,
       features: [
-        { text: 'Tout du Pro + Illimité', included: true },
-        { text: 'API Access complète + webhooks', included: true },
-        { text: '5-100+ utilisateurs', included: true },
-        { text: 'Intégrations QuickBooks/Xero', included: true },
-        { text: 'White-label (option)', included: true },
+        { text: 'Everything in Pro + Unlimited', included: true },
+        { text: 'Full API access + webhooks', included: true },
+        { text: '5-100+ users', included: true },
+        { text: 'QuickBooks/Xero integrations', included: true },
+        { text: 'White-label (optional)', included: true },
         { text: 'Dedicated account manager', included: true },
-        { text: 'SLA 99.9% + Priority support', included: true },
-        { text: 'Custom features sur demande', included: true },
+        { text: '99.9% SLA + Priority support', included: true },
+        { text: 'Custom features on demand', included: true },
       ],
       cta: 'Contact Sales',
       href: 'mailto:sales@cryptonomadhub.io',
@@ -102,8 +102,8 @@ export default function Pricing() {
 
   const getPeriod = (plan: typeof plans[0]) => {
     if (plan.customPrice) return ''
-    if (billingCycle === 'monthly') return '/mois'
-    return '/an'
+    if (billingCycle === 'monthly') return '/mo'
+    return '/yr'
   }
 
   const getSavings = (plan: typeof plans[0]) => {
@@ -213,13 +213,14 @@ export default function Pricing() {
             className="text-center mb-12 space-y-4"
           >
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 dark:text-white">
-              Tarifs simples,{' '}
+              Simple,{' '}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600">
-                transparents
+                transparent
               </span>
+              {' '}pricing
             </h1>
             <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              Choisissez le plan adapté à vos besoins. Sans engagement. Annulez quand vous voulez.
+              Choose the plan that fits your needs. No commitment. Cancel anytime.
             </p>
           </motion.div>
 
@@ -233,7 +234,7 @@ export default function Pricing() {
             <span className={`text-sm font-semibold transition-colors ${
               billingCycle === 'monthly' ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400'
             }`}>
-              Mensuel
+              Monthly
             </span>
             <button
               onClick={() => setBillingCycle(billingCycle === 'monthly' ? 'annual' : 'monthly')}
@@ -248,7 +249,7 @@ export default function Pricing() {
             <span className={`text-sm font-semibold transition-colors ${
               billingCycle === 'annual' ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-slate-400'
             }`}>
-              Annuel
+              Annual
             </span>
             {billingCycle === 'annual' && (
               <motion.span
@@ -256,7 +257,7 @@ export default function Pricing() {
                 animate={{ scale: 1 }}
                 className="ml-2 px-3 py-1 text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-full"
               >
-                Économisez 20%
+                Save 20%
               </motion.span>
             )}
           </motion.div>
@@ -334,12 +335,12 @@ export default function Pricing() {
                         </div>
                         {savings && billingCycle === 'annual' && (
                           <p className="text-sm text-emerald-600 dark:text-emerald-400 font-semibold mt-1">
-                            Économisez ${savings.amount}/an
+                            Save ${savings.amount}/year
                           </p>
                         )}
                         {billingCycle === 'monthly' && plan.monthlyPrice !== null && plan.monthlyPrice > 0 && (
                           <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                            ou ${plan.annualPrice}/an (-20%)
+                            or ${plan.annualPrice}/year (-20%)
                           </p>
                         )}
                       </div>
@@ -405,58 +406,58 @@ export default function Pricing() {
             className="max-w-3xl mx-auto"
           >
             <h2 className="text-3xl font-bold text-slate-900 dark:text-white text-center mb-12">
-              Questions fréquentes
+              Frequently Asked Questions
             </h2>
             <div className="space-y-6">
               <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
-                  Puis-je changer de plan à tout moment ?
+                  Can I change my plan anytime?
                 </h3>
                 <p className="text-slate-600 dark:text-slate-400">
-                  Oui, vous pouvez upgrader ou downgrader votre plan à tout moment. Les changements sont appliqués immédiatement et facturés au prorata.
+                  Yes, you can upgrade or downgrade your plan at any time. Changes are applied immediately and billed on a prorated basis.
                 </p>
               </div>
 
               <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
-                  Quelle est la politique d'annulation ?
+                  What is the cancellation policy?
                 </h3>
                 <p className="text-slate-600 dark:text-slate-400">
-                  Aucun engagement. Annulez à tout moment depuis votre dashboard. Les plans mensuels ne seront pas renouvelés, les plans annuels restent actifs jusqu'à la fin de la période payée.
+                  No commitment. Cancel anytime from your dashboard. Monthly plans won't be renewed, annual plans remain active until the end of the paid period.
                 </p>
               </div>
 
               <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
-                  Qu'est-ce qui est inclus dans le Free trial ?
+                  What's included in the free trial?
                 </h3>
                 <p className="text-slate-600 dark:text-slate-400">
-                  14 jours d'essai gratuit sur les plans Starter et Pro, sans carte bancaire requise. Accès complet à toutes les fonctionnalités du plan choisi.
+                  14-day free trial on Starter and Pro plans, no credit card required. Full access to all features of your chosen plan.
                 </p>
               </div>
 
               <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
-                  Comment fonctionne le plan Enterprise ?
+                  How does the Enterprise plan work?
                 </h3>
                 <p className="text-slate-600 dark:text-slate-400 mb-3">
-                  Le plan Enterprise est personnalisé selon vos besoins (nombre d'utilisateurs, volume d'API calls, intégrations spécifiques). Prix sur devis à partir de $300/mois.
+                  The Enterprise plan is customized to your needs (number of users, API volume, specific integrations). Custom pricing starting from $300/month.
                 </p>
                 <Link
                   href="mailto:sales@cryptonomadhub.io"
                   className="inline-flex items-center gap-2 text-violet-600 dark:text-violet-400 hover:underline font-semibold"
                 >
                   <Mail className="w-4 h-4" />
-                  Contactez notre équipe sales
+                  Contact our sales team
                 </Link>
               </div>
 
               <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
-                  Les données des 167 pays sont-elles accessibles gratuitement ?
+                  Is the 167 countries data accessible for free?
                 </h3>
                 <p className="text-slate-600 dark:text-slate-400">
-                  Oui ! Notre base de données complète des 167 pays avec analyses IA et scoring est accessible publiquement pour favoriser la transparence fiscale. Les plans payants débloquent les fonctionnalités avancées (comparaisons illimitées, export PDF, audits DeFi, Tax Optimizer...).
+                  Yes! Our complete database of 167 countries with AI analysis and scoring is publicly accessible to promote tax transparency. Paid plans unlock advanced features (unlimited comparisons, PDF export, DeFi audits, Tax Optimizer...).
                 </p>
               </div>
             </div>
@@ -470,16 +471,16 @@ export default function Pricing() {
             className="mt-24 text-center bg-gradient-to-r from-violet-600 to-fuchsia-600 rounded-2xl p-12"
           >
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Prêt à optimiser vos impôts crypto ?
+              Ready to optimize your crypto taxes?
             </h2>
             <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-              Rejoignez des milliers d'investisseurs qui économisent en moyenne $127k/an
+              Join thousands of investors saving an average of $127k/year
             </p>
             <Link
               href="/auth/register"
               className="inline-block px-8 py-4 bg-white text-violet-600 font-bold rounded-xl hover:bg-slate-100 transition-all shadow-lg hover:shadow-xl"
             >
-              Commencer gratuitement
+              Get Started Free
             </Link>
           </motion.div>
         </div>
