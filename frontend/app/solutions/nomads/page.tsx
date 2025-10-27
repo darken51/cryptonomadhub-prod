@@ -237,6 +237,245 @@ export default function DigitalNomadsPage() {
         </div>
       </section>
 
+      {/* FAQ Section */}
+      <section className="py-20 md:py-32 px-4 bg-gradient-to-b from-white to-slate-50 dark:from-slate-950 dark:to-slate-900">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
+              Common Questions from Digital Nomads
+            </h2>
+            <p className="text-xl text-slate-600 dark:text-slate-400">
+              Everything you need to know about crypto tax optimization while traveling
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-lg"
+            >
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 flex items-start gap-3">
+                <span className="text-2xl">🗺️</span>
+                What is the 183-day rule and why does it matter?
+              </h3>
+              <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                Most countries consider you a tax resident if you spend 183 days or more per year within their borders. This means you&apos;ll owe taxes on your worldwide income to that country. However, the rule varies: some count partial days, others have &quot;center of vital interests&quot; tests (where your family/property is), and some tie it to permanent address. CryptoNomadHub tracks all 167 country variations and can alert you 30 days before you risk triggering unwanted tax residency.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-lg"
+            >
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 flex items-start gap-3">
+                <span className="text-2xl">🛂</span>
+                Can I be tax resident nowhere (perpetual traveler)?
+              </h3>
+              <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-3">
+                Technically yes - stay under 183 days everywhere and you might avoid tax residency anywhere. However, this &quot;flag theory&quot; strategy has major drawbacks:
+              </p>
+              <ul className="space-y-2 ml-6">
+                <li className="text-slate-600 dark:text-slate-400 flex items-start gap-2">
+                  <span className="text-red-500 font-bold">•</span>
+                  Your citizenship country may still tax you on worldwide income (US, Eritrea)
+                </li>
+                <li className="text-slate-600 dark:text-slate-400 flex items-start gap-2">
+                  <span className="text-red-500 font-bold">•</span>
+                  Banks and exchanges require proof of tax residency to open accounts
+                </li>
+                <li className="text-slate-600 dark:text-slate-400 flex items-start gap-2">
+                  <span className="text-red-500 font-bold">•</span>
+                  Some countries have anti-avoidance rules that override the 183-day test
+                </li>
+                <li className="text-slate-600 dark:text-slate-400 flex items-start gap-2">
+                  <span className="text-red-500 font-bold">•</span>
+                  You can&apos;t get residency certificates needed for tax treaty benefits
+                </li>
+              </ul>
+              <p className="text-slate-600 dark:text-slate-400 leading-relaxed mt-3">
+                <strong>Better strategy:</strong> Establish official residency in a 0% crypto tax country (UAE, Portugal, Singapore, Panama) for legitimacy while maintaining freedom to travel.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-lg"
+            >
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 flex items-start gap-3">
+                <span className="text-2xl">💰</span>
+                How much does it cost to relocate for tax optimization?
+              </h3>
+              <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-3">
+                Costs vary dramatically by country. Here are realistic estimates for popular destinations:
+              </p>
+              <div className="space-y-3">
+                <div className="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-lg border border-emerald-200 dark:border-emerald-800">
+                  <div className="font-bold text-emerald-700 dark:text-emerald-300 mb-1">Budget Options ($1,000-$2,000/mo)</div>
+                  <ul className="space-y-1 text-sm text-slate-700 dark:text-slate-300">
+                    <li>• Panama: $1,200/mo living + $5,000 Friendly Nations visa</li>
+                    <li>• Portugal: $900/mo living + €7,500 D7 visa (freelancer/passive income)</li>
+                    <li>• Malaysia: $1,500/mo + $35,000 MM2H deposit (refundable)</li>
+                    <li>• Georgia: $800/mo + free 1-year visa for 95+ countries</li>
+                  </ul>
+                </div>
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <div className="font-bold text-blue-700 dark:text-blue-300 mb-1">Premium Options ($2,500-$5,000/mo)</div>
+                  <ul className="space-y-1 text-sm text-slate-700 dark:text-slate-300">
+                    <li>• UAE Dubai: $3,500/mo + free remote work visa (2-year renewable)</li>
+                    <li>• Singapore: $3,000/mo + EntrePass (entrepreneurs, $50k capital)</li>
+                    <li>• Malta: $2,800/mo + €10,000/yr nomad visa</li>
+                  </ul>
+                </div>
+              </div>
+              <p className="text-slate-600 dark:text-slate-400 leading-relaxed mt-3">
+                <strong>Break-even calculation:</strong> If you&apos;re saving $30k+/year on crypto taxes, even premium destinations pay for themselves in 3-6 months.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-lg"
+            >
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 flex items-start gap-3">
+                <span className="text-2xl">🇺🇸</span>
+                I&apos;m a US citizen - can I escape crypto taxes by moving abroad?
+              </h3>
+              <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-3">
+                Unfortunately, US citizens are taxed on worldwide income regardless of where they live. However, you still have significant optimization opportunities:
+              </p>
+              <div className="space-y-2 ml-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">✓</div>
+                  <div>
+                    <div className="font-semibold text-slate-900 dark:text-white">Foreign Earned Income Exclusion (FEIE)</div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400">Exclude $120,000 of foreign earned income if you pass the physical presence test (330+ days outside US)</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">✓</div>
+                  <div>
+                    <div className="font-semibold text-slate-900 dark:text-white">Foreign Tax Credit (FTC)</div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400">Deduct foreign taxes paid from US tax liability (useful if residing in moderate-tax countries)</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">✓</div>
+                  <div>
+                    <div className="font-semibold text-slate-900 dark:text-white">State Tax Elimination</div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400">Establish residency in no-tax states (FL, TX, WY, NV) before leaving US to avoid 5-13% state taxes</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-violet-500 text-white flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">★</div>
+                  <div>
+                    <div className="font-semibold text-slate-900 dark:text-white">Puerto Rico Act 60</div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400">Move to Puerto Rico (US territory) for 0% crypto gains tax if you&apos;re a bona fide PR resident (183+ days/year). No passport change needed.</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center font-bold text-xs flex-shrink-0 mt-0.5">!</div>
+                  <div>
+                    <div className="font-semibold text-slate-900 dark:text-white">Expatriation (Renouncing Citizenship)</div>
+                    <div className="text-sm text-slate-600 dark:text-slate-400">Extreme option: Renounce US citizenship ($2,350 fee + exit tax on unrealized gains &gt;$2M net worth). Permanent and irreversible.</div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4 }}
+              className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-lg"
+            >
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 flex items-start gap-3">
+                <span className="text-2xl">⚖️</span>
+                Do I need a tax advisor or can CryptoNomadHub replace one?
+              </h3>
+              <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-3">
+                CryptoNomadHub is a research and planning tool, not a replacement for professional tax advice. Here&apos;s how we fit into your workflow:
+              </p>
+              <div className="bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 p-4 rounded-lg border border-violet-200 dark:border-violet-800 mb-3">
+                <div className="font-bold text-violet-700 dark:text-violet-300 mb-2">✅ What CryptoNomadHub does:</div>
+                <ul className="space-y-1 text-sm text-slate-700 dark:text-slate-300 ml-4">
+                  <li>• Identify best countries for your situation in 60 seconds</li>
+                  <li>• Compare tax rates, costs, visas across 167 countries</li>
+                  <li>• Calculate theoretical tax savings</li>
+                  <li>• Track residency days to avoid triggering unwanted tax obligations</li>
+                  <li>• Provide data-driven recommendations backed by official sources</li>
+                </ul>
+              </div>
+              <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 p-4 rounded-lg border border-amber-200 dark:border-amber-800">
+                <div className="font-bold text-amber-700 dark:text-amber-300 mb-2">⚠️ When you need a tax advisor:</div>
+                <ul className="space-y-1 text-sm text-slate-700 dark:text-slate-300 ml-4">
+                  <li>• Filing actual tax returns in multiple jurisdictions</li>
+                  <li>• Structuring holding companies or trusts</li>
+                  <li>• Handling complex situations (dual citizenship, existing tax residency disputes)</li>
+                  <li>• Estate planning and wealth transfer strategies</li>
+                  <li>• Audit representation or tax dispute resolution</li>
+                </ul>
+              </div>
+              <p className="text-slate-600 dark:text-slate-400 leading-relaxed mt-3">
+                <strong>Recommended approach:</strong> Use CryptoNomadHub to identify your top 2-3 country options (saves you 20+ hours of research), then consult a cross-border tax advisor for implementation. Typical advisor cost: $2k-5k for relocation planning vs $50k-200k+ in annual tax savings.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.5 }}
+              className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-lg"
+            >
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 flex items-start gap-3">
+                <span className="text-2xl">🏦</span>
+                How do I prove tax residency to banks and exchanges?
+              </h3>
+              <p className="text-slate-600 dark:text-slate-400 leading-relaxed mb-3">
+                Banks, crypto exchanges, and financial institutions require proof of tax residency for KYC/AML compliance. Accepted documents typically include:
+              </p>
+              <ul className="space-y-2 ml-4">
+                <li className="text-slate-600 dark:text-slate-400 flex items-start gap-2">
+                  <span className="text-violet-500 font-bold">1.</span>
+                  <div><strong>Tax Residency Certificate</strong> - Official document from your tax authority confirming where you&apos;re tax resident (most reliable)</div>
+                </li>
+                <li className="text-slate-600 dark:text-slate-400 flex items-start gap-2">
+                  <span className="text-violet-500 font-bold">2.</span>
+                  <div><strong>Residency Visa/Permit</strong> - Long-term visa showing legal right to reside (UAE residence visa, Portugal D7, etc.)</div>
+                </li>
+                <li className="text-slate-600 dark:text-slate-400 flex items-start gap-2">
+                  <span className="text-violet-500 font-bold">3.</span>
+                  <div><strong>Utility Bills</strong> - 2-3 months of electricity/water/internet bills in your name at local address</div>
+                </li>
+                <li className="text-slate-600 dark:text-slate-400 flex items-start gap-2">
+                  <span className="text-violet-500 font-bold">4.</span>
+                  <div><strong>Lease Agreement</strong> - Rental contract showing minimum 6-12 month commitment</div>
+                </li>
+                <li className="text-slate-600 dark:text-slate-400 flex items-start gap-2">
+                  <span className="text-violet-500 font-bold">5.</span>
+                  <div><strong>Local Bank Account Statement</strong> - Proof of local financial ties</div>
+                </li>
+              </ul>
+              <p className="text-slate-600 dark:text-slate-400 leading-relaxed mt-3">
+                <strong>Pro tip:</strong> Don&apos;t rely on &quot;digital nomad&quot; visas (Bali, Mexico, etc.) as sole proof - they&apos;re often tourist visas that don&apos;t establish true tax residency. Choose countries where you can get official tax resident status.
+              </p>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-20 md:py-32 px-4 bg-gradient-to-br from-cyan-600 via-blue-600 to-indigo-600">
         <div className="max-w-4xl mx-auto text-center">

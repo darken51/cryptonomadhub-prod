@@ -98,7 +98,7 @@ export default function Home() {
                 </span>
               </h1>
               <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-4xl mx-auto leading-relaxed">
-                Find which of <strong className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600">167 countries</strong> let you pay <strong className="text-emerald-600 dark:text-emerald-400">0% crypto tax</strong>.
+                Find which of <strong className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600">167 countries</strong> let you pay <strong className="text-emerald-600 dark:text-emerald-400">zero tax on cryptocurrencies</strong>.
                 AI analyzes your situation and gives personalized relocation recommendations in <strong className="text-slate-900 dark:text-white">60 seconds</strong>.
               </p>
             </div>
@@ -206,7 +206,7 @@ export default function Home() {
                 <AnimatedCounter value={43} />
               </div>
               <div className="text-sm md:text-base text-slate-600 dark:text-slate-400 font-medium">
-                Countries with 0% Tax
+                Tax-Free Jurisdictions
               </div>
               <div className="text-xs text-slate-500 dark:text-slate-500 mt-1">
                 Pay zero legally
@@ -243,7 +243,7 @@ export default function Home() {
                 Digital Nomads Helped
               </div>
               <div className="text-xs text-slate-500 dark:text-slate-500 mt-1">
-                Now paying 0% tax
+                No capital gains tax
               </div>
             </motion.div>
           </div>
