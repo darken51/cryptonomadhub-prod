@@ -764,46 +764,54 @@ export default function Home() {
                 emoji: '🌍',
                 title: 'Digital Nomads',
                 description: 'AI country scoring helps choose best location for taxes + quality of life',
-                highlight: '167 countries analyzed'
+                highlight: '167 countries analyzed',
+                href: '/solutions/nomads'
               },
               {
                 emoji: '🔄',
                 title: 'DeFi Traders',
                 description: 'Full Solana support + 50+ chains with protocol-level transaction detection',
-                highlight: 'Solana, Jupiter, Raydium'
+                highlight: 'Solana, Jupiter, Raydium',
+                href: '/solutions/traders'
               },
               {
                 emoji: '📊',
                 title: 'Multi-Chain Investors',
                 description: 'Consolidated portfolio tracking across Ethereum, L2s, Solana, and sidechains',
-                highlight: 'All chains in one view'
+                highlight: 'All chains in one view',
+                href: '/solutions/traders'
               },
               {
                 emoji: '💰',
                 title: 'Tax Optimizers',
                 description: 'Automated wash sale detection + tax-loss harvesting opportunities',
-                highlight: 'IRS Form 8949 export'
+                highlight: 'IRS Form 8949 export',
+                href: '/solutions/accountants'
               }
             ].map((useCase, index) => (
-              <motion.div
+              <Link
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 hover:border-violet-300 dark:hover:border-fuchsia-700 shadow-lg hover:shadow-xl transition-all"
+                href={useCase.href}
               >
-                <div className="text-4xl mb-3">{useCase.emoji}</div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
-                  {useCase.title}
-                </h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
-                  {useCase.description}
-                </p>
-                <div className="text-xs font-semibold text-violet-600 dark:text-fuchsia-400">
-                  {useCase.highlight}
-                </div>
-              </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700 hover:border-violet-300 dark:hover:border-fuchsia-700 shadow-lg hover:shadow-xl transition-all h-full group cursor-pointer"
+                >
+                  <div className="text-4xl mb-3">{useCase.emoji}</div>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-violet-600 dark:group-hover:text-fuchsia-400 transition-colors">
+                    {useCase.title}
+                  </h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+                    {useCase.description}
+                  </p>
+                  <div className="text-xs font-semibold text-violet-600 dark:text-fuchsia-400 flex items-center gap-1">
+                    {useCase.highlight} <ArrowRight className="w-3 h-3" />
+                  </div>
+                </motion.div>
+              </Link>
             ))}
           </div>
         </div>
@@ -923,6 +931,56 @@ export default function Home() {
                 <span className="font-medium">{badge.text}</span>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* RESOURCES SECTION */}
+      <section className="py-20 md:py-32 px-4 bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-950">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
+              Learn More About Crypto Taxes
+            </h2>
+            <p className="text-xl text-slate-600 dark:text-slate-400">
+              Expert guides, country comparisons, and tax strategies
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            <Link
+              href="/blog"
+              className="group relative bg-gradient-to-br from-violet-600 to-purple-600 rounded-2xl p-8 overflow-hidden hover:shadow-2xl transition-all"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+              <FileText className="w-12 h-12 text-white mb-4" />
+              <h3 className="text-2xl font-bold text-white mb-3">
+                Crypto Tax Blog
+              </h3>
+              <p className="text-white/90 mb-4">
+                12+ expert articles covering tax strategies, country comparisons, DeFi guides, and regulatory news. Updated weekly with latest crypto tax insights.
+              </p>
+              <div className="flex items-center text-white font-semibold group-hover:gap-3 transition-all">
+                Read Articles <ArrowRight className="w-5 h-5 ml-2 group-hover:ml-3 transition-all" />
+              </div>
+            </Link>
+
+            <Link
+              href="/docs"
+              className="group relative bg-gradient-to-br from-blue-600 to-cyan-600 rounded-2xl p-8 overflow-hidden hover:shadow-2xl transition-all"
+            >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+              <FileText className="w-12 h-12 text-white mb-4" />
+              <h3 className="text-2xl font-bold text-white mb-3">
+                Documentation & Tutorials
+              </h3>
+              <p className="text-white/90 mb-4">
+                Complete guides on AI country scoring, wallet connection, cost basis methods, DeFi audits, and wash sale detection. Step-by-step tutorials for all features.
+              </p>
+              <div className="flex items-center text-white font-semibold group-hover:gap-3 transition-all">
+                Explore Docs <ArrowRight className="w-5 h-5 ml-2 group-hover:ml-3 transition-all" />
+              </div>
+            </Link>
           </div>
         </div>
       </section>

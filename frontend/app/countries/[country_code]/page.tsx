@@ -260,14 +260,26 @@ export default function CountryDetailPage() {
         }}
       />
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Back Button */}
-        <Link
-          href="/countries"
-          className="inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 mb-6 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Countries
-        </Link>
+        {/* Breadcrumb Navigation */}
+        <nav className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 mb-6">
+          <Link
+            href="/"
+            className="hover:text-violet-600 dark:hover:text-violet-400 transition-colors"
+          >
+            Home
+          </Link>
+          <span>/</span>
+          <Link
+            href="/countries"
+            className="hover:text-violet-600 dark:hover:text-violet-400 transition-colors"
+          >
+            Countries
+          </Link>
+          <span>/</span>
+          <span className="text-slate-900 dark:text-white font-medium">
+            {country.country_name}
+          </span>
+        </nav>
 
         {/* Country Header */}
         <motion.div

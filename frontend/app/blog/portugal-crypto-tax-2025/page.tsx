@@ -254,6 +254,48 @@ export default function PortugalCryptoTaxBlogPost() {
                 Explore 167 Countries
               </Link>
             </div>
+
+            {/* Related Articles */}
+            <div className="mt-16 pt-8 border-t border-slate-200 dark:border-slate-700">
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Related Articles</h3>
+              <div className="grid md:grid-cols-3 gap-6">
+                <Link
+                  href="/blog/uae-vs-singapore-comparison"
+                  className="group p-6 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-violet-500 dark:hover:border-violet-500 transition-all hover:shadow-lg"
+                >
+                  <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-violet-600 dark:group-hover:text-violet-400">
+                    UAE vs Singapore: 0% Tax Comparison
+                  </h4>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    Compare two top 0% crypto tax destinations for digital nomads.
+                  </p>
+                </Link>
+
+                <Link
+                  href="/blog/best-crypto-countries-2025"
+                  className="group p-6 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-violet-500 dark:hover:border-violet-500 transition-all hover:shadow-lg"
+                >
+                  <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-violet-600 dark:group-hover:text-violet-400">
+                    Best Crypto Countries 2025
+                  </h4>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    AI-powered ranking of 167 countries for crypto tax optimization.
+                  </p>
+                </Link>
+
+                <Link
+                  href="/blog/cyprus-crypto-tax-eu"
+                  className="group p-6 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-violet-500 dark:hover:border-violet-500 transition-all hover:shadow-lg"
+                >
+                  <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-violet-600 dark:group-hover:text-violet-400">
+                    Cyprus: EU's Hidden 0% Tax Gem
+                  </h4>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    Another EU country with 0% long-term crypto gains tax.
+                  </p>
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </article>

@@ -367,6 +367,48 @@ export default function SolanaDeFiTaxesBlogPost() {
                 Audit Solana Wallet
               </Link>
             </div>
+
+            {/* Related Articles */}
+            <div className="mt-16 pt-8 border-t border-slate-200 dark:border-slate-700">
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Related Articles</h3>
+              <div className="grid md:grid-cols-3 gap-6">
+                <Link
+                  href="/blog/nft-taxes-guide"
+                  className="group p-6 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-violet-500 dark:hover:border-violet-500 transition-all hover:shadow-lg"
+                >
+                  <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-violet-600 dark:group-hover:text-violet-400">
+                    NFT Taxes: Complete Guide
+                  </h4>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    How to report NFT sales, royalties, and minting costs for tax purposes.
+                  </p>
+                </Link>
+
+                <Link
+                  href="/blog/fifo-lifo-hifo-comparison"
+                  className="group p-6 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-violet-500 dark:hover:border-violet-500 transition-all hover:shadow-lg"
+                >
+                  <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-violet-600 dark:group-hover:text-violet-400">
+                    FIFO vs LIFO vs HIFO
+                  </h4>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    Cost basis methods comparison - which saves the most tax?
+                  </p>
+                </Link>
+
+                <Link
+                  href="/blog/wash-sale-rule-crypto"
+                  className="group p-6 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-violet-500 dark:hover:border-violet-500 transition-all hover:shadow-lg"
+                >
+                  <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-violet-600 dark:group-hover:text-violet-400">
+                    Wash Sale Rule for Crypto
+                  </h4>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    Understanding the 30-day wash sale rule and how it applies to crypto.
+                  </p>
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </article>
