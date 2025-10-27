@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { AppHeader } from '@/components/AppHeader'
+import { PublicPageLayout } from '@/components/PublicPageLayout'
 import { CreditCard, ArrowRight, ExternalLink, Check, Info, MapPin, Shield } from 'lucide-react'
 
 interface CryptoCard {
@@ -168,20 +168,51 @@ export default function ToolsPage() {
   const [selectedCard, setSelectedCard] = useState<CryptoCard | null>(null)
 
   return (
-    <>
-      <AppHeader />
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <PublicPageLayout>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "Crypto Cards & Tools - Best Crypto Debit Cards 2025",
+            "description": "Compare the best crypto debit cards: RedotPay (5M+ users), Kast (10% rewards), and Ultimo (offshore banking). Virtual & physical Visa/Mastercard with USDT, USDC, BTC, ETH support. Global coverage with Apple Pay & Google Pay.",
+            "url": "https://cryptonomadhub.com/tools",
+            "mainEntity": {
+              "@type": "ItemList",
+              "itemListElement": [
+                {
+                  "@type": "FinancialProduct",
+                  "name": "RedotPay Crypto Card",
+                  "description": "Stablecoin-powered global payment platform with 5M+ users"
+                },
+                {
+                  "@type": "FinancialProduct",
+                  "name": "Kast Crypto Card",
+                  "description": "Global USD accounts with up to 10% crypto rewards"
+                },
+                {
+                  "@type": "FinancialProduct",
+                  "name": "Ultimo Crypto Card",
+                  "description": "Offshore banking with crypto-backed Platinum Visa"
+                }
+              ]
+            }
+          })
+        }}
+      />
+      <div className="bg-gray-50 dark:bg-gray-900 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Page Title */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4">
               <CreditCard className="w-8 h-8 text-blue-600" />
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                Crypto Tools & Cards
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
+                Best Crypto Debit Cards & Tools for Digital Nomads 2025
               </h1>
             </div>
-            <p className="text-lg text-gray-600 dark:text-gray-400">
-              After optimizing your crypto taxes, you'll need the right tools to spend and manage your crypto globally.
+            <p className="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-4xl">
+              Compare the best crypto cards with USDT, USDC, BTC, and ETH support. Virtual & physical Visa/Mastercard accepted at 150M+ merchants worldwide. Earn up to 10% rewards, Apple Pay support, and offshore banking options.
             </p>
           </div>
         {/* Affiliate Disclosure */}
@@ -542,6 +573,36 @@ export default function ToolsPage() {
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
+
+        {/* SEO Content Section */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-12">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            Why Digital Nomads Need Crypto Debit Cards
+          </h2>
+          <div className="prose dark:prose-invert max-w-none">
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              After optimizing your crypto taxes with our AI-powered platform, you'll need reliable tools to spend and manage your crypto globally.
+              Crypto debit cards bridge the gap between cryptocurrency and everyday spending, allowing you to use your BTC, ETH, USDT, and USDC
+              at millions of merchants worldwide.
+            </p>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 mt-6">
+              What to Look for in a Crypto Card
+            </h3>
+            <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 mb-4">
+              <li><strong>Global Acceptance:</strong> Visa or Mastercard network with 40M+ merchants</li>
+              <li><strong>Stablecoin Support:</strong> USDT and USDC for stable spending power</li>
+              <li><strong>Low Fees:</strong> Competitive loading, transaction, and withdrawal fees</li>
+              <li><strong>Rewards Programs:</strong> Cashback or rewards on card spend (up to 10%)</li>
+              <li><strong>Apple Pay & Google Pay:</strong> Contactless payment integration</li>
+              <li><strong>Offshore Banking:</strong> Privacy and asset protection for high-net-worth individuals</li>
+            </ul>
+            <p className="text-gray-700 dark:text-gray-300">
+              Our curated selection includes RedotPay (5M+ users, global coverage), Kast (167 countries, up to 10% rewards),
+              and Ultimo (offshore banking with Platinum Visa). All cards support major cryptocurrencies and offer instant virtual
+              card access with physical cards shipped worldwide.
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Detail Modal */}
@@ -676,7 +737,6 @@ export default function ToolsPage() {
           </div>
         </div>
       )}
-    </div>
-    </>
+    </PublicPageLayout>
   )
 }
