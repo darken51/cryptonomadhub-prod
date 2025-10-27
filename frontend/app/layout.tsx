@@ -51,10 +51,10 @@ export const metadata: Metadata = {
     description: 'AI analyzes crypto tax regulations in 167 countries. Find 0% tax jurisdictions, compare rates, and optimize your tax strategy as a digital nomad.',
     images: [
       {
-        url: '/og-image.png',
+        url: '/og-homepage.png',
         width: 1200,
         height: 630,
-        alt: 'CryptoNomadHub - 167 Countries Analyzed, 43 with 0% Crypto Tax',
+        alt: 'CryptoNomadHub - 167 Countries Analyzed, 43 with 0% Tax, $127k Avg Savings',
       }
     ],
   },
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'CryptoNomadHub - 167 Countries Crypto Tax Database',
     description: 'Find 0% crypto tax countries. AI-powered analysis of tax regulations across 167 jurisdictions.',
-    images: ['/og-image.png'],
+    images: ['/og-homepage.png'],
     creator: '@CryptoNomadHub',
   },
 

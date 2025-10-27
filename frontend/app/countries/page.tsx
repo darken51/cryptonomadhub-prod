@@ -23,13 +23,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: '167 Countries Crypto Tax Database | 43 with 0% Tax',
     description: 'Interactive world map of crypto tax rates. Find 0% tax countries, compare regulations, and see AI country scores.',
-    images: ['/og-image.png'],
+    images: ['/og-countries.png'],
   },
   twitter: {
     card: 'summary_large_image',
     title: '167 Countries Crypto Tax Database',
     description: 'Interactive map: 43 countries with 0% crypto tax. Compare UAE, Portugal, Singapore, and more.',
-    images: ['/og-image.png'],
+    images: ['/og-countries.png'],
   },
   alternates: {
     canonical: 'https://cryptonomadhub.io/countries',

@@ -1,0 +1,108 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <!-- Gradient Definitions -->
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#d946ef;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.95" />
+      <stop offset="100%" style="stop-color:#f8fafc;stop-opacity:0.95" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-opacity="0.2"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+
+  <!-- Decorative elements -->
+  <circle cx="100" cy="100" r="180" fill="#ffffff" opacity="0.08"/>
+  <circle cx="1100" cy="530" r="150" fill="#ffffff" opacity="0.08"/>
+  <circle cx="950" cy="150" r="100" fill="#ffffff" opacity="0.05"/>
+
+  <!-- Main card -->
+  <rect x="60" y="60" width="1080" height="510" rx="24" fill="url(#cardGrad)" filter="url(#shadow)"/>
+
+  <!-- Logo/Brand section -->
+  <rect x="80" y="80" width="8" height="80" rx="4" fill="#8b5cf6"/>
+  <text x="110" y="125" font-family="system-ui, -apple-system, sans-serif" font-size="56" font-weight="800" fill="#0f172a">
+    CryptoNomadHub
+  </text>
+  <text x="110" y="165" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#64748b" font-weight="500">
+    AI-Powered Crypto Tax Optimization Platform
+  </text>
+
+  <!-- Stats Grid -->
+  <!-- Stat 1 -->
+  <rect x="100" y="240" width="320" height="140" rx="16" fill="#f0fdf4" stroke="#10b981" stroke-width="2"/>
+  <text x="260" y="280" font-family="system-ui, -apple-system, sans-serif" font-size="48" font-weight="800" fill="#10b981" text-anchor="middle">
+    167
+  </text>
+  <text x="260" y="310" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#059669" text-anchor="middle" font-weight="600">
+    Countries Analyzed
+  </text>
+  <text x="260" y="335" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#6b7280" text-anchor="middle">
+    Most comprehensive database
+  </text>
+
+  <!-- Stat 2 -->
+  <rect x="440" y="240" width="320" height="140" rx="16" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <text x="600" y="280" font-family="system-ui, -apple-system, sans-serif" font-size="48" font-weight="800" fill="#f59e0b" text-anchor="middle">
+    43
+  </text>
+  <text x="600" y="310" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#d97706" text-anchor="middle" font-weight="600">
+    0% Tax Countries
+  </text>
+  <text x="600" y="335" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#6b7280" text-anchor="middle">
+    Pay zero legally
+  </text>
+
+  <!-- Stat 3 -->
+  <rect x="780" y="240" width="320" height="140" rx="16" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/>
+  <text x="940" y="280" font-family="system-ui, -apple-system, sans-serif" font-size="48" font-weight="800" fill="#8b5cf6" text-anchor="middle">
+    $127k
+  </text>
+  <text x="940" y="310" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#7c3aed" text-anchor="middle" font-weight="600">
+    Avg Tax Savings
+  </text>
+  <text x="940" y="335" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#6b7280" text-anchor="middle">
+    Per year by relocating
+  </text>
+
+  <!-- Features badges -->
+  <g transform="translate(100, 410)">
+    <rect width="200" height="40" rx="20" fill="#6366f1" opacity="0.1"/>
+    <text x="100" y="26" font-family="system-ui, -apple-system, sans-serif" font-size="16" fill="#6366f1" text-anchor="middle" font-weight="600">
+      🤖 AI Country Scoring
+    </text>
+  </g>
+
+  <g transform="translate(320, 410)">
+    <rect width="240" height="40" rx="20" fill="#10b981" opacity="0.1"/>
+    <text x="120" y="26" font-family="system-ui, -apple-system, sans-serif" font-size="16" fill="#10b981" text-anchor="middle" font-weight="600">
+      🌍 Multi-Country Compare
+    </text>
+  </g>
+
+  <g transform="translate(580, 410)">
+    <rect width="200" height="40" rx="20" fill="#8b5cf6" opacity="0.1"/>
+    <text x="100" y="26" font-family="system-ui, -apple-system, sans-serif" font-size="16" fill="#8b5cf6" text-anchor="middle" font-weight="600">
+      ⚡ Solana DeFi Support
+    </text>
+  </g>
+
+  <g transform="translate(800, 410)">
+    <rect width="200" height="40" rx="20" fill="#f59e0b" opacity="0.1"/>
+    <text x="100" y="26" font-family="system-ui, -apple-system, sans-serif" font-size="16" fill="#f59e0b" text-anchor="middle" font-weight="600">
+      📊 Form 8949 Export
+    </text>
+  </g>
+
+  <!-- Footer URL -->
+  <text x="600" y="540" font-family="system-ui, -apple-system, sans-serif" font-size="26" fill="#475569" text-anchor="middle" font-weight="600">
+    cryptonomadhub.io
+  </text>
+</svg>

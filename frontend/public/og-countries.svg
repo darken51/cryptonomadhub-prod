@@ -1,0 +1,111 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgCountries" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0ea5e9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6366f1;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="mapBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e293b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#334155;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgCountries)"/>
+
+  <!-- Main card -->
+  <rect x="50" y="50" width="1100" height="530" rx="24" fill="#ffffff" opacity="0.95"/>
+
+  <!-- Header -->
+  <text x="600" y="120" font-family="system-ui, -apple-system, sans-serif" font-size="52" font-weight="800" fill="#0f172a" text-anchor="middle">
+    167 Countries Tax Database
+  </text>
+  <text x="600" y="160" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#64748b" text-anchor="middle">
+    Interactive World Map • 43 Countries with 0% Crypto Tax
+  </text>
+
+  <!-- Map visualization (simplified world map grid) -->
+  <rect x="100" y="200" width="1000" height="300" rx="12" fill="url(#mapBg)"/>
+
+  <!-- Simulated country dots with color coding -->
+  <!-- Green (0% tax) dots -->
+  <g opacity="0.9">
+    <circle cx="250" cy="280" r="12" fill="#10b981" filter="url(#glow)"/>
+    <circle cx="320" cy="300" r="12" fill="#10b981" filter="url(#glow)"/>
+    <circle cx="450" cy="260" r="12" fill="#10b981" filter="url(#glow)"/>
+    <circle cx="520" cy="310" r="12" fill="#10b981" filter="url(#glow)"/>
+    <circle cx="680" cy="290" r="12" fill="#10b981" filter="url(#glow)"/>
+    <circle cx="750" cy="270" r="12" fill="#10b981" filter="url(#glow)"/>
+    <circle cx="850" cy="320" r="12" fill="#10b981" filter="url(#glow)"/>
+    <circle cx="920" cy="295" r="12" fill="#10b981" filter="url(#glow)"/>
+  </g>
+
+  <!-- Yellow/Orange (low tax) dots -->
+  <g opacity="0.9">
+    <circle cx="280" cy="320" r="10" fill="#f59e0b" filter="url(#glow)"/>
+    <circle cx="380" cy="340" r="10" fill="#f59e0b" filter="url(#glow)"/>
+    <circle cx="580" cy="360" r="10" fill="#f59e0b" filter="url(#glow)"/>
+    <circle cx="720" cy="350" r="10" fill="#f59e0b" filter="url(#glow)"/>
+    <circle cx="880" cy="370" r="10" fill="#f59e0b" filter="url(#glow)"/>
+  </g>
+
+  <!-- Red (high tax) dots -->
+  <g opacity="0.9">
+    <circle cx="350" cy="380" r="10" fill="#ef4444"/>
+    <circle cx="490" cy="400" r="10" fill="#ef4444"/>
+    <circle cx="650" cy="410" r="10" fill="#ef4444"/>
+    <circle cx="820" cy="420" r="10" fill="#ef4444"/>
+  </g>
+
+  <!-- Tooltip example -->
+  <rect x="180" y="220" width="160" height="90" rx="8" fill="#1e293b" opacity="0.95"/>
+  <text x="260" y="250" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#ffffff" text-anchor="middle" font-weight="700">
+    🇦🇪 UAE
+  </text>
+  <text x="260" y="275" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#10b981" text-anchor="middle" font-weight="600">
+    Tax: 0%
+  </text>
+  <text x="260" y="295" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#94a3b8" text-anchor="middle">
+    Legal • High Quality
+  </text>
+
+  <!-- Legend -->
+  <g transform="translate(140, 520)">
+    <circle cx="0" cy="0" r="8" fill="#10b981"/>
+    <text x="20" y="5" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#0f172a" font-weight="600">
+      0% Tax (43 countries)
+    </text>
+  </g>
+
+  <g transform="translate(380, 520)">
+    <circle cx="0" cy="0" r="8" fill="#f59e0b"/>
+    <text x="20" y="5" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#0f172a" font-weight="600">
+      Low Tax (&lt;10%)
+    </text>
+  </g>
+
+  <g transform="translate(580, 520)">
+    <circle cx="0" cy="0" r="8" fill="#ef4444"/>
+    <text x="20" y="5" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#0f172a" font-weight="600">
+      High Tax (20%+)
+    </text>
+  </g>
+
+  <g transform="translate(760, 520)">
+    <text x="0" y="5" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#6366f1" font-weight="700">
+      🤖 AI-Powered Country Scores
+    </text>
+  </g>
+
+  <!-- URL -->
+  <text x="600" y="565" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#64748b" text-anchor="middle" font-weight="600">
+    cryptonomadhub.io/countries
+  </text>
+</svg>

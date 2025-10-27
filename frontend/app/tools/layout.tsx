@@ -20,13 +20,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Best Crypto Debit Cards 2025 | RedotPay, Kast, Ultimo',
     description: 'Compare crypto cards with USDT/USDC support. Up to 10% rewards, global coverage, offshore banking options.',
-    images: ['/og-image.png'],
+    images: ['/og-tools.png'],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Best Crypto Debit Cards 2025',
     description: 'RedotPay (5M users) • Kast (10% rewards) • Ultimo (offshore) • Global USDT/USDC Visa/Mastercard',
-    images: ['/og-image.png'],
+    images: ['/og-tools.png'],
   },
   alternates: {
     canonical: 'https://cryptonomadhub.io/tools',

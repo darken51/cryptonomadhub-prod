@@ -1,0 +1,150 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgTools" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#6366f1;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="card1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#dc2626;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="card2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2563eb;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="card3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+    </linearGradient>
+    <filter id="cardShadow">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgTools)"/>
+
+  <!-- Decorative circles -->
+  <circle cx="150" cy="100" r="120" fill="#ffffff" opacity="0.05"/>
+  <circle cx="1050" cy="530" r="100" fill="#ffffff" opacity="0.05"/>
+
+  <!-- Main card -->
+  <rect x="50" y="50" width="1100" height="530" rx="24" fill="#ffffff" opacity="0.97"/>
+
+  <!-- Header -->
+  <text x="600" y="115" font-family="system-ui, -apple-system, sans-serif" font-size="50" font-weight="800" fill="#0f172a" text-anchor="middle">
+    Best Crypto Debit Cards 2025
+  </text>
+  <text x="600" y="155" font-family="system-ui, -apple-system, sans-serif" font-size="22" fill="#64748b" text-anchor="middle">
+    USDT/USDC • Virtual & Physical Visa/Mastercard • Global Coverage
+  </text>
+
+  <!-- Card 1: RedotPay -->
+  <g transform="translate(100, 200)">
+    <rect width="300" height="180" rx="16" fill="url(#card1)" filter="url(#cardShadow)"/>
+
+    <!-- Card chip -->
+    <rect x="25" y="25" width="50" height="40" rx="6" fill="#fbbf24" opacity="0.9"/>
+    <rect x="28" y="28" width="44" height="34" rx="4" fill="#f59e0b" opacity="0.5"/>
+
+    <!-- Card brand -->
+    <text x="250" y="45" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#ffffff" text-anchor="end" font-weight="700">
+      MASTERCARD
+    </text>
+
+    <!-- Card name -->
+    <text x="25" y="130" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#ffffff" font-weight="700">
+      RedotPay
+    </text>
+    <text x="25" y="155" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#fecaca">
+      5M+ users • Global
+    </text>
+  </g>
+
+  <!-- Card 2: Kast -->
+  <g transform="translate(450, 200)">
+    <rect width="300" height="180" rx="16" fill="url(#card2)" filter="url(#cardShadow)"/>
+
+    <!-- Card chip -->
+    <rect x="25" y="25" width="50" height="40" rx="6" fill="#fbbf24" opacity="0.9"/>
+    <rect x="28" y="28" width="44" height="34" rx="4" fill="#f59e0b" opacity="0.5"/>
+
+    <!-- Card brand -->
+    <text x="250" y="45" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#ffffff" text-anchor="end" font-weight="700">
+      VISA
+    </text>
+
+    <!-- Card name -->
+    <text x="25" y="130" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#ffffff" font-weight="700">
+      Kast
+    </text>
+    <text x="25" y="155" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#bfdbfe">
+      Up to 10% rewards
+    </text>
+  </g>
+
+  <!-- Card 3: Ultimo -->
+  <g transform="translate(800, 200)">
+    <rect width="300" height="180" rx="16" fill="url(#card3)" filter="url(#cardShadow)"/>
+
+    <!-- Card chip -->
+    <rect x="25" y="25" width="50" height="40" rx="6" fill="#fbbf24" opacity="0.9"/>
+    <rect x="28" y="28" width="44" height="34" rx="4" fill="#f59e0b" opacity="0.5"/>
+
+    <!-- Card brand -->
+    <text x="250" y="45" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#ffffff" text-anchor="end" font-weight="700">
+      VISA PLATINUM
+    </text>
+
+    <!-- Card name -->
+    <text x="25" y="130" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#ffffff" font-weight="700">
+      Ultimo
+    </text>
+    <text x="25" y="155" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#ddd6fe">
+      Offshore banking
+    </text>
+  </g>
+
+  <!-- Features grid -->
+  <g transform="translate(100, 420)">
+    <rect width="230" height="50" rx="12" fill="#dbeafe"/>
+    <text x="115" y="32" font-family="system-ui, -apple-system, sans-serif" font-size="16" fill="#1e40af" text-anchor="middle" font-weight="600">
+      💳 USDT/USDC Support
+    </text>
+  </g>
+
+  <g transform="translate(350, 420)">
+    <rect width="200" height="50" rx="12" fill="#fef3c7"/>
+    <text x="100" y="32" font-family="system-ui, -apple-system, sans-serif" font-size="16" fill="#92400e" text-anchor="middle" font-weight="600">
+      🌍 167 Countries
+    </text>
+  </g>
+
+  <g transform="translate(570, 420)">
+    <rect width="220" height="50" rx="12" fill="#fce7f3"/>
+    <text x="110" y="32" font-family="system-ui, -apple-system, sans-serif" font-size="16" fill="#9f1239" text-anchor="middle" font-weight="600">
+      📱 Apple/Google Pay
+    </text>
+  </g>
+
+  <g transform="translate(810, 420)">
+    <rect width="190" height="50" rx="12" fill="#f0fdf4"/>
+    <text x="95" y="32" font-family="system-ui, -apple-system, sans-serif" font-size="16" fill="#166534" text-anchor="middle" font-weight="600">
+      🎁 Rewards
+    </text>
+  </g>
+
+  <!-- Bonus feature -->
+  <g transform="translate(100, 490)">
+    <rect width="1000" height="40" rx="20" fill="#ede9fe"/>
+    <text x="500" y="26" font-family="system-ui, -apple-system, sans-serif" font-size="16" fill="#6d28d9" text-anchor="middle" font-weight="700">
+      🏝️ + Palau Digital Residency for KYC • Official Government ID Card
+    </text>
+  </g>
+
+  <!-- URL -->
+  <text x="600" y="560" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#64748b" text-anchor="middle" font-weight="600">
+    cryptonomadhub.io/tools
+  </text>
+</svg>

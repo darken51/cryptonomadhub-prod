@@ -1,0 +1,133 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgBlog" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7c3aed;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#c026d3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#db2777;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="articleBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#faf5ff;stop-opacity:1" />
+    </linearGradient>
+    <filter id="textShadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgBlog)"/>
+
+  <!-- Decorative -->
+  <circle cx="150" cy="120" r="140" fill="#ffffff" opacity="0.06"/>
+  <circle cx="1050" cy="510" r="120" fill="#ffffff" opacity="0.06"/>
+
+  <!-- Main article card -->
+  <rect x="60" y="60" width="1080" height="510" rx="24" fill="url(#articleBg)" filter="url(#textShadow)"/>
+
+  <!-- Blog header badge -->
+  <rect x="90" y="90" width="180" height="36" rx="18" fill="#a855f7" opacity="0.2"/>
+  <text x="180" y="113" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#7c3aed" text-anchor="middle" font-weight="700">
+    📚 CRYPTO TAX BLOG
+  </text>
+
+  <!-- Article Title (placeholder - can be customized) -->
+  <text x="600" y="180" font-family="system-ui, -apple-system, sans-serif" font-size="48" font-weight="800" fill="#0f172a" text-anchor="middle">
+    Crypto Tax Insights
+  </text>
+  <text x="600" y="230" font-family="system-ui, -apple-system, sans-serif" font-size="28" fill="#64748b" text-anchor="middle" font-weight="600">
+    Expert Guides for Digital Nomads
+  </text>
+
+  <!-- Featured categories -->
+  <g transform="translate(120, 290)">
+    <rect width="220" height="60" rx="12" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+    <text x="110" y="25" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#92400e" text-anchor="middle" font-weight="600">
+      TAX STRATEGY
+    </text>
+    <text x="110" y="45" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#b45309" text-anchor="middle">
+      Loss harvesting • FIFO
+    </text>
+  </g>
+
+  <g transform="translate(360, 290)">
+    <rect width="220" height="60" rx="12" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+    <text x="110" y="25" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#1e40af" text-anchor="middle" font-weight="600">
+      COUNTRY GUIDES
+    </text>
+    <text x="110" y="45" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#2563eb" text-anchor="middle">
+      Portugal • UAE • Singapore
+    </text>
+  </g>
+
+  <g transform="translate(600, 290)">
+    <rect width="220" height="60" rx="12" fill="#f0fdf4" stroke="#10b981" stroke-width="2"/>
+    <text x="110" y="25" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#166534" text-anchor="middle" font-weight="600">
+      DEFI TAXES
+    </text>
+    <text x="110" y="45" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#059669" text-anchor="middle">
+      Solana • Jupiter • Raydium
+    </text>
+  </g>
+
+  <g transform="translate(840, 290)">
+    <rect width="220" height="60" rx="12" fill="#fce7f3" stroke="#ec4899" stroke-width="2"/>
+    <text x="110" y="25" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#9f1239" text-anchor="middle" font-weight="600">
+      TAX NEWS
+    </text>
+    <text x="110" y="45" font-family="system-ui, -apple-system, sans-serif" font-size="12" fill="#be185d" text-anchor="middle">
+      Regulatory updates
+    </text>
+  </g>
+
+  <!-- Stats row -->
+  <g transform="translate(120, 390)">
+    <rect width="960" height="80" rx="16" fill="#fafafa" stroke="#e2e8f0" stroke-width="1"/>
+
+    <g transform="translate(60, 0)">
+      <text x="0" y="32" font-family="system-ui, -apple-system, sans-serif" font-size="28" fill="#7c3aed" font-weight="800">
+        12+
+      </text>
+      <text x="0" y="56" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#64748b">
+        Expert Articles
+      </text>
+    </g>
+
+    <g transform="translate(280, 0)">
+      <text x="0" y="32" font-family="system-ui, -apple-system, sans-serif" font-size="28" fill="#7c3aed" font-weight="800">
+        167
+      </text>
+      <text x="0" y="56" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#64748b">
+        Countries Covered
+      </text>
+    </g>
+
+    <g transform="translate(500, 0)">
+      <text x="0" y="32" font-family="system-ui, -apple-system, sans-serif" font-size="28" fill="#7c3aed" font-weight="800">
+        Weekly
+      </text>
+      <text x="0" y="56" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#64748b">
+        New Content
+      </text>
+    </g>
+
+    <g transform="translate(720, 0)">
+      <text x="0" y="32" font-family="system-ui, -apple-system, sans-serif" font-size="28" fill="#7c3aed" font-weight="800">
+        15k+
+      </text>
+      <text x="0" y="56" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="#64748b">
+        Newsletter Subscribers
+      </text>
+    </g>
+  </g>
+
+  <!-- Footer badge -->
+  <rect x="300" y="500" width="600" height="50" rx="25" fill="#7c3aed" opacity="0.1"/>
+  <text x="600" y="530" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#7c3aed" text-anchor="middle" font-weight="700">
+    🤖 AI-Powered Tax Analysis • Official Government Sources
+  </text>
+
+  <!-- URL -->
+  <text x="600" y="560" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#64748b" text-anchor="middle" font-weight="600">
+    cryptonomadhub.io/blog
+  </text>
+</svg>

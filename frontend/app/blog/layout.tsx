@@ -18,13 +18,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Crypto Tax Blog | Expert Guides for Digital Nomads',
     description: 'Tax strategies, country comparisons, DeFi guides, and the latest crypto tax news.',
-    images: ['/og-image.png'],
+    images: ['/og-blog.png'],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'CryptoNomadHub Blog',
     description: 'Expert crypto tax guides • Country comparisons • DeFi strategies • Regulatory news',
-    images: ['/og-image.png'],
+    images: ['/og-blog.png'],
   },
   alternates: {
     canonical: 'https://cryptonomadhub.io/blog',

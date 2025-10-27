@@ -15,13 +15,13 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Pricing | Crypto Tax Optimization Plans from $0',
     description: 'Free plan available. Paid plans from $20/month with AI chat, DeFi audits, and unlimited tax simulations.',
-    images: ['/og-image.png'],
+    images: ['/og-homepage.png'],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'CryptoNomadHub Pricing',
     description: 'Free: 5 sims/month • Starter $20: 50 sims • Pro $50: 500 sims • Enterprise: Unlimited',
-    images: ['/og-image.png'],
+    images: ['/og-homepage.png'],
   },
   alternates: {
     canonical: 'https://cryptonomadhub.io/pricing',
