@@ -64,6 +64,9 @@ export function Footer() {
               <Link href="/privacy" className="hover:text-violet-600 dark:hover:text-fuchsia-400 transition-colors">
                 Privacy
               </Link>
+              <Link href="/legal" className="hover:text-violet-600 dark:hover:text-fuchsia-400 transition-colors">
+                Legal
+              </Link>
               <a href="mailto:support@cryptonomadhub.io" className="hover:text-violet-600 dark:hover:text-fuchsia-400 transition-colors">
                 Contact Support
               </a>

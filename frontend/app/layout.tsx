@@ -5,6 +5,7 @@ import { AuthProvider } from '@/components/providers/AuthProvider'
 import { ToastProvider } from '@/components/providers/ToastProvider'
 import SkipToContent from '@/components/SkipToContent'
 import ErrorBoundary from '@/components/ErrorBoundary'
+import { CookieConsent } from '@/components/CookieConsent'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -111,6 +112,8 @@ export default function RootLayout({
             </ToastProvider>
           </AuthProvider>
         </ErrorBoundary>
+        {/* ✅ GDPR Cookie Consent Banner */}
+        <CookieConsent />
       </body>
     </html>
   )
