@@ -1,6 +1,9 @@
 import { PublicPageLayout } from '@/components/PublicPageLayout'
 import CountriesClient from './CountriesClient'
 
+// Force dynamic rendering to ensure API is called at request time, not build time
+export const dynamic = 'force-dynamic'
+
 interface AIAnalysis {
   crypto_score: number
   nomad_score: number
@@ -59,19 +62,23 @@ async function getCountries(): Promise<Country[]> {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
     const url = `${apiUrl}/regulations/?reliable_only=true&include_analysis=true`
 
+    console.log('[SSR] Fetching countries from:', url)
+
     const response = await fetch(url, {
-      next: { revalidate: 3600 } // Revalidate every hour
+      cache: 'no-store' // Always fetch fresh data for SSR
     })
 
     if (!response.ok) {
-      console.error('Failed to fetch countries:', response.statusText)
-      return []
+      console.error('[SSR] Failed to fetch countries:', response.status, response.statusText)
+      throw new Error(`API returned ${response.status}`)
     }
 
     const data = await response.json()
+    console.log('[SSR] Successfully fetched', data.length, 'countries')
     return data.sort((a: Country, b: Country) => a.country_name.localeCompare(b.country_name))
   } catch (error) {
-    console.error('Error fetching countries:', error)
+    console.error('[SSR] Error fetching countries:', error)
+    // Return empty array but log the error clearly
     return []
   }
 }

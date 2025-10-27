@@ -72,7 +72,7 @@ export default function CountriesClient({ initialCountries }: CountriesClientPro
   const [filterType, setFilterType] = useState<'all' | 'crypto-friendly' | 'has-crypto-data'>('all')
   const [reliableOnly, setReliableOnly] = useState(true)
   const [hideBannedCountries, setHideBannedCountries] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(initialCountries.length === 0)
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
@@ -132,6 +132,41 @@ export default function CountriesClient({ initialCountries }: CountriesClientPro
   useEffect(() => {
     filterCountries()
   }, [filterCountries])
+
+  // Fallback: fetch client-side if SSR data is empty
+  useEffect(() => {
+    if (initialCountries.length === 0) {
+      const fetchCountries = async () => {
+        try {
+          setIsLoading(true)
+          console.log('[Client] SSR data empty, fetching countries client-side...')
+
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+          const response = await fetch(`${apiUrl}/regulations/?reliable_only=true&include_analysis=true`)
+
+          if (!response.ok) {
+            throw new Error(`API returned ${response.status}`)
+          }
+
+          const data = await response.json()
+          console.log('[Client] Successfully fetched', data.length, 'countries')
+
+          const sortedData = data.sort((a: Country, b: Country) =>
+            a.country_name.localeCompare(b.country_name)
+          )
+
+          setCountries(sortedData)
+          setFilteredCountries(sortedData)
+        } catch (error) {
+          console.error('[Client] Error fetching countries:', error)
+        } finally {
+          setIsLoading(false)
+        }
+      }
+
+      fetchCountries()
+    }
+  }, [initialCountries.length])
 
   const getCryptoBannedBadge = (country: Country) => {
     if (!isCryptoBanned(country)) return null
