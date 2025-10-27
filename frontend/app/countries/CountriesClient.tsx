@@ -347,7 +347,17 @@ export default function CountriesClient({ initialCountries }: CountriesClientPro
                   <>
                     <div className="bg-gradient-to-br from-violet-50 to-fuchsia-50 dark:from-violet-900/20 dark:to-fuchsia-900/20 rounded-lg p-4">
                       <p className="text-xs font-medium text-violet-700 dark:text-violet-300 mb-1">Crypto Short-Term</p>
-                      <p className="text-2xl font-bold text-violet-900 dark:text-violet-200">{country.crypto_short_rate}%</p>
+                      <div className="flex items-baseline gap-2">
+                        <p className="text-2xl font-bold text-violet-900 dark:text-violet-200">{country.crypto_short_rate}%</p>
+                        {country.crypto_short_rate === 0 && (
+                          <Link
+                            href={`/countries/${country.country_code.toLowerCase()}`}
+                            className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                          >
+                            *Conditions apply
+                          </Link>
+                        )}
+                      </div>
                       {country.holding_period_months && (
                         <p className="text-xs text-violet-600 dark:text-violet-400 mt-1">
                           &lt; {country.holding_period_months} months
@@ -356,9 +366,19 @@ export default function CountriesClient({ initialCountries }: CountriesClientPro
                     </div>
                     <div className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-lg p-4">
                       <p className="text-xs font-medium text-emerald-700 dark:text-emerald-300 mb-1">Crypto Long-Term</p>
-                      <p className="text-2xl font-bold text-emerald-900 dark:text-emerald-200">
-                        {country.crypto_long_rate ?? country.crypto_short_rate}%
-                      </p>
+                      <div className="flex items-baseline gap-2">
+                        <p className="text-2xl font-bold text-emerald-900 dark:text-emerald-200">
+                          {country.crypto_long_rate ?? country.crypto_short_rate}%
+                        </p>
+                        {(country.crypto_long_rate === 0 || country.crypto_short_rate === 0) && (
+                          <Link
+                            href={`/countries/${country.country_code.toLowerCase()}`}
+                            className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                          >
+                            *Conditions apply
+                          </Link>
+                        )}
+                      </div>
                       {country.holding_period_months && (
                         <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1">
                           ≥ {country.holding_period_months} months
@@ -370,11 +390,31 @@ export default function CountriesClient({ initialCountries }: CountriesClientPro
                   <>
                     <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4">
                       <p className="text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">General CGT Short-Term</p>
-                      <p className="text-2xl font-bold text-slate-900 dark:text-slate-200">{country.cgt_short_rate}%</p>
+                      <div className="flex items-baseline gap-2">
+                        <p className="text-2xl font-bold text-slate-900 dark:text-slate-200">{country.cgt_short_rate}%</p>
+                        {country.cgt_short_rate === 0 && (
+                          <Link
+                            href={`/countries/${country.country_code.toLowerCase()}`}
+                            className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                          >
+                            *Conditions apply
+                          </Link>
+                        )}
+                      </div>
                     </div>
                     <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4">
                       <p className="text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">General CGT Long-Term</p>
-                      <p className="text-2xl font-bold text-slate-900 dark:text-slate-200">{country.cgt_long_rate}%</p>
+                      <div className="flex items-baseline gap-2">
+                        <p className="text-2xl font-bold text-slate-900 dark:text-slate-200">{country.cgt_long_rate}%</p>
+                        {country.cgt_long_rate === 0 && (
+                          <Link
+                            href={`/countries/${country.country_code.toLowerCase()}`}
+                            className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                          >
+                            *Conditions apply
+                          </Link>
+                        )}
+                      </div>
                     </div>
                   </>
                 )}

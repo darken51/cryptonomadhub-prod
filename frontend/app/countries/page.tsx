@@ -79,6 +79,25 @@ async function getCountries(): Promise<Country[]> {
 export default async function CountriesPage() {
   const countries = await getCountries()
 
+  // Top 15 crypto-friendly countries for ItemList
+  const top15Countries = [
+    { code: 'AE', name: 'United Arab Emirates', rate: '0%', flag: '🇦🇪' },
+    { code: 'PT', name: 'Portugal', rate: '0%', flag: '🇵🇹' },
+    { code: 'SG', name: 'Singapore', rate: '0%', flag: '🇸🇬' },
+    { code: 'DE', name: 'Germany', rate: '0%*', flag: '🇩🇪' },
+    { code: 'CH', name: 'Switzerland', rate: '0%*', flag: '🇨🇭' },
+    { code: 'MY', name: 'Malaysia', rate: '0%', flag: '🇲🇾' },
+    { code: 'MT', name: 'Malta', rate: '0%', flag: '🇲🇹' },
+    { code: 'BH', name: 'Bahrain', rate: '0%', flag: '🇧🇭' },
+    { code: 'BM', name: 'Bermuda', rate: '0%', flag: '🇧🇲' },
+    { code: 'KY', name: 'Cayman Islands', rate: '0%', flag: '🇰🇾' },
+    { code: 'HK', name: 'Hong Kong', rate: '0%', flag: '🇭🇰' },
+    { code: 'PR', name: 'Puerto Rico', rate: '0-4%', flag: '🇵🇷' },
+    { code: 'GI', name: 'Gibraltar', rate: '0%', flag: '🇬🇮' },
+    { code: 'EE', name: 'Estonia', rate: '0-20%', flag: '🇪🇪' },
+    { code: 'SI', name: 'Slovenia', rate: '0%*', flag: '🇸🇮' }
+  ]
+
   return (
     <PublicPageLayout contentClassName="bg-slate-50 dark:bg-slate-900 py-4 sm:py-8">
       <script
@@ -89,23 +108,45 @@ export default async function CountriesPage() {
             "@type": "Dataset",
             "name": "Crypto Tax Rates by Country",
             "description": "Comprehensive database of cryptocurrency taxation rates across 167 countries, including capital gains tax, crypto-specific regulations, and legal status.",
-            "url": "https://cryptonomadhub.com/countries",
+            "url": "https://cryptonomadhub.io/countries",
             "keywords": ["crypto tax", "cryptocurrency taxation", "capital gains tax", "bitcoin tax", "ethereum tax", "international tax rates"],
             "creator": {
               "@type": "Organization",
               "name": "CryptoNomadHub",
-              "url": "https://cryptonomadhub.com"
+              "url": "https://cryptonomadhub.io"
             },
             "distribution": {
               "@type": "DataDownload",
               "encodingFormat": "application/json",
-              "contentUrl": "https://cryptonomadhub.com/countries"
+              "contentUrl": "https://cryptonomadhub.io/countries"
             },
             "temporalCoverage": "2024/2025",
             "spatialCoverage": {
               "@type": "Place",
               "name": "Worldwide"
             }
+          })
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "name": "Top 15 Crypto-Friendly Countries - 0% Tax Jurisdictions",
+            "description": "Best countries for cryptocurrency investors with 0% or minimal capital gains tax on crypto.",
+            "numberOfItems": 15,
+            "itemListElement": top15Countries.map((country, index) => ({
+              "@type": "ListItem",
+              "position": index + 1,
+              "item": {
+                "@type": "Place",
+                "name": `${country.flag} ${country.name}`,
+                "description": `Crypto tax rate: ${country.rate}`,
+                "url": `https://cryptonomadhub.io/countries/${country.code.toLowerCase()}`
+              }
+            }))
           })
         }}
       />

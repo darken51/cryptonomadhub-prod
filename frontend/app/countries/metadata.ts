@@ -1,8 +1,8 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: '167 Countries Crypto Tax Rates & Regulations 2025 | CryptoNomadHub',
-  description: 'Compare crypto tax rates across 167 countries worldwide. Interactive world map, AI country scoring, verified data from OECD, PwC, KPMG. Find 0% tax countries like Portugal, UAE, Singapore. Updated daily with capital gains tax rates and crypto-specific regulations.',
+  title: '167 Countries Crypto Tax Rates 2025 - 0% Tax Guide | CryptoNomadHub',
+  description: 'Compare crypto tax rates: 167 countries with short/long-term CGT, staking, DeFi. Find 0% tax jurisdictions (UAE, Portugal, Singapore). Updated daily with verified data from OECD, PwC, KPMG.',
   keywords: [
     'crypto tax rates by country',
     'cryptocurrency taxation',
@@ -24,13 +24,13 @@ export const metadata: Metadata = {
     'tax residency crypto',
   ],
   openGraph: {
-    title: '167 Countries Crypto Tax Rates - Interactive World Map',
+    title: '167 Countries Crypto Tax Rates 2025 - 0% Tax Guide',
     description: 'Compare crypto tax rates worldwide. 0% tax in Portugal, UAE, Singapore. Interactive map with AI scoring. Updated daily with verified data.',
-    url: 'https://cryptonomadhub.com/countries',
+    url: 'https://cryptonomadhub.io/countries',
     type: 'website',
     images: [
       {
-        url: 'https://cryptonomadhub.com/og-countries-map.png',
+        url: 'https://cryptonomadhub.io/og-countries-map.png',
         width: 1200,
         height: 630,
         alt: 'World Crypto Tax Map - 167 Countries',
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     description: 'Interactive world map showing crypto tax rates. Find 0% tax countries and optimize your crypto taxes.',
   },
   alternates: {
-    canonical: 'https://cryptonomadhub.com/countries',
+    canonical: 'https://cryptonomadhub.io/countries',
   },
   robots: {
     index: true,
