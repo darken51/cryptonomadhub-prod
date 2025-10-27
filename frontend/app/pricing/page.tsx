@@ -72,7 +72,7 @@ export default function Pricing() {
         { text: 'Priority support', included: true },
       ],
       cta: 'Contact Sales',
-      href: 'mailto:contact@cryptonomadhub.io',
+      href: 'mailto:support@cryptonomadhub.io',
       dark: true,
     },
   ]

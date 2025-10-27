@@ -133,7 +133,7 @@ export default function HelpPage() {
         },
         {
           question: 'Do you offer enterprise solutions?',
-          answer: 'Yes! Contact our sales team at contact@cryptonomadhub.io for custom enterprise pricing, dedicated support, and integration options.'
+          answer: 'Yes! Contact our sales team at support@cryptonomadhub.io for custom enterprise pricing, dedicated support, and integration options.'
         }
       ]
     },
@@ -224,7 +224,7 @@ export default function HelpPage() {
                 description: 'Get help via email within 24h',
                 action: 'Send Email',
                 gradient: 'from-blue-500 to-cyan-600',
-                href: 'mailto:contact@cryptonomadhub.io'
+                href: 'mailto:support@cryptonomadhub.io'
               },
               {
                 icon: BookOpen,
@@ -354,7 +354,7 @@ export default function HelpPage() {
 
           <div className="flex justify-center">
             <Link
-              href="mailto:contact@cryptonomadhub.io"
+              href="mailto:support@cryptonomadhub.io"
               className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold text-cyan-600 bg-white hover:bg-slate-50 rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all"
             >
               <Mail className="w-5 h-5 mr-2" />
