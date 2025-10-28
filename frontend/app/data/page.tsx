@@ -1,4 +1,4 @@
-import PublicPageLayout from '@/components/PublicPageLayout'
+import { PublicPageLayout } from '@/components/PublicPageLayout'
 import { Database, Download, Code, FileJson, Calendar, Shield } from 'lucide-react'
 
 interface Country {
