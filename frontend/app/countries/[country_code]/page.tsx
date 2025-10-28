@@ -76,24 +76,6 @@ export default function CountryDetailPage() {
     }
   }, [country_code])
 
-  // Update document title with country-specific info
-  useEffect(() => {
-    if (country) {
-      const cryptoRate = country.crypto_short_rate !== null && country.crypto_short_rate !== undefined
-        ? `${country.crypto_short_rate}%`
-        : `${country.cgt_short_rate}%`
-
-      let titleSuffix = ''
-      if (country.crypto_short_rate === 0 || (country.crypto_short_rate === null && country.cgt_short_rate === 0)) {
-        titleSuffix = ' - 0% Tax Guide'
-      } else if (country.holding_period_months) {
-        titleSuffix = ` - ${country.holding_period_months}m Holding Period`
-      }
-
-      document.title = `${country.country_name} Crypto Tax 2025${titleSuffix} | CryptoNomadHub`
-    }
-  }, [country])
-
   const fetchCountryData = async () => {
     try {
       setIsLoading(true)
