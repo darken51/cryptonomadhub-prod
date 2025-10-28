@@ -272,6 +272,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ]
 
+  // Data pages (for AI crawlers and open data)
+  const dataPages: MetadataRoute.Sitemap = [
+    {
+      url: `${baseUrl}/data`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/tax-data.json`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.7,
+    },
+  ]
+
   // Legal & Help pages
   const legalPages: MetadataRoute.Sitemap = [
     {
@@ -308,5 +324,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
-  return [...staticPages, ...blogPages, ...solutionPages, ...featurePages, ...docPages, ...legalPages, ...countryPages]
+  return [...staticPages, ...blogPages, ...solutionPages, ...featurePages, ...docPages, ...dataPages, ...legalPages, ...countryPages]
 }
