@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowLeft, ExternalLink, Calendar, AlertCircle, CheckCircle2, XCircle, TrendingDown, Info } from 'lucide-react'
 import CountryScoreCard from '@/components/CountryScoreCard'
+import CountryFAQ from '@/components/CountryFAQ'
 
 interface AIAnalysis {
   crypto_score: number
@@ -549,12 +550,56 @@ export default function CountryDetailPage() {
           </motion.div>
         )}
 
-        {/* CTA to Tools */}
+        {/* FAQs Section */}
         <motion.div
           className="mt-12"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
+        >
+          <CountryFAQ country={country} />
+        </motion.div>
+
+        {/* Data Sources & Disclaimer */}
+        <motion.div
+          className="mt-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+        >
+          <div className="bg-slate-100 dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+              <Info className="w-4 h-4" />
+              Data Sources & Methodology
+            </h3>
+            <div className="text-sm text-slate-600 dark:text-slate-400 space-y-2">
+              <p>
+                <strong>Sources:</strong> Official government tax authorities ({country.country_name} tax agency),
+                OECD Tax Database, PwC Tax Summaries, Deloitte International Tax Guides, and verified legal documentation.
+              </p>
+              <p>
+                <strong>AI Analysis:</strong> Powered by Claude (Anthropic) and trained on official tax documentation,
+                government publications, and international tax treaties. Analysis confidence: {country.ai_analysis ? `${Math.round(country.ai_analysis.confidence * 100)}%` : 'N/A'}.
+              </p>
+              <p>
+                <strong>Last Updated:</strong> {country.updated_at ? formatDate(country.updated_at) : 'October 2025'} •
+                Data refreshed monthly with regulatory changes
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-500 pt-2 border-t border-slate-300 dark:border-slate-600">
+                <strong>Disclaimer:</strong> This information is for educational purposes only and does not constitute
+                financial, tax, or legal advice. Tax laws change frequently. Always consult with a qualified tax
+                professional in {country.country_name} for advice specific to your situation.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* CTA to Tools */}
+        <motion.div
+          className="mt-8"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
         >
           <Link href="/tools">
             <div className="bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-xl p-[2px] hover:shadow-lg transition-shadow">
