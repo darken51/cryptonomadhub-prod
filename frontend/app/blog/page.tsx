@@ -146,7 +146,7 @@ export default function BlogPage() {
     : blogPosts.filter(post => post.category === selectedCategory)
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-slate-950">
+    <PublicPageLayout>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -160,7 +160,7 @@ export default function BlogPage() {
         }}
       />
       {/* Hero */}
-      <section className="relative bg-gradient-to-b from-violet-50 via-purple-50 to-white dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 pt-20 pb-24 md:pt-32 md:pb-32 px-4">
+      <section className="relative bg-gradient-to-b from-violet-50 via-purple-50 to-white dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 pt-12 pb-24 md:pt-20 md:pb-32 px-4">
         <div className="max-w-7xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-100 dark:bg-purple-900/30 text-violet-700 dark:text-purple-300 text-sm font-bold mb-6">
@@ -316,6 +316,7 @@ export default function BlogPage() {
             </p>
           </div>
         </div>
-      </section>    </div>
+      </section>
+    </PublicPageLayout>
   )
 }
