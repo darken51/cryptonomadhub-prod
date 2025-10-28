@@ -46,7 +46,7 @@ export default function Pricing() {
         { text: 'Portfolio: 20 cryptos', included: true },
         { text: 'Email support', included: true },
       ],
-      cta: 'Start 14-Day Trial',
+      cta: 'Get Started',
       href: '/auth/register',
       highlight: true,
     },
@@ -68,7 +68,7 @@ export default function Pricing() {
         { text: 'Unlimited portfolio + analytics', included: true },
         { text: 'Priority support', included: true },
       ],
-      cta: 'Start 14-Day Trial',
+      cta: 'Get Started',
       href: '/auth/register',
     },
     {
@@ -89,7 +89,7 @@ export default function Pricing() {
         { text: 'Custom features on demand', included: true },
       ],
       cta: 'Contact Sales',
-      href: 'mailto:sales@cryptonomadhub.io',
+      href: 'mailto:contact@cryptonomadhub.io',
       dark: true,
     },
   ]
