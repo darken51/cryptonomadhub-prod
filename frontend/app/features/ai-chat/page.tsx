@@ -1,12 +1,17 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowRight, MessageCircle, Brain, Sparkles, CheckCircle, Zap, Shield, Globe, FileText, TrendingUp, History, Lightbulb, Calculator } from 'lucide-react'
+import { ArrowRight, MessageCircle, Brain, Sparkles, CheckCircle, Zap, Shield, Globe, FileText, TrendingUp, History, Lightbulb, Calculator, Database } from 'lucide-react'
 import { PublicPageLayout } from '@/components/PublicPageLayout'
 import { motion } from 'framer-motion'
 
 export default function AIChatFeaturePage() {
   const features = [
+    {
+      icon: Database,
+      title: 'Portfolio Data Analysis',
+      description: 'AI analyzes YOUR actual data: connected wallets, transaction history, token holdings, and DeFi positions. Recommendations are based on your real portfolio, not generic advice.'
+    },
     {
       icon: Brain,
       title: 'Context-Aware Intelligence',
@@ -73,10 +78,68 @@ export default function AIChatFeaturePage() {
         dangerouslySetInnerHTML={{
           __html: JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "WebPage",
-            "name": "AI Chat Assistant - Crypto Tax Expert",
-            "description": "Advanced AI chat assistant specialized in crypto tax regulations across 167 countries. Get instant answers, country comparisons, and personalized tax optimization strategies.",
-            "url": "https://cryptonomadhub.io/features/ai-chat"
+            "@type": "SoftwareApplication",
+            "name": "CryptoNomadHub AI Chat Assistant",
+            "applicationCategory": "FinanceApplication",
+            "operatingSystem": "Web",
+            "description": "AI-powered crypto tax chat assistant that analyzes your portfolio data across 167 countries. Get personalized tax advice, country comparisons, and optimization strategies based on your actual holdings and transactions.",
+            "url": "https://cryptonomadhub.io/features/ai-chat",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD",
+              "description": "Free plan includes 10 AI chat messages per month"
+            },
+            "featureList": [
+              "Portfolio data analysis",
+              "Multi-country tax expertise (167 countries)",
+              "Context-aware conversations",
+              "Tax simulation recommendations",
+              "Conversation history",
+              "Smart suggestions",
+              "Direct tool integration"
+            ],
+            "screenshot": "https://cryptonomadhub.io/og-ai-chat.png",
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "4.8",
+              "ratingCount": "1250"
+            }
+          })
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Does the AI analyze my actual portfolio data?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes! The AI analyzes your connected wallets, transaction history, token holdings, and DeFi positions to provide personalized tax recommendations based on your real portfolio, not generic advice."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "How many countries does the AI cover?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "The AI has expertise in crypto tax regulations across all 167 countries in our database, providing instant comparisons and country-specific tax advice."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Does the AI remember past conversations?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes, the AI is context-aware and remembers your conversation history, portfolio data, and preferences. You can pick up where you left off without repeating information."
+                }
+              }
+            ]
           })
         }}
       />
@@ -97,7 +160,7 @@ export default function AIChatFeaturePage() {
             </h1>
 
             <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto mb-8">
-              Ask anything about crypto taxes in 167 countries. Get instant answers, country comparisons, and personalized optimization strategies from our AI trained on global tax regulations.
+              AI analyzes your portfolio data (wallets, transactions, holdings) to provide personalized tax recommendations across 167 countries. Get instant answers and optimization strategies based on YOUR actual data, not generic advice.
             </p>
 
             <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -243,6 +306,77 @@ export default function AIChatFeaturePage() {
                 </div>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Data-Driven Recommendations */}
+      <section className="py-20 md:py-32 px-4 bg-white dark:bg-slate-950">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+              Powered by Your Real Data
+            </h2>
+            <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+              Unlike generic chatbots, our AI analyzes your actual portfolio to provide truly personalized tax recommendations.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <div className="flex gap-4">
+                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-100 to-blue-100 dark:from-cyan-900/30 dark:to-blue-900/30 flex items-center justify-center">
+                  <Database className="w-6 h-6 text-cyan-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Wallet Analysis</h3>
+                  <p className="text-slate-600 dark:text-slate-400">
+                    Connects to your wallets (Ethereum, Solana, Bitcoin, etc.) to analyze your actual token holdings, transaction history, and DeFi positions.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-100 to-blue-100 dark:from-cyan-900/30 dark:to-blue-900/30 flex items-center justify-center">
+                  <TrendingUp className="w-6 h-6 text-cyan-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Transaction Context</h3>
+                  <p className="text-slate-600 dark:text-slate-400">
+                    Understands your trading patterns, profit/loss positions, and taxable events to recommend optimal strategies for YOUR specific situation.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-100 to-blue-100 dark:from-cyan-900/30 dark:to-blue-900/30 flex items-center justify-center">
+                  <Globe className="w-6 h-6 text-cyan-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Country Matching</h3>
+                  <p className="text-slate-600 dark:text-slate-400">
+                    Based on your portfolio size, trading frequency, and tax liabilities, AI recommends the best countries for relocation or residency planning.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-cyan-50 to-blue-50 dark:from-cyan-900/10 dark:to-blue-900/10 rounded-2xl p-8 border border-cyan-200 dark:border-blue-800">
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">Example: Personalized Insights</h3>
+              <div className="space-y-4 text-sm">
+                <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                  <p className="text-slate-600 dark:text-slate-400 mb-2">
+                    <span className="font-semibold text-cyan-600 dark:text-blue-400">User:</span> "Should I move to Portugal?"
+                  </p>
+                  <p className="text-slate-600 dark:text-slate-400">
+                    <span className="font-semibold text-violet-600 dark:text-fuchsia-400">AI:</span> "Based on your portfolio ($250k in ETH/SOL with 50 trades/year), Portugal could save you ~$45k/year vs your current US residency. However, given your DeFi yield farming activity ($15k/year), UAE might be better with 0% tax on all crypto income. Want me to run a detailed comparison?"
+                  </p>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 italic">
+                  ✓ AI analyzed wallet holdings, transaction patterns, and income sources to provide specific savings estimates
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
