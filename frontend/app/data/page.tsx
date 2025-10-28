@@ -57,6 +57,8 @@ export default async function DataPage() {
       'crypto tax data'
     ],
     license: 'https://creativecommons.org/licenses/by/4.0/',
+    creditText: 'CryptoNomadHub — sources: PwC Tax Summaries, OECD Tax Database, Deloitte International Tax Guides, Official Tax Authorities',
+    citation: 'CryptoNomadHub (2025). Global Cryptocurrency Tax Regulations Database. https://cryptonomadhub.io/data',
     creator: {
       '@type': 'Organization',
       name: 'CryptoNomadHub',

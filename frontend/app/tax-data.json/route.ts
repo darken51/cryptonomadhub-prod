@@ -25,18 +25,44 @@ interface Country {
   updated_at?: string
 }
 
+// Fallback data when backend is unavailable
+const FALLBACK_RESPONSE = {
+  status: 'degraded',
+  message: 'Backend temporarily unavailable. Showing cached/fallback data.',
+  metadata: {
+    title: 'Global Cryptocurrency Tax Regulations Database',
+    version: '1.0',
+    license: 'CC-BY-4.0',
+    licenseUrl: 'https://creativecommons.org/licenses/by/4.0/',
+    publisher: 'CryptoNomadHub',
+    publisherUrl: 'https://cryptonomadhub.io',
+    contact: 'contact@cryptonomadhub.io',
+    dateModified: new Date().toISOString(),
+    attribution: 'CryptoNomadHub — sources: PwC, OECD, Deloitte, Official Tax Authorities',
+    disclaimer: 'Backend service temporarily unavailable. Please try again later or visit https://cryptonomadhub.io/data'
+  },
+  countries: [],
+  reason: 'backend_unavailable'
+}
+
 export async function GET() {
   try {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'
     const response = await fetch(`${apiUrl}/regulations?include_analysis=true`, {
-      next: { revalidate: 3600 } // Revalidate every hour
+      next: { revalidate: 3600 }, // Revalidate every hour
+      signal: AbortSignal.timeout(10000) // 10s timeout
     })
 
     if (!response.ok) {
-      return NextResponse.json(
-        { error: 'Failed to fetch tax data' },
-        { status: 500 }
-      )
+      console.warn(`Backend returned ${response.status}, returning fallback data`)
+      return NextResponse.json(FALLBACK_RESPONSE, {
+        status: 200, // Still return 200 with degraded status
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300', // Shorter cache for errors
+          'Access-Control-Allow-Origin': '*',
+        }
+      })
     }
 
     const countries: Country[] = await response.json()
@@ -141,10 +167,15 @@ export async function GET() {
     })
   } catch (error) {
     console.error('Error generating tax-data.json:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    // Return graceful degraded response instead of 500
+    return NextResponse.json(FALLBACK_RESPONSE, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        'Access-Control-Allow-Origin': '*',
+      }
+    })
   }
 }
 

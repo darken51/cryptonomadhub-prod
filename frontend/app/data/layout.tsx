@@ -41,7 +41,10 @@ export const metadata: Metadata = {
     creator: '@CryptoNomadHub'
   },
   alternates: {
-    canonical: 'https://cryptonomadhub.io/data'
+    canonical: 'https://cryptonomadhub.io/data',
+    types: {
+      'application/json': 'https://cryptonomadhub.io/tax-data.json'
+    }
   },
   robots: {
     index: true,
