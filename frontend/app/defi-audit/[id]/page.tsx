@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { useToast } from '@/components/providers/ToastProvider'
-import { ArrowLeft, Download, ExternalLink } from 'lucide-react'
+import { ArrowLeft, Download, ExternalLink, RefreshCw, Clock, Loader2, Trash2 } from 'lucide-react'
 
 interface AuditReport {
   audit_id: number
@@ -48,6 +48,11 @@ export default function AuditReportPage() {
 
   const [report, setReport] = useState<AuditReport | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [elapsedTime, setElapsedTime] = useState(0)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const startTimeRef = useRef<number>(Date.now())
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -55,13 +60,44 @@ export default function AuditReportPage() {
     }
   }, [user, authLoading, router])
 
+  // Timer for elapsed time when processing
+  useEffect(() => {
+    if (report?.status === 'processing') {
+      const timer = setInterval(() => {
+        setElapsedTime(Math.floor((Date.now() - startTimeRef.current) / 1000))
+      }, 1000)
+
+      return () => clearInterval(timer)
+    }
+  }, [report?.status])
+
+  // Auto-refresh when processing
+  useEffect(() => {
+    if (report?.status === 'processing') {
+      pollingIntervalRef.current = setInterval(() => {
+        fetchReport(true) // Silent refresh
+      }, 5000) // Poll every 5 seconds
+
+      return () => {
+        if (pollingIntervalRef.current) {
+          clearInterval(pollingIntervalRef.current)
+          pollingIntervalRef.current = null
+        }
+      }
+    } else if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current)
+      pollingIntervalRef.current = null
+    }
+  }, [report?.status])
+
   useEffect(() => {
     if (user && token && auditId) {
       fetchReport()
     }
   }, [user, token, auditId])
 
-  const fetchReport = async () => {
+  const fetchReport = async (silent = false) => {
+    if (!silent) setIsRefreshing(true)
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/defi/audit/${auditId}`,
@@ -79,11 +115,50 @@ export default function AuditReportPage() {
       const data = await response.json()
       setReport(data)
     } catch (error: any) {
-      showToast(error.message || 'Failed to load audit report', 'error')
-      router.push('/defi-audit')
+      if (!silent) {
+        showToast(error.message || 'Failed to load audit report', 'error')
+        router.push('/defi-audit')
+      }
     } finally {
       setIsLoading(false)
+      setIsRefreshing(false)
     }
+  }
+
+  const deleteAudit = async () => {
+    if (!confirm('Are you sure you want to delete this audit? This action cannot be undone.')) {
+      return
+    }
+
+    setIsDeleting(true)
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/defi/audit/${auditId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error('Failed to delete audit')
+      }
+
+      showToast('Audit deleted successfully', 'success')
+      router.push('/defi-audit')
+    } catch (error: any) {
+      showToast(error.message || 'Failed to delete audit', 'error')
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
+  const formatElapsedTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
   const formatDate = (dateString: string) => {
@@ -171,6 +246,31 @@ export default function AuditReportPage() {
             </div>
 
             <div className="flex gap-3">
+              {report.status === 'processing' && (
+                <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
+                  <Clock className="w-4 h-4" />
+                  <span>{formatElapsedTime(elapsedTime)}</span>
+                </div>
+              )}
+
+              <button
+                onClick={() => fetchReport()}
+                disabled={isRefreshing}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50"
+                title="Refresh"
+              >
+                <RefreshCw className={`w-4 h-4 text-gray-600 dark:text-gray-400 ${isRefreshing ? 'animate-spin' : ''}`} />
+              </button>
+
+              <button
+                onClick={deleteAudit}
+                disabled={isDeleting}
+                className="p-2 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
+                title="Delete audit"
+              >
+                <Trash2 className={`w-4 h-4 text-red-600 dark:text-red-400 ${isDeleting ? 'opacity-50' : ''}`} />
+              </button>
+
               <button
                 onClick={async () => {
                   try {
