@@ -21,24 +21,11 @@ import { useDashboardData } from '@/components/dashboard/useDashboardData'
 import { HeroSection } from '@/components/dashboard/HeroSection'
 import { QuickActionsGrid } from '@/components/dashboard/QuickActionsGrid'
 
-// ✅ PERFORMANCE: Lazy load heavy sections
-import dynamic from 'next/dynamic'
-
-const AlertsSection = dynamic(() => import('@/components/dashboard/AlertsSection'), {
-  loading: () => <div className="h-32 bg-slate-800/50 rounded-xl animate-pulse" />
-})
-
-const AIChat = dynamic(() => import('@/components/dashboard/AIChat'), {
-  loading: () => <div className="h-96 bg-slate-800/50 rounded-xl animate-pulse" />
-})
-
-const TaxOpportunities = dynamic(() => import('@/components/dashboard/TaxOpportunities'), {
-  loading: () => <div className="h-64 bg-slate-800/50 rounded-xl animate-pulse" />
-})
-
-const RecentActivities = dynamic(() => import('@/components/dashboard/RecentActivities'), {
-  loading: () => <div className="h-48 bg-slate-800/50 rounded-xl animate-pulse" />
-})
+// ✅ PERFORMANCE: Import components directly (no lazy loading for now)
+import AlertsSection from '@/components/dashboard/AlertsSection'
+import AIChat from '@/components/dashboard/AIChat'
+import TaxOpportunities from '@/components/dashboard/TaxOpportunities'
+import RecentActivities from '@/components/dashboard/RecentActivities'
 
 export default function DashboardPage() {
   const { user, isLoading: authLoading, token } = useAuth()
