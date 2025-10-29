@@ -299,9 +299,21 @@ class WalletPortfolioService:
         all_positions = {}  # {token_symbol: aggregated_data}
         chains_set = set()
 
-        for wallet in wallets:
+        # ⚡ PERFORMANCE: Calculate ALL wallets in PARALLEL instead of sequential loop
+        import asyncio
+        wallet_tasks = [
+            self.calculate_wallet_value(wallet.id, user_id)
+            for wallet in wallets
+        ]
+        wallet_portfolios = await asyncio.gather(*wallet_tasks, return_exceptions=True)
+
+        for wallet, wallet_portfolio in zip(wallets, wallet_portfolios):
+            # Skip failed wallets
+            if isinstance(wallet_portfolio, Exception):
+                logger.error(f"Error calculating wallet {wallet.id}: {wallet_portfolio}")
+                continue
+
             try:
-                wallet_portfolio = await self.calculate_wallet_value(wallet.id, user_id)
 
                 total_value_usd += wallet_portfolio["total_value_usd"]
                 total_cost_basis += wallet_portfolio["total_cost_basis"]

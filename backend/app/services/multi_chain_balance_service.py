@@ -127,22 +127,25 @@ class MultiChainBalanceService:
             "accept": "application/json"
         }
 
-        # Get native balance
-        native_url = f"https://deep-index.moralis.io/api/v2.2/{wallet_address}/balance"
         params = {"chain": moralis_chain}
 
-        native_response = await self.http_client.get(native_url, headers=headers, params=params)
-        native_response.raise_for_status()
-        native_data = native_response.json()
-
-        native_balance = Decimal(native_data.get("balance", "0")) / Decimal(10 ** 18)
-
-        # Get ERC20 tokens
+        # ⚡ PERFORMANCE: Fetch native balance and ERC20 tokens in PARALLEL
+        import asyncio
+        native_url = f"https://deep-index.moralis.io/api/v2.2/{wallet_address}/balance"
         tokens_url = f"https://deep-index.moralis.io/api/v2.2/{wallet_address}/erc20"
 
-        tokens_response = await self.http_client.get(tokens_url, headers=headers, params=params)
+        native_response, tokens_response = await asyncio.gather(
+            self.http_client.get(native_url, headers=headers, params=params),
+            self.http_client.get(tokens_url, headers=headers, params=params)
+        )
+
+        native_response.raise_for_status()
         tokens_response.raise_for_status()
+
+        native_data = native_response.json()
         tokens_data = tokens_response.json()
+
+        native_balance = Decimal(native_data.get("balance", "0")) / Decimal(10 ** 18)
 
         tokens = []
         for token in tokens_data:
@@ -186,7 +189,8 @@ class MultiChainBalanceService:
 
         base_url = f"https://{network}.g.alchemy.com/v2/{self.alchemy_key}"
 
-        # Get native balance
+        # ⚡ PERFORMANCE: Fetch native balance and token balances in PARALLEL
+        import asyncio
         native_payload = {
             "id": 1,
             "jsonrpc": "2.0",
@@ -194,14 +198,6 @@ class MultiChainBalanceService:
             "params": [wallet_address, "latest"]
         }
 
-        native_response = await self.http_client.post(base_url, json=native_payload)
-        native_response.raise_for_status()
-        native_result = native_response.json()
-
-        native_balance_hex = native_result.get("result", "0x0")
-        native_balance = Decimal(int(native_balance_hex, 16)) / Decimal(10 ** 18)
-
-        # Get ERC20 tokens using Alchemy's getTokenBalances
         tokens_payload = {
             "id": 1,
             "jsonrpc": "2.0",
@@ -209,9 +205,19 @@ class MultiChainBalanceService:
             "params": [wallet_address]
         }
 
-        tokens_response = await self.http_client.post(base_url, json=tokens_payload)
+        native_response, tokens_response = await asyncio.gather(
+            self.http_client.post(base_url, json=native_payload),
+            self.http_client.post(base_url, json=tokens_payload)
+        )
+
+        native_response.raise_for_status()
         tokens_response.raise_for_status()
+
+        native_result = native_response.json()
         tokens_result = tokens_response.json()
+
+        native_balance_hex = native_result.get("result", "0x0")
+        native_balance = Decimal(int(native_balance_hex, 16)) / Decimal(10 ** 18)
 
         tokens = []
         token_balances = tokens_result.get("result", {}).get("tokenBalances", [])
