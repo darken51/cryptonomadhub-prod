@@ -48,13 +48,34 @@ export const HeroSection = memo(function HeroSection({
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-600 via-fuchsia-600 to-pink-600 p-1">
         <div className="bg-slate-900 rounded-3xl p-8 md:p-10">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-              Welcome back, {user?.full_name || user?.email?.split('@')[0]} 👋
-            </h1>
-            <p className="text-lg text-white/70">
-              Your personal crypto tax optimization dashboard
-            </p>
+          <div className="mb-8 flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+            <div className="flex-1">
+              <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+                Welcome back, {user?.full_name || user?.email?.split('@')[0]} 👋
+              </h1>
+              <p className="text-lg text-white/70">
+                Your personal crypto tax optimization dashboard
+              </p>
+            </div>
+
+            {/* Plan Badge & Upgrade Button */}
+            <div className="flex items-center gap-3">
+              <div className="px-4 py-2 bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-full shadow-lg">
+                <span className="text-white font-bold text-sm">
+                  {user?.license?.tier ? user.license.tier.charAt(0).toUpperCase() + user.license.tier.slice(1) : 'Free'} Plan
+                </span>
+              </div>
+
+              {(!user?.license?.tier || user?.license?.tier === 'free') && (
+                <Link
+                  href="/pricing"
+                  className="px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 rounded-full shadow-lg transition-all hover:scale-105 flex items-center gap-2"
+                >
+                  <Sparkles className="w-4 h-4 text-white" />
+                  <span className="text-white font-bold text-sm">Upgrade</span>
+                </Link>
+              )}
+            </div>
           </div>
 
           {/* Main Content */}
