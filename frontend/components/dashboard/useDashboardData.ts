@@ -38,15 +38,15 @@ export function useDashboardData(token: string | null) {
       const [overviewRes, portfolioRes, simulationsRes] = await Promise.all([
         fetch(`${baseUrl}/dashboard/overview`, {
           headers,
-          next: { revalidate: 60 } // Cache for 60 seconds
+          cache: 'no-store' // Disable cache to avoid stale data on dashboard
         }),
         fetch(`${baseUrl}/wallet-portfolio/overview`, {
           headers,
-          next: { revalidate: 30 } // Cache for 30 seconds
+          cache: 'no-store'
         }),
         fetch(`${baseUrl}/simulations/history`, {
           headers,
-          next: { revalidate: 120 } // Cache for 2 minutes
+          cache: 'no-store'
         }),
       ])
 
