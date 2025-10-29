@@ -76,12 +76,12 @@ const CryptoIcon = ({ id }: { id: string }) => {
 }
 
 const SUPPORTED_CRYPTOS = [
-  { id: 'btc', name: 'Bitcoin', network: 'Bitcoin Network' },
-  { id: 'eth', name: 'Ethereum', network: 'Ethereum Network' },
-  { id: 'usdttrc20', name: 'USDT', network: 'TRC20 (Tron)' },
-  { id: 'usdterc20', name: 'USDT', network: 'ERC20 (Ethereum)' },
-  { id: 'usdc', name: 'USDC', network: 'ERC20 (Ethereum)' },
-  { id: 'ltc', name: 'Litecoin', network: 'Litecoin Network' },
+  { id: 'btc', name: 'Bitcoin', network: 'Bitcoin Network', minAmount: 20 },
+  { id: 'eth', name: 'Ethereum', network: 'Ethereum Network', minAmount: 20 },
+  { id: 'usdttrc20', name: 'USDT', network: 'TRC20 (Tron)', minAmount: 10 },
+  { id: 'usdterc20', name: 'USDT', network: 'ERC20 (Ethereum)', minAmount: 10 },
+  { id: 'usdc', name: 'USDC', network: 'ERC20 (Ethereum)', minAmount: 10 },
+  { id: 'ltc', name: 'Litecoin', network: 'Litecoin Network', minAmount: 20 },
 ]
 
 export function CryptoPaymentModal({ isOpen, onClose, planName, tier, period, amount }: CryptoPaymentModalProps) {
@@ -91,6 +91,9 @@ export function CryptoPaymentModal({ isOpen, onClose, planName, tier, period, am
   const [error, setError] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [checkingStatus, setCheckingStatus] = useState(false)
+
+  // Filter cryptos based on payment amount (NOWPayments minimum amounts)
+  const availableCryptos = SUPPORTED_CRYPTOS.filter(crypto => amount >= crypto.minAmount)
 
   // Reset state when modal closes
   useEffect(() => {
@@ -238,8 +241,15 @@ export function CryptoPaymentModal({ isOpen, onClose, planName, tier, period, am
                     <h3 className="text-lg font-semibold mb-4 text-slate-900 dark:text-white">
                       Select Cryptocurrency
                     </h3>
+
+                    {amount < 20 && (
+                      <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-sm text-blue-800 dark:text-blue-300">
+                        ℹ️ For payments under $20, only stablecoins (USDT, USDC) are available due to minimum amount requirements.
+                      </div>
+                    )}
+
                     <div className="grid grid-cols-2 gap-4">
-                      {SUPPORTED_CRYPTOS.map((crypto) => (
+                      {availableCryptos.map((crypto) => (
                         <button
                           key={crypto.id}
                           onClick={() => handleCryptoSelect(crypto.id)}
