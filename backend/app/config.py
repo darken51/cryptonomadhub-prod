@@ -33,6 +33,11 @@ class Settings(BaseSettings):
     PADDLE_PUBLIC_KEY: str = "test_public_key"
     PADDLE_WEBHOOK_SECRET: str = "test_secret"
 
+    # NOWPayments (Crypto payments)
+    NOWPAYMENTS_API_KEY: str = ""
+    NOWPAYMENTS_IPN_SECRET: str = ""
+    NOWPAYMENTS_SANDBOX: bool = False  # Set to True for testing
+
     # Company Info (IBC Seychelles)
     COMPANY_NAME: str = ""
     COMPANY_NUMBER: str = ""

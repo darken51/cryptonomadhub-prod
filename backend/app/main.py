@@ -73,7 +73,7 @@ async def root():
 
 # Import routers
 from app.routers import (
-    auth, simulations, paddle_webhook, chat, admin, regulations,
+    auth, simulations, paddle_webhook, nowpayments_webhook, chat, admin, regulations,
     defi_audit, health, users, cost_basis, tax_optimizer, wallets, user_wallets,
     dashboard, wallet_portfolio
 )
@@ -84,6 +84,7 @@ app.include_router(users.router)
 app.include_router(dashboard.router)
 app.include_router(simulations.router)
 app.include_router(paddle_webhook.router)
+app.include_router(nowpayments_webhook.router)
 app.include_router(chat.router)
 app.include_router(admin.router)
 app.include_router(regulations.router)
