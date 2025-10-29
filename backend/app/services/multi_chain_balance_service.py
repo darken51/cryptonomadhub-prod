@@ -150,7 +150,13 @@ class MultiChainBalanceService:
 
         tokens = []
         for token in tokens_data:
-            decimals = int(token.get("decimals", 18))
+            # ⚡ FIX: Handle None decimals (API can return null)
+            decimals = token.get("decimals")
+            if decimals is None or decimals == "":
+                decimals = 18  # Default for most ERC20 tokens
+            else:
+                decimals = int(decimals)  # Ensure it's an integer
+
             balance_raw = Decimal(token.get("balance", "0"))
             balance_formatted = balance_raw / Decimal(10 ** decimals)
 
@@ -240,7 +246,14 @@ class MultiChainBalanceService:
                     metadata_response = await self.http_client.post(base_url, json=metadata_payload)
                     metadata = metadata_response.json().get("result", {})
 
-                    decimals = metadata.get("decimals", 18)
+                    # ⚡ FIX: Handle None decimals (API can return null)
+                    decimals = metadata.get("decimals")
+                    if decimals is None or decimals == "":
+                        decimals = 18  # Default for most ERC20 tokens
+                        logger.warning(f"Token {token_address} has no decimals, using default 18")
+                    else:
+                        decimals = int(decimals)  # Ensure it's an integer
+
                     balance_raw = Decimal(int(balance_hex, 16))
                     balance_formatted = balance_raw / Decimal(10 ** decimals)
 
