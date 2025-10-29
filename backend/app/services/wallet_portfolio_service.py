@@ -91,7 +91,7 @@ class WalletPortfolioService:
 
         # Native token
         if native_balance > 0 and chain_symbol:
-            native_price = token_prices.get(chain_symbol, Decimal("0"))
+            native_price = token_prices.get(chain_symbol) or Decimal("0")
 
             native_value = native_balance * native_price
             native_cost = await self._get_cost_basis(
@@ -122,7 +122,7 @@ class WalletPortfolioService:
                 continue
 
             symbol = token.get("symbol", "UNKNOWN")
-            price = token_prices.get(symbol, Decimal("0"))
+            price = token_prices.get(symbol) or Decimal("0")
 
             value_usd = balance * price
             cost_basis = await self._get_cost_basis(
