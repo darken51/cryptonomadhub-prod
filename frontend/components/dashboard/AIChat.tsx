@@ -104,7 +104,7 @@ export default memo(function AIChat({ token }: { token: string | null }) {
                 className={`max-w-2xl px-4 py-3 rounded-2xl ${
                   message.role === 'user'
                     ? 'bg-white text-slate-900 shadow-xl'
-                    : 'bg-slate-700 text-white shadow-lg border border-slate-600'
+                    : 'bg-white text-slate-900 shadow-lg border-4 border-red-600'
                 }`}
               >
                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>

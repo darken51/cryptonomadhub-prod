@@ -246,10 +246,12 @@ export default function AuditReportPage() {
             </div>
 
             <div className="flex gap-3">
-              {report.status === 'processing' && (
-                <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
-                  <Clock className="w-4 h-4" />
-                  <span>{formatElapsedTime(elapsedTime)}</span>
+              {report?.status === 'processing' && (
+                <div className="flex items-center gap-2 px-4 py-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                  <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                    {formatElapsedTime(elapsedTime)}
+                  </span>
                 </div>
               )}
 
@@ -265,10 +267,11 @@ export default function AuditReportPage() {
               <button
                 onClick={deleteAudit}
                 disabled={isDeleting}
-                className="p-2 hover:bg-red-100 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
+                className="px-6 py-3 bg-white border-4 border-red-600 rounded-lg transition-colors disabled:opacity-50"
                 title="Delete audit"
               >
-                <Trash2 className={`w-4 h-4 text-red-600 dark:text-red-400 ${isDeleting ? 'opacity-50' : ''}`} />
+                <Trash2 className={`w-8 h-8 text-red-600 ${isDeleting ? 'opacity-50' : ''}`} />
+                <span className="ml-2 text-red-600 font-bold">DELETE</span>
               </button>
 
               <button

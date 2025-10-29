@@ -24,7 +24,7 @@ services:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - ANTHROPIC_MODEL=${ANTHROPIC_MODEL}
       - FRONTEND_URL=http://localhost:3001
-      - CORS_ORIGINS=http://localhost:3001,http://localhost:3000
+      - CORS_ORIGINS=http://localhost:3001,http://localhost:3000,http://localhost:3004,http://localhost:3005
       - ENVIRONMENT=development
     depends_on:
       - postgres

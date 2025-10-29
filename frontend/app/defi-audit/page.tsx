@@ -12,6 +12,34 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { CurrencyDisplay, CurrencyBadge } from '@/components/CurrencyDisplay'
 import { parseCurrencyData } from '@/lib/currency'
 
+// Composant Timer qui se met à jour automatiquement
+function ProcessingTimer({ createdAt }: { createdAt: string }) {
+  const [elapsed, setElapsed] = useState(0)
+
+  useEffect(() => {
+    const startTime = new Date(createdAt).getTime()
+
+    // Mise à jour immédiate
+    setElapsed(Math.floor((Date.now() - startTime) / 1000))
+
+    // Mise à jour chaque seconde
+    const interval = setInterval(() => {
+      setElapsed(Math.floor((Date.now() - startTime) / 1000))
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [createdAt])
+
+  const minutes = Math.floor(elapsed / 60)
+  const seconds = elapsed % 60
+
+  return (
+    <div className="text-2xl font-bold text-yellow-900 text-center mt-2">
+      {minutes}:{seconds.toString().padStart(2, '0')}
+    </div>
+  )
+}
+
 interface Audit {
   id: number
   status: string
@@ -141,6 +169,19 @@ export default function DeFiAuditPage() {
       fetchAudits()
     }
   }, [user, token])
+
+  // Auto-refresh toutes les 5 secondes s'il y a des audits en "processing"
+  useEffect(() => {
+    const hasProcessing = audits.some(audit => audit.status === 'processing')
+
+    if (hasProcessing && user && token) {
+      const interval = setInterval(() => {
+        fetchAudits()
+      }, 5000) // 5 secondes
+
+      return () => clearInterval(interval)
+    }
+  }, [audits, user, token])
 
   const fetchAudits = async () => {
     try {
@@ -408,6 +449,47 @@ export default function DeFiAuditPage() {
                         ))}
                       </div>
                     </div>
+
+                    {/* TIMER ÉNORME pour processing */}
+                    {audit.status === 'processing' && (
+                      <div className="flex flex-col items-end gap-3">
+                        <div className="px-8 py-4 bg-yellow-300 border-4 border-yellow-600 rounded-xl shadow-2xl">
+                          <div className="text-5xl font-black text-yellow-900">⏱️ PROCESSING...</div>
+                          <ProcessingTimer createdAt={audit.created_at} />
+                        </div>
+
+                        {/* BOUTON DELETE */}
+                        <button
+                          onClick={async () => {
+                            if (confirm(`Delete audit #${audit.id}?`)) {
+                              try {
+                                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/defi-audit/${audit.id}`, {
+                                  method: 'DELETE',
+                                  headers: { Authorization: `Bearer ${token}` }
+                                })
+                                if (response.ok) {
+                                  showToast('Audit deleted', 'success')
+                                  fetchAudits()
+                                } else {
+                                  showToast('Failed to delete audit', 'error')
+                                }
+                              } catch (error) {
+                                showToast('Failed to delete audit', 'error')
+                              }
+                            }
+                          }}
+                          className="px-6 py-3 bg-white border-4 border-red-600 rounded-xl shadow-lg hover:bg-red-50 transition-colors"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-3xl">🗑️</span>
+                            <span className="text-xl font-bold text-red-600">DELETE</span>
+                          </div>
+                        </button>
+
+                        <Activity className="w-8 h-8 text-violet-600 animate-pulse" />
+                      </div>
+                    )}
+
                     {audit.status === 'completed' && (
                       <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                         <Link

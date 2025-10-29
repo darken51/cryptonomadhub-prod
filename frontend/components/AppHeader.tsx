@@ -26,7 +26,7 @@ const navItems: NavItem[] = [
     icon: Globe,
     children: [
       { name: 'Countries', href: '/countries', icon: Globe, description: '160 jurisdictions' },
-      { name: 'Compare Countries', href: '/features/multi-country-compare', icon: GitCompare, description: 'Side-by-side comparison' },
+      { name: 'Compare Countries', href: '/simulations/compare', icon: GitCompare, description: 'Side-by-side comparison' },
       { name: 'Crypto Cards & ID', href: '/tools', icon: CreditCard, description: 'Payment solutions' },
     ]
   },

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -9,7 +9,7 @@ import { useToast } from '@/components/providers/ToastProvider'
 import { AppHeader } from '@/components/AppHeader'
 import { Footer } from '@/components/Footer'
 import { Tooltip } from '@/components/Tooltip'
-import { ArrowLeft, Calculator, GitCompare, RotateCcw } from 'lucide-react'
+import { ArrowLeft, Calculator, GitCompare, RotateCcw, ChevronDown } from 'lucide-react'
 import { groupCountriesByRegion } from '@/lib/constants'
 
 // Helper to render text with clickable links
@@ -67,6 +67,10 @@ interface CountryComparison {
   savings: number
   savings_percent: number
   effective_rate: number
+  short_term_tax?: number
+  long_term_tax?: number
+  short_term_rate?: number
+  long_term_rate?: number
 }
 
 interface CompareResult {
@@ -93,6 +97,7 @@ export default function ComparePage() {
   const [countries, setCountries] = useState<Country[]>([])
   const [countriesByRegion, setCountriesByRegion] = useState<Record<string, Country[]>>({})
   const [searchTerm, setSearchTerm] = useState('')
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
 
   // Fetch countries on mount
   useEffect(() => {
@@ -152,7 +157,18 @@ export default function ComparePage() {
     setShortTermGains('')
     setLongTermGains('')
     setResult(null)
+    setExpandedRows(new Set())
     window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const toggleRowExpansion = (countryCode: string) => {
+    const newExpanded = new Set(expandedRows)
+    if (newExpanded.has(countryCode)) {
+      newExpanded.delete(countryCode)
+    } else {
+      newExpanded.add(countryCode)
+    }
+    setExpandedRows(newExpanded)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -540,62 +556,130 @@ export default function ComparePage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
-                      {result.comparisons.map((comparison, index) => (
-                        <motion.tr
-                          key={comparison.country_code}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: index * 0.1 }}
-                          whileHover={{ backgroundColor: 'rgba(139, 92, 246, 0.05)' }}
-                          className="transition"
-                        >
-                          <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                            <span className={`inline-flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full text-xs sm:text-sm font-bold ${
-                              index === 0 ? 'bg-gradient-to-br from-green-100 to-emerald-100 text-green-700 dark:from-green-900/30 dark:to-emerald-900/30 dark:text-green-300 border-2 border-green-300 dark:border-green-700' :
-                              index === 1 ? 'bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-700 dark:from-blue-900/30 dark:to-indigo-900/30 dark:text-blue-300' :
-                              index === 2 ? 'bg-gradient-to-br from-orange-100 to-amber-100 text-orange-700 dark:from-orange-900/30 dark:to-amber-900/30 dark:text-orange-300' :
-                              'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300'
-                            }`}>
-                              {index + 1}
-                            </span>
-                          </td>
-                          <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center gap-2">
-                              <span className="text-lg">{comparison.flag_emoji || '🌍'}</span>
-                              <div>
-                                <div className="text-sm font-medium text-slate-900 dark:text-white">
-                                  {comparison.country_name}
+                      {result.comparisons.map((comparison, index) => {
+                        const isExpanded = expandedRows.has(comparison.country_code)
+                        return (
+                          <React.Fragment key={comparison.country_code}>
+                            <motion.tr
+                              key={comparison.country_code}
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: index * 0.1 }}
+                              className="transition cursor-pointer hover:bg-violet-50/50 dark:hover:bg-violet-900/10"
+                              onClick={() => toggleRowExpansion(comparison.country_code)}
+                            >
+                              <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                                <div className="flex items-center gap-2">
+                                  <span className={`inline-flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 rounded-full text-xs sm:text-sm font-bold ${
+                                    index === 0 ? 'bg-gradient-to-br from-green-100 to-emerald-100 text-green-700 dark:from-green-900/30 dark:to-emerald-900/30 dark:text-green-300 border-2 border-green-300 dark:border-green-700' :
+                                    index === 1 ? 'bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-700 dark:from-blue-900/30 dark:to-indigo-900/30 dark:text-blue-300' :
+                                    index === 2 ? 'bg-gradient-to-br from-orange-100 to-amber-100 text-orange-700 dark:from-orange-900/30 dark:to-amber-900/30 dark:text-orange-300' :
+                                    'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300'
+                                  }`}>
+                                    {index + 1}
+                                  </span>
+                                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
                                 </div>
-                                <div className="text-xs text-slate-500 dark:text-slate-400">
-                                  {comparison.country_code}
+                              </td>
+                              <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-lg">{comparison.flag_emoji || '🌍'}</span>
+                                  <div>
+                                    <div className="text-sm font-medium text-slate-900 dark:text-white">
+                                      {comparison.country_name}
+                                    </div>
+                                    <div className="text-xs text-slate-500 dark:text-slate-400">
+                                      {comparison.country_code}
+                                    </div>
+                                  </div>
                                 </div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-right">
-                            <div className="text-sm sm:text-base font-semibold text-slate-900 dark:text-white">
-                              ${comparison.tax_amount.toLocaleString()}
-                            </div>
-                          </td>
-                          <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-right">
-                            <div className={`text-sm sm:text-base font-bold ${
-                              comparison.savings > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                            }`}>
-                              {comparison.savings > 0 ? '+' : ''}${comparison.savings.toLocaleString()}
-                            </div>
-                            <div className={`text-xs ${
-                              comparison.savings > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                            }`}>
-                              ({comparison.savings_percent.toFixed(1)}%)
-                            </div>
-                          </td>
-                          <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-right">
-                            <div className="text-sm sm:text-base font-medium text-slate-900 dark:text-white">
-                              {comparison.effective_rate.toFixed(1)}%
-                            </div>
-                          </td>
-                        </motion.tr>
-                      ))}
+                              </td>
+                              <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-right">
+                                <div className="text-sm sm:text-base font-semibold text-slate-900 dark:text-white">
+                                  ${comparison.tax_amount.toLocaleString()}
+                                </div>
+                              </td>
+                              <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-right">
+                                <div className={`text-sm sm:text-base font-bold ${
+                                  comparison.savings > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                                }`}>
+                                  {comparison.savings > 0 ? '+' : ''}${comparison.savings.toLocaleString()}
+                                </div>
+                                <div className={`text-xs ${
+                                  comparison.savings > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+                                }`}>
+                                  ({comparison.savings_percent.toFixed(1)}%)
+                                </div>
+                              </td>
+                              <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-right">
+                                <div className="text-sm sm:text-base font-medium text-slate-900 dark:text-white">
+                                  {comparison.effective_rate.toFixed(1)}%
+                                </div>
+                              </td>
+                            </motion.tr>
+                            {isExpanded && (
+                              <motion.tr
+                                key={`${comparison.country_code}-details`}
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="bg-slate-50 dark:bg-slate-800/50"
+                              >
+                                <td colSpan={5} className="px-4 sm:px-6 py-4">
+                                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div className="bg-white dark:bg-slate-900 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                                      <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Total Tax</p>
+                                      <p className="text-xl font-bold text-slate-900 dark:text-white">
+                                        ${comparison.tax_amount.toLocaleString()}
+                                      </p>
+                                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                                        Effective Rate: {comparison.effective_rate.toFixed(2)}%
+                                      </p>
+                                    </div>
+
+                                    {comparison.short_term_tax !== undefined && (
+                                      <div className="bg-white dark:bg-slate-900 rounded-lg p-4 border border-orange-200 dark:border-orange-700">
+                                        <p className="text-xs text-orange-600 dark:text-orange-400 mb-1">Short-Term (&lt;1 year)</p>
+                                        <p className="text-xl font-bold text-slate-900 dark:text-white">
+                                          ${comparison.short_term_tax.toLocaleString()}
+                                        </p>
+                                        {comparison.short_term_rate !== undefined && (
+                                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                                            Rate: {comparison.short_term_rate.toFixed(2)}%
+                                          </p>
+                                        )}
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                          On ${result.short_term_gains.toLocaleString()} gains
+                                        </p>
+                                      </div>
+                                    )}
+
+                                    {comparison.long_term_tax !== undefined && (
+                                      <div className="bg-white dark:bg-slate-900 rounded-lg p-4 border border-green-200 dark:border-green-700">
+                                        <p className="text-xs text-green-600 dark:text-green-400 mb-1">Long-Term (&gt;1 year)</p>
+                                        <p className="text-xl font-bold text-slate-900 dark:text-white">
+                                          ${comparison.long_term_tax.toLocaleString()}
+                                        </p>
+                                        {comparison.long_term_rate !== undefined && (
+                                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                                            Rate: {comparison.long_term_rate.toFixed(2)}%
+                                          </p>
+                                        )}
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                          On ${result.long_term_gains.toLocaleString()} gains
+                                        </p>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="mt-3 text-xs text-slate-500 dark:text-slate-400 italic">
+                                    Click on row to collapse details
+                                  </div>
+                                </td>
+                              </motion.tr>
+                            )}
+                          </React.Fragment>
+                        )
+                      })}
                     </tbody>
                   </table>
                 </div>
