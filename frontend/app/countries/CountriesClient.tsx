@@ -339,6 +339,86 @@ export default function CountriesClient({ initialCountries }: CountriesClientPro
       <TopCountriesPodium countries={countries} />
     )}
 
+    {/* SEO Content Section - Moved up for better UX */}
+    <motion.div
+      className="my-8 bg-white dark:bg-slate-800 rounded-xl p-8 border border-slate-200 dark:border-slate-700"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
+    >
+      <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-6">
+        Understanding Crypto Tax Rates Worldwide
+      </h2>
+
+      <div className="prose dark:prose-invert max-w-none">
+        <div className="grid md:grid-cols-2 gap-8 mb-8">
+          <div>
+            <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-3">
+              Countries with 0% Crypto Tax
+            </h3>
+            <p className="text-slate-700 dark:text-slate-300 mb-3">
+              Several countries offer <strong>zero capital gains tax on cryptocurrency</strong>, making them attractive
+              for digital nomads and crypto investors:
+            </p>
+            <ul className="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300">
+              <li><strong>Portugal</strong> - 0% crypto tax after 1 year holding period</li>
+              <li><strong>UAE (Dubai)</strong> - 0% personal income tax on crypto gains</li>
+              <li><strong>Singapore</strong> - 0% capital gains tax on long-term holdings</li>
+              <li><strong>Switzerland</strong> - 0% tax on private crypto gains for individuals</li>
+              <li><strong>Germany</strong> - 0% tax after 1 year holding period</li>
+              <li><strong>Malaysia</strong> - 0% capital gains tax on crypto</li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-3">
+              How We Verify Tax Data
+            </h3>
+            <p className="text-slate-700 dark:text-slate-300 mb-3">
+              Our crypto tax rates are sourced from <strong>official government publications</strong> and verified
+              by leading international tax authorities:
+            </p>
+            <ul className="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300">
+              <li><strong>OECD</strong> - International tax policy data</li>
+              <li><strong>PwC Tax Summaries</strong> - Professional tax firm reports</li>
+              <li><strong>KPMG</strong> - Global tax rate surveys</li>
+              <li><strong>Government websites</strong> - Direct source verification</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-violet-50 to-fuchsia-50 dark:from-slate-900 dark:to-slate-800 rounded-lg p-6 mb-8">
+          <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-3">
+            Capital Gains Tax vs. Crypto-Specific Tax
+          </h3>
+          <p className="text-slate-700 dark:text-slate-300 mb-3">
+            Many countries treat cryptocurrency differently from traditional assets. While some apply standard
+            <strong> capital gains tax (CGT)</strong> rates, others have introduced <strong>crypto-specific regulations</strong>:
+          </p>
+          <ul className="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300">
+            <li><strong>Short-term gains</strong> - Typically taxed at higher rates (held &lt; 1 year)</li>
+            <li><strong>Long-term gains</strong> - Lower rates for assets held &gt; 1 year</li>
+            <li><strong>Income vs. gains</strong> - Mining, staking, DeFi yields often taxed as income</li>
+            <li><strong>Wash sale rules</strong> - Some countries restrict loss harvesting strategies</li>
+          </ul>
+        </div>
+
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
+          <h3 className="text-xl font-semibold text-blue-900 dark:text-blue-200 mb-3">
+            💡 How to Use This Database
+          </h3>
+          <ol className="list-decimal list-inside space-y-2 text-blue-800 dark:text-blue-300">
+            <li><strong>Search by country name</strong> or use the interactive world map to explore tax rates</li>
+            <li><strong>Filter by crypto-friendly countries</strong> (&lt;10% tax) to narrow your options</li>
+            <li><strong>Compare multiple countries</strong> side-by-side using our AI scoring system</li>
+            <li><strong>Check data quality badges</strong> to ensure you're using verified information</li>
+            <li><strong>Consult with tax professionals</strong> - this data is for informational purposes only</li>
+          </ol>
+        </div>
+      </div>
+    </motion.div>
+
     {/* Countries Grid */}
     <div className="space-y-4">
       {filteredCountries.map((country, index) => (
@@ -491,87 +571,6 @@ export default function CountriesClient({ initialCountries }: CountriesClientPro
         </motion.div>
       )}
     </div>
-
-    {/* SEO Content Section */}
-    <motion.div
-      className="mt-12 bg-white dark:bg-slate-800 rounded-xl p-8 border border-slate-200 dark:border-slate-700"
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5 }}
-    >
-      <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-6">
-        Understanding Crypto Tax Rates Worldwide
-      </h2>
-
-      <div className="prose dark:prose-invert max-w-none">
-        <div className="grid md:grid-cols-2 gap-8 mb-8">
-          <div>
-            <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-3">
-              Countries with 0% Crypto Tax
-            </h3>
-            <p className="text-slate-700 dark:text-slate-300 mb-3">
-              Several countries offer <strong>zero capital gains tax on cryptocurrency</strong>, making them attractive
-              for digital nomads and crypto investors:
-            </p>
-            <ul className="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300">
-              <li><strong>Portugal</strong> - 0% crypto tax for individuals (under review)</li>
-              <li><strong>UAE (Dubai)</strong> - 0% personal income tax on crypto gains</li>
-              <li><strong>Singapore</strong> - 0% capital gains tax on long-term holdings</li>
-              <li><strong>Switzerland</strong> - 0% tax on private crypto gains for individuals</li>
-              <li><strong>Germany</strong> - 0% tax after 1 year holding period</li>
-              <li><strong>Malaysia</strong> - 0% capital gains tax on crypto</li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-3">
-              How We Verify Tax Data
-            </h3>
-            <p className="text-slate-700 dark:text-slate-300 mb-3">
-              Our crypto tax rates are sourced from <strong>official government publications</strong> and verified
-              by leading international tax authorities:
-            </p>
-            <ul className="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300">
-              <li><strong>OECD</strong> - International tax policy data</li>
-              <li><strong>PwC Tax Summaries</strong> - Professional tax firm reports</li>
-              <li><strong>KPMG</strong> - Global tax rate surveys</li>
-              <li><strong>Koinly</strong> - Crypto-specific tax research</li>
-              <li><strong>Government websites</strong> - Direct source verification</li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-br from-violet-50 to-fuchsia-50 dark:from-slate-900 dark:to-slate-800 rounded-lg p-6 mb-8">
-          <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-3">
-            Capital Gains Tax vs. Crypto-Specific Tax
-          </h3>
-          <p className="text-slate-700 dark:text-slate-300 mb-3">
-            Many countries treat cryptocurrency differently from traditional assets. While some apply standard
-            <strong> capital gains tax (CGT)</strong> rates, others have introduced <strong>crypto-specific regulations</strong>:
-          </p>
-          <ul className="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300">
-            <li><strong>Short-term gains</strong> - Typically taxed at higher rates (held &lt; 1 year)</li>
-            <li><strong>Long-term gains</strong> - Lower rates for assets held &gt; 1 year</li>
-            <li><strong>Income vs. gains</strong> - Mining, staking, DeFi yields often taxed as income</li>
-            <li><strong>Wash sale rules</strong> - Some countries restrict loss harvesting strategies</li>
-          </ul>
-        </div>
-
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
-          <h3 className="text-xl font-semibold text-blue-900 dark:text-blue-200 mb-3">
-            💡 How to Use This Database
-          </h3>
-          <ol className="list-decimal list-inside space-y-2 text-blue-800 dark:text-blue-300">
-            <li><strong>Search by country name</strong> or use the interactive world map to explore tax rates</li>
-            <li><strong>Filter by crypto-friendly countries</strong> (&lt;10% tax) to narrow your options</li>
-            <li><strong>Compare multiple countries</strong> side-by-side using our AI scoring system</li>
-            <li><strong>Check data quality badges</strong> to ensure you're using verified information</li>
-            <li><strong>Consult with tax professionals</strong> - this data is for informational purposes only</li>
-          </ol>
-        </div>
-      </div>
-    </motion.div>
 
     {/* Disclaimer */}
     <motion.div
