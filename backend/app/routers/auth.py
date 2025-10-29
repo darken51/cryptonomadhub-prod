@@ -3,6 +3,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.user import User
+from app.models.license import License
 from app.utils.security import hash_password, verify_password, create_access_token, verify_token, create_refresh_token, verify_refresh_token, hash_token, verify_hashed_token
 from app.middleware import limiter, get_rate_limit
 from app.services.license_service import LicenseService
@@ -39,11 +40,19 @@ class UserRegister(BaseModel):
         return v
 
 
+class LicenseInfo(BaseModel):
+    tier: str
+    status: str
+    expires_at: datetime | None = None
+    next_billing_date: datetime | None = None
+
+
 class UserResponse(BaseModel):
     id: int
     email: str
     role: str
     full_name: str | None = None
+    license: LicenseInfo | None = None
 
 
 class Token(BaseModel):
@@ -276,14 +285,28 @@ async def refresh_access_token(
 async def get_me(
     request: Request,
     response: Response,
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
-    """Get current user info"""
+    """Get current user info with license data"""
+    # Fetch license info
+    license = db.query(License).filter(License.user_id == current_user.id).first()
+
+    license_info = None
+    if license:
+        license_info = LicenseInfo(
+            tier=license.tier.value,
+            status=license.status.value,
+            expires_at=license.expires_at,
+            next_billing_date=license.next_billing_date
+        )
+
     return UserResponse(
         id=current_user.id,
         email=current_user.email,
         role=current_user.role.value,
-        full_name=current_user.full_name
+        full_name=current_user.full_name,
+        license=license_info
     )
 
 

@@ -938,11 +938,14 @@ export default function SettingsPage() {
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-medium text-slate-900 dark:text-white">Current Plan</p>
                   <span className="px-3 py-1 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white text-sm font-semibold rounded-full shadow-lg">
-                    Free Tier
+                    {user?.license?.tier ? user.license.tier.charAt(0).toUpperCase() + user.license.tier.slice(1) : 'Free'} Tier
                   </span>
                 </div>
                 <p className="text-sm text-slate-600 dark:text-slate-400">
-                  You are currently on the free tier with limited features.
+                  {user?.license?.tier === 'free' || !user?.license?.tier
+                    ? 'You are currently on the free tier with limited features.'
+                    : `You are subscribed to the ${user.license.tier} plan.${user.license.expires_at ? ` Expires ${new Date(user.license.expires_at).toLocaleDateString()}` : ''}`
+                  }
                 </p>
               </div>
 

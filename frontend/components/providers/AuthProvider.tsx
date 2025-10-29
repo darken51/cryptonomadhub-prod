@@ -2,11 +2,19 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 
+interface LicenseInfo {
+  tier: string
+  status: string
+  expires_at?: string | null
+  next_billing_date?: string | null
+}
+
 interface User {
   id: number
   email: string
   role: string
   full_name?: string | null
+  license?: LicenseInfo | null
 }
 
 interface AuthContextType {
