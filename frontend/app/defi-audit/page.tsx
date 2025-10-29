@@ -463,7 +463,7 @@ export default function DeFiAuditPage() {
                           onClick={async () => {
                             if (confirm(`Delete audit #${audit.id}?`)) {
                               try {
-                                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/defi-audit/${audit.id}`, {
+                                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/defi/audit/${audit.id}`, {
                                   method: 'DELETE',
                                   headers: { Authorization: `Bearer ${token}` }
                                 })

@@ -13,7 +13,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
+import dynamic from 'next/dynamic'
 import { AppHeader } from '@/components/AppHeader'
 import { Footer } from '@/components/Footer'
 import { useAuth } from '@/components/providers/AuthProvider'
@@ -21,11 +21,24 @@ import { useDashboardData } from '@/components/dashboard/useDashboardData'
 import { HeroSection } from '@/components/dashboard/HeroSection'
 import { QuickActionsGrid } from '@/components/dashboard/QuickActionsGrid'
 
-// ✅ PERFORMANCE: Import components directly (no lazy loading for now)
+// ✅ PERFORMANCE: Lazy load non-critical components
 import AlertsSection from '@/components/dashboard/AlertsSection'
-import AIChat from '@/components/dashboard/AIChat'
-import TaxOpportunities from '@/components/dashboard/TaxOpportunities'
-import RecentActivities from '@/components/dashboard/RecentActivities'
+
+// Lazy load heavy components to improve initial page load
+const AIChat = dynamic(() => import('@/components/dashboard/AIChat'), {
+  loading: () => <div className="animate-pulse bg-slate-800/50 rounded-2xl h-96 mb-12" />,
+  ssr: false
+})
+
+const TaxOpportunities = dynamic(() => import('@/components/dashboard/TaxOpportunities'), {
+  loading: () => <div className="animate-pulse bg-slate-800/50 rounded-2xl h-48 mb-12" />,
+  ssr: false
+})
+
+const RecentActivities = dynamic(() => import('@/components/dashboard/RecentActivities'), {
+  loading: () => <div className="animate-pulse bg-slate-800/50 rounded-2xl h-64 mb-12" />,
+  ssr: false
+})
 
 export default function DashboardPage() {
   const { user, isLoading: authLoading, token } = useAuth()
