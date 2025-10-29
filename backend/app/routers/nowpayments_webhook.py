@@ -318,7 +318,7 @@ async def create_crypto_payment(
 
     Returns payment details with address and amount to pay
     """
-    from app.auth import get_current_user
+    from app.routers.auth import get_current_user
 
     # Get current user (requires authentication)
     try:
