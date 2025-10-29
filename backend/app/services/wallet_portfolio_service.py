@@ -54,6 +54,9 @@ class WalletPortfolioService:
                 "total_chains": int
             }
         """
+        import time
+        start_time = time.time()
+
         wallet = self.db.query(UserWallet).filter(
             UserWallet.id == wallet_id,
             UserWallet.user_id == user_id
@@ -63,10 +66,13 @@ class WalletPortfolioService:
             raise ValueError(f"Wallet {wallet_id} not found")
 
         # Get on-chain balances
+        balance_start = time.time()
         balances = await self.balance_service.get_wallet_balances(
             wallet.wallet_address,
             wallet.chain
         )
+        balance_time = time.time() - balance_start
+        logger.info(f"[PERF] Wallet {wallet_id} - Balance fetch: {balance_time:.2f}s")
 
         # ⚡ PERFORMANCE: Collect all tokens first, then batch fetch prices
         positions = []
@@ -87,7 +93,10 @@ class WalletPortfolioService:
                 all_tokens.append(token.get("symbol", "UNKNOWN"))
 
         # ⚡ BATCH FETCH: Get ALL prices in ONE API call
+        price_start = time.time()
         token_prices = self.price_service.get_current_prices_batch(all_tokens)
+        price_time = time.time() - price_start
+        logger.info(f"[PERF] Wallet {wallet_id} - Price fetch for {len(all_tokens)} tokens: {price_time:.2f}s")
 
         # Native token
         if native_balance > 0 and chain_symbol:
@@ -152,6 +161,9 @@ class WalletPortfolioService:
             if total_cost_basis > 0
             else Decimal("0")
         )
+
+        total_time = time.time() - start_time
+        logger.info(f"[PERF] Wallet {wallet_id} - TOTAL calculation time: {total_time:.2f}s")
 
         return {
             "total_value_usd": total_value_usd,
@@ -276,10 +288,16 @@ class WalletPortfolioService:
         Returns:
             Aggregated portfolio data
         """
+        import time
+        start_time = time.time()
+        logger.info(f"[PERF] User {user_id} - Starting consolidated portfolio calculation")
+
         wallets = self.db.query(UserWallet).filter(
             UserWallet.user_id == user_id,
             UserWallet.is_active == True
         ).all()
+
+        logger.info(f"[PERF] User {user_id} - Found {len(wallets)} active wallets")
 
         if not wallets:
             return {
@@ -301,11 +319,14 @@ class WalletPortfolioService:
 
         # ⚡ PERFORMANCE: Calculate ALL wallets in PARALLEL instead of sequential loop
         import asyncio
+        parallel_start = time.time()
         wallet_tasks = [
             self.calculate_wallet_value(wallet.id, user_id)
             for wallet in wallets
         ]
         wallet_portfolios = await asyncio.gather(*wallet_tasks, return_exceptions=True)
+        parallel_time = time.time() - parallel_start
+        logger.info(f"[PERF] User {user_id} - Parallel wallet calculations: {parallel_time:.2f}s")
 
         for wallet, wallet_portfolio in zip(wallets, wallet_portfolios):
             # Skip failed wallets
@@ -370,6 +391,9 @@ class WalletPortfolioService:
             if total_cost_basis > 0
             else Decimal("0")
         )
+
+        total_time = time.time() - start_time
+        logger.info(f"[PERF] User {user_id} - TOTAL consolidated portfolio time: {total_time:.2f}s")
 
         return {
             "total_value_usd": total_value_usd,
