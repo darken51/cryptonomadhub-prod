@@ -163,6 +163,9 @@ async def add_wallet(
     """
     Add a new wallet address to user's portfolio
     """
+    # 🔍 DEBUG: Log wallet creation attempts
+    logger.info(f"[ADD_WALLET] User {current_user.id} attempting to add: {request.wallet_address} on {request.chain}")
+
     # Use transaction to prevent race conditions
     try:
         # Check if wallet already exists for this user
@@ -200,11 +203,13 @@ async def add_wallet(
         db.add(wallet)
         db.commit()
         db.refresh(wallet)
-    except HTTPException:
+    except HTTPException as he:
         db.rollback()
+        logger.warning(f"[ADD_WALLET] HTTPException for user {current_user.id}: {he.status_code} - {he.detail}")
         raise
     except Exception as e:
         db.rollback()
+        logger.error(f"[ADD_WALLET] Unexpected error for user {current_user.id}: {type(e).__name__}: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Failed to add wallet: {str(e)}")
     
     return WalletResponse(
