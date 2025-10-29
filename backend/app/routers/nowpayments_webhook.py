@@ -228,6 +228,29 @@ async def nowpayments_webhook(
     return {"status": "ok"}
 
 
+@router.get("/payment-status/{payment_id}")
+async def get_payment_status(payment_id: int):
+    """Get current status of a crypto payment"""
+    nowpayments = NOWPaymentsService()
+    payment = await nowpayments.get_payment_status(payment_id)
+
+    if not payment:
+        raise HTTPException(status_code=404, detail="Payment not found")
+
+    return {
+        "payment_id": payment.get("payment_id"),
+        "payment_status": payment.get("payment_status"),
+        "pay_address": payment.get("pay_address"),
+        "pay_amount": payment.get("pay_amount"),
+        "pay_currency": payment.get("pay_currency"),
+        "price_amount": payment.get("price_amount"),
+        "price_currency": payment.get("price_currency"),
+        "actually_paid": payment.get("actually_paid"),
+        "created_at": payment.get("created_at"),
+        "updated_at": payment.get("updated_at")
+    }
+
+
 @router.get("/currencies")
 async def get_available_currencies():
     """Get list of available cryptocurrencies for payment"""
@@ -267,3 +290,108 @@ async def estimate_crypto_payment(
         raise HTTPException(status_code=503, detail="Failed to get price estimate")
 
     return estimate
+
+
+@router.post("/create-payment")
+async def create_crypto_payment(
+    tier: str,  # "starter" or "pro"
+    period: str,  # "monthly" or "annual"
+    crypto: str,  # "btc", "eth", "usdttrc20", etc.
+    request: Request,
+    db: Session = Depends(get_db)
+):
+    """
+    Create a new crypto payment
+
+    Example: POST /nowpayments/create-payment
+    {
+        "tier": "starter",
+        "period": "monthly",
+        "crypto": "btc"
+    }
+
+    Returns payment details with address and amount to pay
+    """
+    from app.auth import get_current_user
+
+    # Get current user (requires authentication)
+    try:
+        user = await get_current_user(request, db)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Authentication required")
+
+    # Validate tier and period
+    if tier not in ["starter", "pro"]:
+        raise HTTPException(status_code=400, detail="Invalid tier. Must be 'starter' or 'pro'")
+
+    if period not in ["monthly", "annual"]:
+        raise HTTPException(status_code=400, detail="Invalid period. Must be 'monthly' or 'annual'")
+
+    # Define pricing
+    pricing = {
+        "starter": {"monthly": 15.00, "annual": 144.00},
+        "pro": {"monthly": 39.00, "annual": 374.00}
+    }
+
+    price = pricing[tier][period]
+
+    # Create order ID
+    order_id = f"user_{user.id}_{tier}_{period}"
+
+    # Create payment description
+    plan_name = f"{tier.capitalize()} {period.capitalize()}"
+    description = f"CryptoNomadHub {plan_name} Subscription"
+
+    # Callback URLs
+    from app.config import settings
+    ipn_callback = f"{settings.BACKEND_URL}/nowpayments/webhook"
+    success_url = f"{settings.FRONTEND_URL}/dashboard?payment=success"
+    cancel_url = f"{settings.FRONTEND_URL}/pricing?payment=cancelled"
+
+    # Create payment via NOWPayments
+    nowpayments = NOWPaymentsService()
+    payment = await nowpayments.create_payment(
+        price_amount=price,
+        price_currency="usd",
+        pay_currency=crypto.lower(),
+        order_id=order_id,
+        order_description=description,
+        ipn_callback_url=ipn_callback,
+        success_url=success_url,
+        cancel_url=cancel_url,
+        customer_email=user.email
+    )
+
+    if not payment:
+        raise HTTPException(status_code=503, detail="Failed to create payment")
+
+    # Log payment creation
+    audit = AuditLog(
+        user_id=user.id,
+        action="crypto_payment_initiated",
+        details={
+            "payment_id": payment.get("payment_id"),
+            "tier": tier,
+            "period": period,
+            "amount": price,
+            "crypto": crypto
+        }
+    )
+    db.add(audit)
+    db.commit()
+
+    logger.info(f"Created crypto payment {payment.get('payment_id')} for user {user.id}")
+
+    return {
+        "payment_id": payment.get("payment_id"),
+        "pay_address": payment.get("pay_address"),
+        "pay_amount": payment.get("pay_amount"),
+        "pay_currency": payment.get("pay_currency"),
+        "price_amount": price,
+        "price_currency": "USD",
+        "order_id": order_id,
+        "order_description": description,
+        "created_at": payment.get("created_at"),
+        "expiration_estimate_date": payment.get("expiration_estimate_date"),
+        "payment_url": payment.get("invoice_url")  # Link to NOWPayments payment page
+    }

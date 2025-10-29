@@ -4,10 +4,13 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Check, X, Zap, Crown, Rocket, Building2, Mail } from 'lucide-react'
 import { PublicPageLayout } from '@/components/PublicPageLayout'
+import { CryptoPaymentModal } from '@/components/CryptoPaymentModal'
 import { motion } from 'framer-motion'
 
 export default function Pricing() {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly')
+  const [cryptoModalOpen, setCryptoModalOpen] = useState(false)
+  const [selectedPlan, setSelectedPlan] = useState<{ name: string, tier: 'starter' | 'pro', period: 'monthly' | 'annual', amount: number } | null>(null)
 
   const plans = [
     {
@@ -367,6 +370,27 @@ export default function Pricing() {
                       >
                         {plan.cta}
                       </Link>
+
+                      {/* Crypto Payment Button (only for paid plans) */}
+                      {(plan.name === 'Starter' || plan.name === 'Pro') && (
+                        <button
+                          onClick={() => {
+                            const tier = plan.name.toLowerCase() as 'starter' | 'pro'
+                            const amount = billingCycle === 'monthly' ? plan.monthlyPrice : plan.annualPrice
+                            setSelectedPlan({
+                              name: `${plan.name} ${billingCycle.charAt(0).toUpperCase() + billingCycle.slice(1)}`,
+                              tier,
+                              period: billingCycle,
+                              amount: amount!
+                            })
+                            setCryptoModalOpen(true)
+                          }}
+                          className="mt-3 w-full text-center px-6 py-3 rounded-xl font-semibold transition-all border-2 border-violet-600 dark:border-fuchsia-400 text-violet-600 dark:text-fuchsia-400 hover:bg-violet-50 dark:hover:bg-violet-900/20 flex items-center justify-center gap-2"
+                        >
+                          <span className="text-xl">🪙</span>
+                          Pay with Crypto
+                        </button>
+                      )}
                     </div>
 
                     {/* Features List */}
@@ -487,6 +511,21 @@ export default function Pricing() {
           </motion.div>
         </div>
       </main>
+
+      {/* Crypto Payment Modal */}
+      {selectedPlan && (
+        <CryptoPaymentModal
+          isOpen={cryptoModalOpen}
+          onClose={() => {
+            setCryptoModalOpen(false)
+            setSelectedPlan(null)
+          }}
+          planName={selectedPlan.name}
+          tier={selectedPlan.tier}
+          period={selectedPlan.period}
+          amount={selectedPlan.amount}
+        />
+      )}
     </PublicPageLayout>
   )
 }
