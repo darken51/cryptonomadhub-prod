@@ -2,10 +2,10 @@
 License Model for Subscription Management
 
 Handles freemium pricing tiers with usage limits:
-- FREE: 5 simulations/month, no DeFi audit, no PDF export
-- STARTER: 50 simulations/month, 5 DeFi audits/month, unlimited PDF
-- PRO: 500 simulations/month, 50 DeFi audits/month, unlimited PDF
-- ENTERPRISE: Unlimited everything
+- FREE: 3 simulations/month, 2 DeFi audits/month, 10 AI msgs, 1 wallet
+- STARTER: $15/mo - 50 simulations/month, 15 DeFi audits/month, 100 AI msgs, 3 wallets, 1k tx/year
+- PRO: $39/mo - Unlimited simulations, 100 DeFi audits/month, 500 AI msgs, 15 wallets, 50k tx/year
+- ENTERPRISE: Custom pricing - Unlimited everything
 """
 
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, Float, Enum as SQLEnum, ForeignKey
@@ -115,28 +115,36 @@ class License(Base):
         """Get usage limits for current tier"""
         limits = {
             LicenseTier.FREE: {
-                "simulations": 5,
-                "defi_audits": 0,
+                "simulations": 3,
+                "defi_audits": 2,
                 "pdf_exports": 0,
-                "chat_messages": 20,
+                "chat_messages": 10,
+                "wallets": 1,
+                "cost_basis_tx": 0,
             },
             LicenseTier.STARTER: {
                 "simulations": 50,
-                "defi_audits": 5,
+                "defi_audits": 15,
                 "pdf_exports": 999999,  # Unlimited
-                "chat_messages": 200,
+                "chat_messages": 100,
+                "wallets": 3,
+                "cost_basis_tx": 1000,
             },
             LicenseTier.PRO: {
-                "simulations": 500,
-                "defi_audits": 50,
+                "simulations": 999999,  # Unlimited
+                "defi_audits": 100,
                 "pdf_exports": 999999,
-                "chat_messages": 2000,
+                "chat_messages": 500,
+                "wallets": 15,
+                "cost_basis_tx": 50000,
             },
             LicenseTier.ENTERPRISE: {
                 "simulations": 999999,
                 "defi_audits": 999999,
                 "pdf_exports": 999999,
                 "chat_messages": 999999,
+                "wallets": 999999,
+                "cost_basis_tx": 999999,
             }
         }
         return limits.get(self.tier, limits[LicenseTier.FREE])

@@ -203,41 +203,61 @@ async def get_paddle_plans():
     return {
         "plans": [
             {
-                "id": settings.PADDLE_PLAN_STARTER,
-                "name": "Starter",
-                "price": 20,
+                "id": "free",
+                "name": "Free",
+                "monthly_price": 0,
+                "annual_price": 0,
                 "currency": "USD",
                 "features": [
-                    "10 simulations/month",
-                    "10 countries",
-                    "Basic audit",
-                    "Email support"
+                    "3 simulations/month",
+                    "2 DeFi audits/month",
+                    "10 AI messages/month",
+                    "1 wallet",
+                    "167 countries database"
                 ]
             },
             {
-                "id": settings.PADDLE_PLAN_PRO,
+                "id": settings.PADDLE_PLAN_STARTER if hasattr(settings, 'PADDLE_PLAN_STARTER') else "starter_monthly",
+                "name": "Starter",
+                "monthly_price": 15,
+                "annual_price": 144,
+                "currency": "USD",
+                "features": [
+                    "50 simulations/month",
+                    "15 DeFi audits/month + PDF",
+                    "100 AI messages/month",
+                    "3 wallets",
+                    "1k cost basis tx/year"
+                ]
+            },
+            {
+                "id": settings.PADDLE_PLAN_PRO if hasattr(settings, 'PADDLE_PLAN_PRO') else "pro_monthly",
                 "name": "Pro",
-                "price": 50,
+                "monthly_price": 39,
+                "annual_price": 374,
                 "currency": "USD",
                 "features": [
                     "Unlimited simulations",
-                    "50 countries",
-                    "Real-time DeFi audit",
-                    "Export tax forms",
-                    "Priority support"
+                    "100 DeFi audits/month + CSV",
+                    "500 AI messages/month",
+                    "15 wallets",
+                    "50k cost basis tx/year",
+                    "Tax Optimizer AI"
                 ]
             },
             {
-                "id": settings.PADDLE_PLAN_ENTERPRISE,
+                "id": "enterprise",
                 "name": "Enterprise",
-                "price": 100,
+                "monthly_price": None,
+                "annual_price": None,
                 "currency": "USD",
+                "custom_pricing": True,
                 "features": [
-                    "Everything in Pro",
-                    "API access",
+                    "Everything Unlimited",
+                    "API access + webhooks",
+                    "5-100+ users",
                     "White-label option",
-                    "Dedicated support",
-                    "CPA review included"
+                    "Dedicated support"
                 ]
             }
         ]
