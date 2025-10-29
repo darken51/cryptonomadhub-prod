@@ -50,12 +50,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const userData = await response.json()
         setUser(userData)
       } else {
-        // Token invalid
+        // Token invalid - clear everything and logout
         localStorage.removeItem('access_token')
         setToken(null)
+        setUser(null)
       }
     } catch (error) {
       console.error('Failed to fetch user:', error)
+      // Network error - also clear auth state
+      localStorage.removeItem('access_token')
+      setToken(null)
+      setUser(null)
     } finally {
       setIsLoading(false)
     }
