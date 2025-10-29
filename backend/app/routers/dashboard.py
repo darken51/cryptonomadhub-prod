@@ -45,6 +45,8 @@ router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
 
 async def _get_user_stats(db: Session, user_id: int) -> DashboardStats:
     """Calculate dashboard statistics for a user"""
+    import time
+    func_start = time.time()
 
     # Count simulations (if table exists - placeholder for now)
     total_simulations = 0
@@ -168,6 +170,9 @@ async def _get_user_stats(db: Session, user_id: int) -> DashboardStats:
                     potential_tax_savings_local = potential_tax_savings * exchange_rate
         except Exception as e:
             logger.warning(f"Could not get exchange rate for jurisdiction: {e}")
+
+    stats_time = time.time() - func_start
+    logger.info(f"[_get_user_stats] User {user_id} - Completed in {stats_time:.2f}s")
 
     return DashboardStats(
         total_simulations=total_simulations,
@@ -464,15 +469,29 @@ async def get_dashboard_overview(
     try:
         # ⚡ PERFORMANCE: Fetch stats and portfolio in PARALLEL (both call exchange rate)
         import asyncio
+        import time
+
+        logger.info(f"[DASHBOARD] User {current_user.id} - Starting dashboard fetch")
+        start_time = time.time()
+
+        stats_start = time.time()
         stats, portfolio = await asyncio.gather(
             _get_user_stats(db, current_user.id),
             _get_portfolio_summary(db, current_user.id)
         )
+        parallel_time = time.time() - stats_start
+        logger.info(f"[DASHBOARD] User {current_user.id} - Stats+Portfolio: {parallel_time:.2f}s")
 
         # These are fast (no async calls), run them after
+        sync_start = time.time()
         alerts = _get_user_alerts(db, current_user.id, stats)
         activities = _get_recent_activities(db, current_user.id, limit=10)
         tax_opportunities = _get_tax_opportunities(db, current_user.id, limit=5)
+        sync_time = time.time() - sync_start
+        logger.info(f"[DASHBOARD] User {current_user.id} - Sync operations: {sync_time:.2f}s")
+
+        total_time = time.time() - start_time
+        logger.info(f"[DASHBOARD] User {current_user.id} - TOTAL TIME: {total_time:.2f}s")
 
         return DashboardOverview(
             stats=stats,

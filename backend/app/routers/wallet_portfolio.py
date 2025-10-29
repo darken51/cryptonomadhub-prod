@@ -114,11 +114,21 @@ async def get_portfolio_overview(
         - 24h changes
         - List of all wallets with their values
     """
+    import time
+    import logging
+    logger = logging.getLogger(__name__)
+
+    start_time = time.time()
+    logger.info(f"[WALLET_PORTFOLIO] User {current_user.id} - Starting portfolio fetch")
+
     service = WalletPortfolioService(db)
 
     try:
         # Get consolidated portfolio
+        portfolio_start = time.time()
         portfolio = await service.get_consolidated_portfolio(current_user.id)
+        portfolio_time = time.time() - portfolio_start
+        logger.info(f"[WALLET_PORTFOLIO] User {current_user.id} - Portfolio calc: {portfolio_time:.2f}s")
 
         # Get 24h change (from most recent consolidated snapshot)
         yesterday = datetime.utcnow() - timedelta(hours=24)
@@ -153,6 +163,9 @@ async def get_portfolio_overview(
                 total_chains=1,
                 last_updated=datetime.utcnow().isoformat()
             ))
+
+        total_time = time.time() - start_time
+        logger.info(f"[WALLET_PORTFOLIO] User {current_user.id} - TOTAL TIME: {total_time:.2f}s")
 
         return ConsolidatedPortfolioResponse(
             total_value_usd=float(portfolio["total_value_usd"]),
