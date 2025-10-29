@@ -250,9 +250,34 @@ export default function WalletsPage() {
         fetchPortfolio();
         alert("✅ Wallet added successfully!");
       } else {
-        // Show error message from API
-        const errorData = await res.json().catch(() => ({ detail: "Failed to add wallet" }));
-        alert(`❌ Error: ${errorData.detail || "Failed to add wallet"}`);
+        // Show detailed error message from API
+        try {
+          const errorData = await res.json();
+          console.error("API Error:", errorData);
+
+          // Handle different error formats
+          let errorMessage = "Failed to add wallet";
+
+          if (errorData.detail) {
+            // FastAPI standard error format
+            if (Array.isArray(errorData.detail)) {
+              // Pydantic validation errors
+              errorMessage = errorData.detail.map((e: any) => `${e.loc.join('.')}: ${e.msg}`).join('\n');
+            } else if (typeof errorData.detail === 'string') {
+              errorMessage = errorData.detail;
+            } else if (typeof errorData.detail === 'object') {
+              errorMessage = JSON.stringify(errorData.detail);
+            }
+          } else if (errorData.message) {
+            errorMessage = errorData.message;
+          }
+
+          alert(`❌ Error (${res.status}):\n${errorMessage}`);
+        } catch (parseError) {
+          const text = await res.text();
+          console.error("Failed to parse error response:", text);
+          alert(`❌ Error ${res.status}: ${text.substring(0, 200)}`);
+        }
       }
     } catch (error) {
       console.error("Failed to add wallet:", error);
