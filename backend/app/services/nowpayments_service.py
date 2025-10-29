@@ -125,8 +125,7 @@ class NOWPaymentsService:
             payload["success_url"] = success_url
         if cancel_url:
             payload["cancel_url"] = cancel_url
-        if customer_email:
-            payload["payout_extra_id"] = customer_email  # For tracking
+        # Note: customer_email not used in payload as NOWPayments doesn't accept it for /payment endpoint
 
         try:
             async with httpx.AsyncClient() as client:
