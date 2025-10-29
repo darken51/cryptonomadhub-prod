@@ -143,7 +143,7 @@ export default function TermsOfService() {
               </h2>
               <div className="space-y-4 text-slate-700 dark:text-slate-300">
                 <p><strong className="text-violet-600 dark:text-fuchsia-400">Free Tier:</strong> Limited features with usage quotas</p>
-                <p><strong className="text-violet-600 dark:text-fuchsia-400">Paid Tiers:</strong> STARTER ($20/month), PRO ($50/month), ENTERPRISE (custom pricing)</p>
+                <p><strong className="text-violet-600 dark:text-fuchsia-400">Paid Tiers:</strong> STARTER ($15/month or $144/year), PRO ($39/month or $374/year), ENTERPRISE (custom pricing)</p>
 
                 <div>
                   <p className="font-semibold mb-2">Payment terms:</p>
@@ -151,8 +151,8 @@ export default function TermsOfService() {
                     <li>Payments are processed securely via Paddle (our Merchant of Record)</li>
                     <li>Subscriptions renew automatically unless cancelled</li>
                     <li>You can cancel anytime from your account settings</li>
-                    <li>No refunds for partial months</li>
                     <li>We reserve the right to change pricing with 30 days notice</li>
+                    <li>Cryptocurrency payments (BTC, ETH, USDT) may be available for annual plans</li>
                   </ul>
                 </div>
               </div>
@@ -167,9 +167,9 @@ export default function TermsOfService() {
                 Each subscription tier has monthly usage limits:
               </p>
               <ul className="list-disc pl-6 text-slate-700 dark:text-slate-300 space-y-2">
-                <li><strong>FREE:</strong> 5 simulations, 0 DeFi audits, 20 chat messages</li>
-                <li><strong>STARTER:</strong> 50 simulations, 5 DeFi audits, 200 chat messages</li>
-                <li><strong>PRO:</strong> 500 simulations, 50 DeFi audits, 2000 chat messages</li>
+                <li><strong>FREE:</strong> 3 simulations, 2 DeFi audits, 10 chat messages, 1 wallet</li>
+                <li><strong>STARTER:</strong> 50 simulations, 15 DeFi audits, 100 chat messages, 3 wallets, 1k cost basis tx/year</li>
+                <li><strong>PRO:</strong> Unlimited simulations, 100 DeFi audits, 500 chat messages, 15 wallets, 50k cost basis tx/year</li>
                 <li><strong>ENTERPRISE:</strong> Unlimited with fair use policy</li>
               </ul>
               <p className="text-slate-700 dark:text-slate-300 mt-4 leading-relaxed">
@@ -177,10 +177,58 @@ export default function TermsOfService() {
               </p>
             </motion.section>
 
+            {/* Refund Policy */}
+            <motion.section variants={fadeInUp} className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/20 dark:to-teal-950/20 rounded-2xl p-8 border-l-4 border-emerald-500 shadow-xl">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-12 h-12 bg-emerald-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <span className="text-2xl">💰</span>
+                </div>
+                <h2 className="text-2xl font-semibold text-emerald-900 dark:text-emerald-200">
+                  7. Refund Policy
+                </h2>
+              </div>
+              <div className="space-y-4 text-slate-700 dark:text-slate-300">
+                <p className="font-semibold text-emerald-900 dark:text-emerald-200">14-Day Money-Back Guarantee:</p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>If you are not satisfied with your purchase, you may request a full refund within <strong>14 days</strong> of your initial subscription payment</li>
+                  <li>To request a refund, contact us at <strong className="text-violet-600 dark:text-fuchsia-400">contact@cryptonomadhub.io</strong> with your account email and subscription details</li>
+                  <li>Refunds are processed within 5-10 business days via Paddle (our payment processor)</li>
+                  <li>After the 14-day period, subscriptions are non-refundable</li>
+                </ul>
+
+                <p className="font-semibold text-emerald-900 dark:text-emerald-200 mt-4">No Partial Month Refunds:</p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>If you cancel your subscription after the 14-day refund period, you will NOT receive a prorated refund for the unused portion of your billing period</li>
+                  <li>Your subscription will remain active until the end of the current billing cycle</li>
+                  <li>You can continue using all paid features until your subscription expires</li>
+                </ul>
+
+                <p className="font-semibold text-emerald-900 dark:text-emerald-200 mt-4">Annual Subscriptions:</p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>Annual subscriptions are eligible for the 14-day money-back guarantee</li>
+                  <li>After 14 days, annual subscriptions are non-refundable even if cancelled mid-year</li>
+                  <li>You will retain access until the end of your annual billing period</li>
+                </ul>
+
+                <p className="font-semibold text-emerald-900 dark:text-emerald-200 mt-4">Refund Exceptions:</p>
+                <ul className="list-disc pl-6 space-y-2">
+                  <li>We reserve the right to refuse refunds for accounts that violate our Terms of Service</li>
+                  <li>Accounts that abuse the refund policy (e.g., repeated subscriptions and cancellations) may be banned</li>
+                  <li>Cryptocurrency payments may have different refund terms due to blockchain irreversibility</li>
+                </ul>
+
+                <div className="mt-6 p-4 bg-white dark:bg-slate-800 rounded-lg border border-emerald-200 dark:border-emerald-900">
+                  <p className="text-sm font-semibold text-emerald-900 dark:text-emerald-200 mb-2">Contact for Refunds:</p>
+                  <p className="text-sm">Email: <a href="mailto:contact@cryptonomadhub.io" className="text-violet-600 dark:text-fuchsia-400 hover:underline">contact@cryptonomadhub.io</a></p>
+                  <p className="text-sm mt-1">Include: Your account email, subscription details, and reason for refund request</p>
+                </div>
+              </div>
+            </motion.section>
+
             {/* Prohibited Uses */}
             <motion.section variants={fadeInUp} className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-xl">
               <h2 className="text-2xl font-semibold mb-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent">
-                7. Prohibited Uses
+                8. Prohibited Uses
               </h2>
               <p className="text-slate-700 dark:text-slate-300 mb-4 leading-relaxed">You may NOT:</p>
               <ul className="list-disc pl-6 text-slate-700 dark:text-slate-300 space-y-2">
@@ -197,7 +245,7 @@ export default function TermsOfService() {
             {/* Intellectual Property */}
             <motion.section variants={fadeInUp} className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-xl">
               <h2 className="text-2xl font-semibold mb-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent">
-                8. Intellectual Property
+                9. Intellectual Property
               </h2>
               <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
                 The Service and its original content, features, and functionality are owned by CryptoNomadHub and are
@@ -208,7 +256,7 @@ export default function TermsOfService() {
             {/* Data Privacy */}
             <motion.section variants={fadeInUp} className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-xl">
               <h2 className="text-2xl font-semibold mb-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent">
-                9. Data and Privacy
+                10. Data and Privacy
               </h2>
               <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
                 Your use of the Service is also governed by our <Link href="/privacy" className="text-violet-600 dark:text-fuchsia-400 hover:underline font-semibold">Privacy Policy</Link>.
@@ -219,7 +267,7 @@ export default function TermsOfService() {
             {/* Termination */}
             <motion.section variants={fadeInUp} className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-xl">
               <h2 className="text-2xl font-semibold mb-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent">
-                10. Termination
+                11. Termination
               </h2>
               <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
                 We may terminate or suspend your account and access immediately, without prior notice or liability,
@@ -234,7 +282,7 @@ export default function TermsOfService() {
                   <Info className="w-6 h-6 text-white" />
                 </div>
                 <h2 className="text-2xl font-semibold text-orange-900 dark:text-orange-200">
-                  11. Your Responsibilities
+                  12. Your Responsibilities
                 </h2>
               </div>
               <div className="space-y-4 text-slate-700 dark:text-slate-300">
@@ -257,7 +305,7 @@ export default function TermsOfService() {
             {/* Indemnification */}
             <motion.section variants={fadeInUp} className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-xl">
               <h2 className="text-2xl font-semibold mb-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent">
-                12. Indemnification
+                13. Indemnification
               </h2>
               <p className="text-slate-700 dark:text-slate-300 mb-4 leading-relaxed">
                 You agree to defend, indemnify, and hold harmless CryptoNomadHub, its owners, employees, contractors, and
@@ -279,7 +327,7 @@ export default function TermsOfService() {
                   <ShieldAlert className="w-6 h-6 text-white" />
                 </div>
                 <h2 className="text-2xl font-semibold text-red-900 dark:text-red-200">
-                  13. Limitation of Liability
+                  14. Limitation of Liability
                 </h2>
               </div>
               <div className="space-y-4 text-slate-700 dark:text-slate-300">
@@ -299,7 +347,7 @@ export default function TermsOfService() {
             {/* Blockchain Data Disclaimer */}
             <motion.section variants={fadeInUp} className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-xl">
               <h2 className="text-2xl font-semibold mb-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent">
-                14. Blockchain Data and DeFi Audit Disclaimer
+                15. Blockchain Data and DeFi Audit Disclaimer
               </h2>
               <p className="text-slate-700 dark:text-slate-300 mb-4 leading-relaxed">Regarding DeFi audits and on-chain transaction analysis:</p>
               <ul className="list-disc pl-6 text-slate-700 dark:text-slate-300 space-y-2">
@@ -315,7 +363,7 @@ export default function TermsOfService() {
             {/* Remaining sections with similar styling */}
             <motion.section variants={fadeInUp} className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-xl">
               <h2 className="text-2xl font-semibold mb-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent">
-                15. Governing Law and Dispute Resolution
+                16. Governing Law and Dispute Resolution
               </h2>
               <div className="text-slate-700 dark:text-slate-300 space-y-4 leading-relaxed">
                 <p>
@@ -336,7 +384,7 @@ export default function TermsOfService() {
 
             <motion.section variants={fadeInUp} className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-xl">
               <h2 className="text-2xl font-semibold mb-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent">
-                16. Severability
+                17. Severability
               </h2>
               <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
                 If any provision of these Terms is found to be unenforceable or invalid, that provision shall be
@@ -346,7 +394,7 @@ export default function TermsOfService() {
 
             <motion.section variants={fadeInUp} className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-xl">
               <h2 className="text-2xl font-semibold mb-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent">
-                17. Changes to Terms
+                18. Changes to Terms
               </h2>
               <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
                 We reserve the right to modify these Terms at any time. We will notify you of material changes by
@@ -358,7 +406,7 @@ export default function TermsOfService() {
 
             <motion.section variants={fadeInUp} className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-xl">
               <h2 className="text-2xl font-semibold mb-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent">
-                18. Entire Agreement
+                19. Entire Agreement
               </h2>
               <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
                 These Terms, together with our Privacy Policy and any other legal notices published by us on the Service,
@@ -368,7 +416,7 @@ export default function TermsOfService() {
 
             <motion.section variants={fadeInUp} className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200 dark:border-slate-800 shadow-xl">
               <h2 className="text-2xl font-semibold mb-4 bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent">
-                19. Contact Us
+                20. Contact Us
               </h2>
               <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
                 If you have questions about these Terms, please contact us at:<br />
