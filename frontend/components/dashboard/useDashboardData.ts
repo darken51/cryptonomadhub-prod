@@ -36,9 +36,18 @@ export function useDashboardData(token: string | null) {
 
       // ✅ OPTIMIZATION: Fetch all data in PARALLEL (not sequential)
       const [overviewRes, portfolioRes, simulationsRes] = await Promise.all([
-        fetch(`${baseUrl}/dashboard/overview`, { headers }),
-        fetch(`${baseUrl}/wallet-portfolio/overview?t=${Date.now()}`, { headers }),
-        fetch(`${baseUrl}/simulations/history`, { headers }),
+        fetch(`${baseUrl}/dashboard/overview`, {
+          headers,
+          next: { revalidate: 60 } // Cache for 60 seconds
+        }),
+        fetch(`${baseUrl}/wallet-portfolio/overview`, {
+          headers,
+          next: { revalidate: 30 } // Cache for 30 seconds
+        }),
+        fetch(`${baseUrl}/simulations/history`, {
+          headers,
+          next: { revalidate: 120 } // Cache for 2 minutes
+        }),
       ])
 
       // Parse responses in parallel

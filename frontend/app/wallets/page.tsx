@@ -94,8 +94,8 @@ export default function WalletsPage() {
     if (!isLoading && !user) {
       router.push("/auth/login");
     } else if (user && token) {
-      fetchWallets();
-      fetchPortfolio();
+      // Fetch in parallel for better performance
+      Promise.all([fetchWallets(), fetchPortfolio()]);
     }
   }, [user, isLoading, token, router]);
 

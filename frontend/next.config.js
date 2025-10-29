@@ -20,12 +20,18 @@ const nextConfig = {
     minimumCacheTTL: 60,
   },
 
-  // Enable SWC minification
-  swcMinify: true,
-
   // ✅ PERFORMANCE: Experimental optimizations
   experimental: {
-    optimizePackageImports: ['lucide-react', 'framer-motion'],
+    optimizePackageImports: ['lucide-react', 'framer-motion', '@radix-ui/react-icons'],
+    // Optimize CSS
+    optimizeCss: true,
+  },
+
+  // Reduce bundle size
+  modularizeImports: {
+    'lucide-react': {
+      transform: 'lucide-react/dist/esm/icons/{{kebabCase member}}',
+    },
   },
 
   // Production optimizations

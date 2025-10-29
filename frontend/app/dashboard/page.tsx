@@ -93,8 +93,23 @@ export default function DashboardPage() {
 
   if (authLoading || isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-500"></div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+        <AppHeader />
+        <main className="container mx-auto px-4 py-8 max-w-7xl">
+          {/* Loading skeleton */}
+          <div className="animate-pulse space-y-8">
+            {/* Hero skeleton */}
+            <div className="bg-slate-800/50 rounded-3xl h-96" />
+            {/* Quick actions skeleton */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map(i => (
+                <div key={i} className="bg-slate-800/50 rounded-2xl h-32" />
+              ))}
+            </div>
+            {/* Content skeleton */}
+            <div className="bg-slate-800/50 rounded-2xl h-64" />
+          </div>
+        </main>
       </div>
     )
   }
