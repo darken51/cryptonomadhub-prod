@@ -279,6 +279,84 @@ class PriceService:
         except Exception as e:
             logger.warning(f"Redis set failed: {e}")
 
+    def get_current_prices_batch(self, token_symbols: list[str]) -> dict[str, Optional[Decimal]]:
+        """
+        Get current prices for multiple tokens in ONE API call (MUCH faster than individual calls)
+
+        Args:
+            token_symbols: List of token symbols (e.g., ["ETH", "USDC", "SOL"])
+
+        Returns:
+            Dict mapping token symbol to price (or None if not found)
+        """
+        result = {}
+        tokens_to_fetch = []
+        coingecko_ids = []
+
+        for token_symbol in token_symbols:
+            token_symbol = token_symbol.upper()
+
+            # Stablecoins
+            if token_symbol in ["USDC", "USDT", "DAI", "BUSD"]:
+                result[token_symbol] = Decimal("1.0")
+                continue
+
+            # Check cache first
+            cache_key = self._get_cache_key("current", token_symbol)
+            cached_price = self._get_from_cache(cache_key)
+            if cached_price:
+                result[token_symbol] = Decimal(cached_price)
+                continue
+
+            # Queue for batch fetch
+            coingecko_id = self.TOKEN_ID_MAP.get(token_symbol)
+            if coingecko_id:
+                tokens_to_fetch.append(token_symbol)
+                coingecko_ids.append(coingecko_id)
+            else:
+                result[token_symbol] = None
+
+        # Batch fetch from CoinGecko (1 API call for all tokens!)
+        if coingecko_ids:
+            try:
+                url = f"{self.base_url}/simple/price"
+                params = {
+                    "ids": ",".join(coingecko_ids),
+                    "vs_currencies": "usd"
+                }
+
+                response = self.client.get(url, params=params)
+
+                if response.status_code == 200:
+                    data = response.json()
+
+                    # Map results back to token symbols
+                    for i, token_symbol in enumerate(tokens_to_fetch):
+                        coingecko_id = coingecko_ids[i]
+                        price = data.get(coingecko_id, {}).get("usd")
+
+                        if price:
+                            price_decimal = Decimal(str(price))
+                            result[token_symbol] = price_decimal
+                            # Cache it
+                            cache_key = self._get_cache_key("current", token_symbol)
+                            self._set_cache(cache_key, str(price_decimal), ttl_seconds=300)
+                        else:
+                            result[token_symbol] = None
+
+                    logger.info(f"Batch fetched prices for {len(tokens_to_fetch)} tokens in 1 API call")
+                else:
+                    # API failed, set all to None
+                    for token_symbol in tokens_to_fetch:
+                        result[token_symbol] = None
+
+            except Exception as e:
+                logger.error(f"Error in batch price fetch: {e}")
+                for token_symbol in tokens_to_fetch:
+                    result[token_symbol] = None
+
+        return result
+
     def get_current_price(self, token_symbol: str) -> Optional[Decimal]:
         """
         Get current price for a token (with Redis caching)

@@ -68,16 +68,30 @@ class WalletPortfolioService:
             wallet.chain
         )
 
-        # Calculate positions with prices
+        # ⚡ PERFORMANCE: Collect all tokens first, then batch fetch prices
         positions = []
         total_value_usd = Decimal("0")
         total_cost_basis = Decimal("0")
 
-        # Native token
+        # Collect all token symbols
+        all_tokens = []
         native_balance = balances.get("native_balance", Decimal("0"))
+        chain_symbol = None
+
         if native_balance > 0:
             chain_symbol = self._get_chain_native_symbol(wallet.chain)
-            native_price = await self._get_token_price(chain_symbol)
+            all_tokens.append(chain_symbol)
+
+        for token in balances.get("tokens", []):
+            if token.get("balance_formatted", Decimal("0")) > 0:
+                all_tokens.append(token.get("symbol", "UNKNOWN"))
+
+        # ⚡ BATCH FETCH: Get ALL prices in ONE API call
+        token_prices = self.price_service.get_current_prices_batch(all_tokens)
+
+        # Native token
+        if native_balance > 0 and chain_symbol:
+            native_price = token_prices.get(chain_symbol, Decimal("0"))
 
             native_value = native_balance * native_price
             native_cost = await self._get_cost_basis(
@@ -108,7 +122,7 @@ class WalletPortfolioService:
                 continue
 
             symbol = token.get("symbol", "UNKNOWN")
-            price = await self._get_token_price(symbol)
+            price = token_prices.get(symbol, Decimal("0"))
 
             value_usd = balance * price
             cost_basis = await self._get_cost_basis(

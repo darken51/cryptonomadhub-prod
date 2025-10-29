@@ -68,12 +68,19 @@ async def _get_user_stats(db: Session, user_id: int) -> DashboardStats:
     total_portfolio_value = 0.0
     portfolio_cost_basis = 0.0
 
-    # Calculate portfolio value
+    # ⚡ PERFORMANCE: Batch fetch all prices in ONE API call instead of N calls
     from app.services.price_service import PriceService
     price_service = PriceService()
 
+    # Collect unique tokens
+    unique_tokens = list(set([lot.token for lot in lots]))
+
+    # Batch fetch prices (1 API call for ALL tokens!)
+    token_prices = price_service.get_current_prices_batch(unique_tokens)
+
+    # Calculate portfolio value using batch-fetched prices
     for lot in lots:
-        current_price_decimal = price_service.get_current_price(lot.token)
+        current_price_decimal = token_prices.get(lot.token)
         if current_price_decimal:
             current_price = float(current_price_decimal)
         else:
