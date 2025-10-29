@@ -140,9 +140,20 @@ export function CryptoPaymentModal({ isOpen, onClose, planName, tier, period, am
     setError(null)
 
     try {
+      // Get token from localStorage
+      const token = localStorage.getItem('access_token')
+      if (!token) {
+        setError('Authentication required. Please log in again.')
+        setLoading(false)
+        return
+      }
+
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/nowpayments/create-payment`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         credentials: 'include',
         body: JSON.stringify({
           tier,
