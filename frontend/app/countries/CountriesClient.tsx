@@ -118,8 +118,8 @@ export default function CountriesClient({ initialCountries }: CountriesClientPro
     if (filterType === 'crypto-friendly') {
       filtered = filtered.filter(c =>
         !isCryptoBanned(c) && (
-          (c.crypto_short_rate !== null && c.crypto_short_rate !== undefined && c.crypto_short_rate < 10) ||
-          (c.cgt_short_rate < 10)
+          (c.crypto_short_rate !== null && c.crypto_short_rate !== undefined && c.crypto_short_rate < 0.10) ||
+          (c.cgt_short_rate < 0.10)
         )
       )
     } else if (filterType === 'has-crypto-data') {
@@ -383,7 +383,7 @@ export default function CountriesClient({ initialCountries }: CountriesClientPro
                     <div className="bg-gradient-to-br from-violet-50 to-fuchsia-50 dark:from-violet-900/20 dark:to-fuchsia-900/20 rounded-lg p-4">
                       <p className="text-xs font-medium text-violet-700 dark:text-violet-300 mb-1">Crypto Short-Term</p>
                       <div className="flex items-baseline gap-2">
-                        <p className="text-2xl font-bold text-violet-900 dark:text-violet-200">{country.crypto_short_rate}%</p>
+                        <p className="text-2xl font-bold text-violet-900 dark:text-violet-200">{(country.crypto_short_rate * 100).toFixed(1)}%</p>
                         {country.crypto_short_rate === 0 && (
                           <Link
                             href={`/countries/${country.country_code.toLowerCase()}`}
@@ -403,7 +403,7 @@ export default function CountriesClient({ initialCountries }: CountriesClientPro
                       <p className="text-xs font-medium text-emerald-700 dark:text-emerald-300 mb-1">Crypto Long-Term</p>
                       <div className="flex items-baseline gap-2">
                         <p className="text-2xl font-bold text-emerald-900 dark:text-emerald-200">
-                          {country.crypto_long_rate ?? country.crypto_short_rate}%
+                          {((country.crypto_long_rate ?? country.crypto_short_rate) * 100).toFixed(1)}%
                         </p>
                         {(country.crypto_long_rate === 0 || country.crypto_short_rate === 0) && (
                           <Link
@@ -426,7 +426,7 @@ export default function CountriesClient({ initialCountries }: CountriesClientPro
                     <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4">
                       <p className="text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">General CGT Short-Term</p>
                       <div className="flex items-baseline gap-2">
-                        <p className="text-2xl font-bold text-slate-900 dark:text-slate-200">{country.cgt_short_rate}%</p>
+                        <p className="text-2xl font-bold text-slate-900 dark:text-slate-200">{(country.cgt_short_rate * 100).toFixed(1)}%</p>
                         {country.cgt_short_rate === 0 && (
                           <Link
                             href={`/countries/${country.country_code.toLowerCase()}`}
@@ -440,7 +440,7 @@ export default function CountriesClient({ initialCountries }: CountriesClientPro
                     <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4">
                       <p className="text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">General CGT Long-Term</p>
                       <div className="flex items-baseline gap-2">
-                        <p className="text-2xl font-bold text-slate-900 dark:text-slate-200">{country.cgt_long_rate}%</p>
+                        <p className="text-2xl font-bold text-slate-900 dark:text-slate-200">{(country.cgt_long_rate * 100).toFixed(1)}%</p>
                         {country.cgt_long_rate === 0 && (
                           <Link
                             href={`/countries/${country.country_code.toLowerCase()}`}
