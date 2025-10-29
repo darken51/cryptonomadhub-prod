@@ -2,12 +2,16 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Check, X, Zap, Crown, Rocket, Building2, Mail } from 'lucide-react'
 import { PublicPageLayout } from '@/components/PublicPageLayout'
 import { CryptoPaymentModal } from '@/components/CryptoPaymentModal'
 import { motion } from 'framer-motion'
+import { useAuth } from '@/components/providers/AuthProvider'
 
 export default function Pricing() {
+  const router = useRouter()
+  const { user } = useAuth()
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly')
   const [cryptoModalOpen, setCryptoModalOpen] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState<{ name: string, tier: 'starter' | 'pro', period: 'monthly' | 'annual', amount: number } | null>(null)
@@ -375,6 +379,13 @@ export default function Pricing() {
                       {(plan.name === 'Starter' || plan.name === 'Pro') && (
                         <button
                           onClick={() => {
+                            // Check if user is authenticated
+                            if (!user) {
+                              // Redirect to login with return URL
+                              router.push('/auth/login?redirect=/pricing')
+                              return
+                            }
+
                             const tier = plan.name.toLowerCase() as 'starter' | 'pro'
                             const amount = billingCycle === 'monthly' ? plan.monthlyPrice : plan.annualPrice
                             setSelectedPlan({
