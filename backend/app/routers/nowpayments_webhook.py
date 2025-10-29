@@ -257,9 +257,9 @@ async def get_available_currencies():
     nowpayments = NOWPaymentsService()
     currencies = await nowpayments.get_available_currencies()
 
-    # Filter to most popular ones
-    popular = ["btc", "eth", "usdttrc20", "usdterc20", "ltc", "usdc", "bnb_bsc"]
-    available = [c for c in currencies if c in popular]
+    # Filter to most popular ones (matching frontend)
+    popular = ["btc", "eth", "usdttrc20", "usdterc20", "usdc", "usdcerc20", "ltc", "bnb_bsc"]
+    available = [c for c in currencies if c.lower() in popular]
 
     return {
         "currencies": available,
