@@ -273,7 +273,7 @@ export default function CountryDetailPage() {
         >
           <div className="flex items-start gap-4 mb-4">
             {country.flag_emoji && (
-              <span className="text-6xl">{country.flag_emoji}</span>
+              <span className="text-6xl" role="img" aria-label={`${country.country_name} flag`}>{country.flag_emoji}</span>
             )}
             <div className="flex-1">
               <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent mb-2">
@@ -529,7 +529,7 @@ export default function CountryDetailPage() {
                     >
                       <div className="p-4 rounded-lg border-2 border-slate-200 dark:border-slate-700 hover:border-violet-400 dark:hover:border-violet-600 transition-colors bg-slate-50 dark:bg-slate-900">
                         <div className="flex items-center gap-3 mb-2">
-                          {similar.flag_emoji && <span className="text-3xl">{similar.flag_emoji}</span>}
+                          {similar.flag_emoji && <span className="text-3xl" role="img" aria-label={`${similar.country_name} flag`}>{similar.flag_emoji}</span>}
                           <div className="flex-1">
                             <p className="font-semibold text-slate-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
                               {similar.country_name}

@@ -439,7 +439,7 @@ export default function CountriesClient({ initialCountries }: CountriesClientPro
           >
             <div className="flex items-start justify-between mb-4">
               <div className="flex items-center gap-3">
-                <span className="text-4xl">{country.flag_emoji || '🌍'}</span>
+                <span className="text-4xl" role="img" aria-label={`${country.country_name} flag`}>{country.flag_emoji || '🌍'}</span>
                 <div>
                   <h2 className={`text-xl sm:text-2xl font-bold ${
                     isCryptoBanned(country)
