@@ -77,19 +77,20 @@ class MultiChainBalanceService:
     ) -> Dict[str, any]:
         """Get EVM chain balances with fallback strategy"""
 
-        # Try Moralis first (supports most EVM chains)
-        if self.moralis_key:
-            try:
-                return await self._get_moralis_balances(wallet_address, chain)
-            except Exception as e:
-                logger.warning(f"Moralis failed for {chain}: {e}, trying fallback...")
-
-        # Fallback to Alchemy (Ethereum, Polygon, Arbitrum, Optimism, Base)
+        # ⚡ PERFORMANCE FIX: Try Alchemy FIRST (Moralis has 401 errors currently)
+        # Alchemy is faster and more reliable for supported chains
         if self.alchemy_key and chain in ["ethereum", "polygon", "arbitrum", "optimism", "base"]:
             try:
                 return await self._get_alchemy_balances(wallet_address, chain)
             except Exception as e:
-                logger.warning(f"Alchemy failed for {chain}: {e}, trying RPC...")
+                logger.warning(f"Alchemy failed for {chain}: {e}, trying Moralis...")
+
+        # Fallback to Moralis (if Alchemy not available or failed)
+        if self.moralis_key:
+            try:
+                return await self._get_moralis_balances(wallet_address, chain)
+            except Exception as e:
+                logger.warning(f"Moralis failed for {chain}: {e}, trying RPC...")
 
         # Final fallback: Public RPC
         try:
