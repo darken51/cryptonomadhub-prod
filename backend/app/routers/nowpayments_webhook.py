@@ -300,14 +300,16 @@ class CreateCryptoPaymentRequest(BaseModel):
     crypto: str
 
 
+from app.routers.auth import get_current_user
+
 @router.post("/create-payment")
 async def create_crypto_payment(
     payment_request: CreateCryptoPaymentRequest,
-    request: Request,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user)
 ):
     """
-    Create a new crypto payment
+    Create a new crypto payment (requires authentication)
 
     Example: POST /nowpayments/create-payment
     {
@@ -318,13 +320,6 @@ async def create_crypto_payment(
 
     Returns payment details with address and amount to pay
     """
-    from app.routers.auth import get_current_user
-
-    # Get current user (requires authentication)
-    try:
-        user = await get_current_user(request, db)
-    except Exception:
-        raise HTTPException(status_code=401, detail="Authentication required")
 
     tier = payment_request.tier
     period = payment_request.period
