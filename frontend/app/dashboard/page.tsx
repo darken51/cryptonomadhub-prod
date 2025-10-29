@@ -47,6 +47,19 @@ export default function DashboardPage() {
   // ✅ OPTIMIZATION: Single hook fetches all data in parallel
   const { data, isLoading, refetch } = useDashboardData(token)
 
+  const [loadingTime, setLoadingTime] = useState(0)
+
+  // Track loading time
+  useEffect(() => {
+    if (isLoading) {
+      setLoadingTime(0)
+      const interval = setInterval(() => {
+        setLoadingTime(prev => prev + 1)
+      }, 1000)
+      return () => clearInterval(interval)
+    }
+  }, [isLoading])
+
   const [dismissedAlerts, setDismissedAlerts] = useState<Set<string>>(() => {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem('dismissedAlerts')
@@ -96,17 +109,35 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
         <AppHeader />
         <main className="container mx-auto px-4 py-8 max-w-7xl">
-          {/* Loading skeleton */}
-          <div className="animate-pulse space-y-8">
-            {/* Hero skeleton */}
+          {/* Loading spinner + message */}
+          <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-6">
+            <div className="relative">
+              <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-b-4 border-violet-500"></div>
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <div className="w-3 h-3 bg-violet-500 rounded-full animate-pulse"></div>
+              </div>
+            </div>
+            <div className="text-center space-y-2">
+              <h2 className="text-2xl font-bold text-white">Loading Dashboard...</h2>
+              <p className="text-slate-400">Fetching your portfolio and tax data</p>
+              {loadingTime > 0 && (
+                <p className="text-sm text-slate-500 mt-2">
+                  {loadingTime}s elapsed
+                  {loadingTime > 5 && <span className="block mt-1 text-yellow-400">⚡ Fetching token prices from multiple blockchains...</span>}
+                  {loadingTime > 10 && <span className="block mt-1 text-orange-400">Almost there! Large portfolio detected.</span>}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Loading skeleton (subtle in background) */}
+          <div className="animate-pulse space-y-8 opacity-30">
             <div className="bg-slate-800/50 rounded-3xl h-96" />
-            {/* Quick actions skeleton */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {[1, 2, 3, 4].map(i => (
                 <div key={i} className="bg-slate-800/50 rounded-2xl h-32" />
               ))}
             </div>
-            {/* Content skeleton */}
             <div className="bg-slate-800/50 rounded-2xl h-64" />
           </div>
         </main>
