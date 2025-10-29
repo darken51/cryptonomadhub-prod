@@ -538,7 +538,7 @@ export default function CountryDetailPage() {
                           </div>
                         </div>
                         <div className="flex items-baseline gap-2">
-                          <span className="text-2xl font-bold text-violet-600 dark:text-violet-400">{rate}%</span>
+                          <span className="text-2xl font-bold text-violet-600 dark:text-violet-400">{(rate * 100).toFixed(1)}%</span>
                           <span className="text-xs text-slate-500 dark:text-slate-400">crypto tax</span>
                         </div>
                       </div>
