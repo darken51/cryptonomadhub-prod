@@ -67,6 +67,7 @@ async def nowpayments_webhook(
     actually_paid = data.get("actually_paid")  # Actual crypto received
 
     logger.info(f"NOWPayments IPN: payment_id={payment_id}, status={payment_status}, order={order_id}")
+    logger.info(f"Payment details: price={price_amount} {price_currency}, paid={actually_paid} {pay_currency}")
 
     # Parse order_id to extract user_id and plan
     try:
