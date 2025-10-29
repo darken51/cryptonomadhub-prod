@@ -248,9 +248,15 @@ export default function WalletsPage() {
         setDetectedChain(null);
         fetchWallets();
         fetchPortfolio();
+        alert("✅ Wallet added successfully!");
+      } else {
+        // Show error message from API
+        const errorData = await res.json().catch(() => ({ detail: "Failed to add wallet" }));
+        alert(`❌ Error: ${errorData.detail || "Failed to add wallet"}`);
       }
     } catch (error) {
       console.error("Failed to add wallet:", error);
+      alert("❌ Network error: Could not connect to server");
     }
   };
 

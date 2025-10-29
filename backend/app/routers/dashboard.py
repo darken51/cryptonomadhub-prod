@@ -462,12 +462,17 @@ async def get_dashboard_overview(
     - Portfolio summary
     """
     try:
-        # Get all dashboard data
-        stats = await _get_user_stats(db, current_user.id)
+        # ⚡ PERFORMANCE: Fetch stats and portfolio in PARALLEL (both call exchange rate)
+        import asyncio
+        stats, portfolio = await asyncio.gather(
+            _get_user_stats(db, current_user.id),
+            _get_portfolio_summary(db, current_user.id)
+        )
+
+        # These are fast (no async calls), run them after
         alerts = _get_user_alerts(db, current_user.id, stats)
         activities = _get_recent_activities(db, current_user.id, limit=10)
         tax_opportunities = _get_tax_opportunities(db, current_user.id, limit=5)
-        portfolio = await _get_portfolio_summary(db, current_user.id)
 
         return DashboardOverview(
             stats=stats,
