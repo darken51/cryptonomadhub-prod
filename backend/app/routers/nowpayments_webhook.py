@@ -292,11 +292,17 @@ async def estimate_crypto_payment(
     return estimate
 
 
+from pydantic import BaseModel
+
+class CreateCryptoPaymentRequest(BaseModel):
+    tier: str
+    period: str
+    crypto: str
+
+
 @router.post("/create-payment")
 async def create_crypto_payment(
-    tier: str,  # "starter" or "pro"
-    period: str,  # "monthly" or "annual"
-    crypto: str,  # "btc", "eth", "usdttrc20", etc.
+    payment_request: CreateCryptoPaymentRequest,
     request: Request,
     db: Session = Depends(get_db)
 ):
@@ -319,6 +325,10 @@ async def create_crypto_payment(
         user = await get_current_user(request, db)
     except Exception:
         raise HTTPException(status_code=401, detail="Authentication required")
+
+    tier = payment_request.tier
+    period = payment_request.period
+    crypto = payment_request.crypto
 
     # Validate tier and period
     if tier not in ["starter", "pro"]:
