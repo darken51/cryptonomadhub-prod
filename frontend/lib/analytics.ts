@@ -176,3 +176,29 @@ export const trackConversion = (conversionType: string, value?: number, properti
     timestamp: new Date().toISOString(),
   })
 }
+
+export const trackCountryVisit = (countryCode: string, countryName: string, userId?: string) => {
+  analytics.track('country_page_viewed', {
+    country_code: countryCode,
+    country_name: countryName,
+    user_id: userId,
+    timestamp: new Date().toISOString(),
+  })
+}
+
+export const trackDataDownload = (format: 'json' | 'csv', userId?: string) => {
+  analytics.track('data_downloaded', {
+    format,
+    user_id: userId,
+    timestamp: new Date().toISOString(),
+  })
+}
+
+export const trackSearch = (query: string, resultsCount: number, userId?: string) => {
+  analytics.track('search_performed', {
+    query,
+    results_count: resultsCount,
+    user_id: userId,
+    timestamp: new Date().toISOString(),
+  })
+}
