@@ -84,31 +84,63 @@ export default function CountryDetailPage() {
     try {
       setIsLoading(true)
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'
-      const response = await fetch(`${apiUrl}/regulations?include_analysis=true`)
 
-      if (!response.ok) throw new Error('Failed to fetch country data')
+      // ✅ PERFORMANCE OPTIMIZATION:
+      // 1. Fetch ONLY the requested country (not all 167 countries)
+      // 2. Use cache for similar countries lookup
 
-      const data: Country[] = await response.json()
-      const foundCountry = data.find(c => c.country_code === country_code.toUpperCase())
+      // Fetch the specific country with analysis (optimized endpoint)
+      const countryResponse = await fetch(
+        `${apiUrl}/regulations/${country_code.toUpperCase()}?include_analysis=true`
+      )
 
-      if (!foundCountry) {
-        setError('Country not found')
-      } else {
-        setCountry(foundCountry)
-
-        // Find similar countries based on crypto tax rate
-        const currentRate = foundCountry.crypto_short_rate ?? foundCountry.cgt_short_rate
-        const otherCountries = data
-          .filter(c => c.country_code !== foundCountry.country_code && c.crypto_legal_status !== 'banned')
-          .map(c => ({
-            ...c,
-            taxDiff: Math.abs((c.crypto_short_rate ?? c.cgt_short_rate) - currentRate)
-          }))
-          .sort((a, b) => a.taxDiff - b.taxDiff)
-          .slice(0, 3)
-
-        setSimilarCountries(otherCountries)
+      if (!countryResponse.ok) {
+        if (countryResponse.status === 404) {
+          setError('Country not found')
+          setIsLoading(false)
+          return
+        }
+        throw new Error('Failed to fetch country data')
       }
+
+      const foundCountry: Country = await countryResponse.json()
+      setCountry(foundCountry)
+
+      // ✅ For similar countries: use cached all-countries data if available
+      const cacheKey = 'countries_reliable_list'
+      const cacheTTL = 10 * 60 * 1000 // 10 minutes
+      const cached = localStorage.getItem(cacheKey)
+      const cacheTime = localStorage.getItem(cacheKey + '_time')
+
+      let allCountries: Country[]
+
+      if (cached && cacheTime && Date.now() - parseInt(cacheTime) < cacheTTL) {
+        // Use cached list for similar countries
+        allCountries = JSON.parse(cached)
+      } else {
+        // Fetch reliable countries list (smaller, without full analysis)
+        const listResponse = await fetch(`${apiUrl}/regulations/?reliable_only=true`)
+        if (listResponse.ok) {
+          allCountries = await listResponse.json()
+          localStorage.setItem(cacheKey, JSON.stringify(allCountries))
+          localStorage.setItem(cacheKey + '_time', Date.now().toString())
+        } else {
+          allCountries = []
+        }
+      }
+
+      // Find similar countries based on crypto tax rate
+      const currentRate = foundCountry.crypto_short_rate ?? foundCountry.cgt_short_rate
+      const otherCountries = allCountries
+        .filter(c => c.country_code !== foundCountry.country_code && c.crypto_legal_status !== 'banned')
+        .map(c => ({
+          ...c,
+          taxDiff: Math.abs((c.crypto_short_rate ?? c.cgt_short_rate) - currentRate)
+        }))
+        .sort((a, b) => a.taxDiff - b.taxDiff)
+        .slice(0, 3)
+
+      setSimilarCountries(otherCountries)
     } catch (err) {
       console.error('Error fetching country:', err)
       setError('Failed to load country data')
