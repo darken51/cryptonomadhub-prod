@@ -1,5 +1,8 @@
 'use client'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 import Link from 'next/link'
 import { ArrowRight, BookOpen, Code, Rocket, FileText, Shield, Zap, Globe, Terminal, Book, MessageCircle, CheckCircle } from 'lucide-react'
 import { PublicPageLayout } from '@/components/PublicPageLayout'

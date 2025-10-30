@@ -1,5 +1,8 @@
 'use client'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, FileText, Clock, Tag, TrendingUp, Globe, DollarSign, Shield, Calendar } from 'lucide-react'

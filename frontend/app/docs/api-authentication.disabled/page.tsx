@@ -1,5 +1,8 @@
 'use client'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 import Link from 'next/link'
 import { ArrowLeft, Key, Code, Shield } from 'lucide-react'
 import { Header } from '@/components/Header'

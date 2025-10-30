@@ -1,5 +1,8 @@
 'use client'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 import Link from 'next/link'
 import { useState } from 'react'
 import { ArrowRight, HelpCircle, MessageCircle, Mail, BookOpen, ChevronDown, Search, Zap, Globe, Activity, Calculator, Users, Shield } from 'lucide-react'

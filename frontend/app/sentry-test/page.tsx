@@ -1,5 +1,8 @@
 'use client'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 import { AppHeader } from '@/components/AppHeader'
 import { Footer } from '@/components/Footer'
 
