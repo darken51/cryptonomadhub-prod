@@ -13,6 +13,9 @@ import { Footer } from '@/components/Footer'
 import { GoogleSignInButton } from '@/components/GoogleSignInButton'
 import { trackSignup } from '@/lib/analytics'
 
+// Force dynamic rendering for auth pages
+export const dynamic = 'force-dynamic'
+
 export default function RegisterPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
