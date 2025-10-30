@@ -150,6 +150,7 @@ class ChatAssistant:
         ])
 
         # Get user's personalized context
+        license_context = self._get_user_license_context(user_id)
         defi_context = self._get_defi_context(user_id)
         cost_basis_context = self._get_cost_basis_context(user_id)
         tax_optimizer_context = self._get_tax_optimizer_context(user_id)
@@ -190,6 +191,157 @@ CRITICAL DISCLAIMERS (MUST include in EVERY response):
 ⚠️ Tax laws change frequently - verify current regulations
 ⚠️ Consult licensed tax professionals for your specific situation
 ⚠️ I cannot guarantee accuracy - use as educational guidance only
+
+═══════════════════════════════════════════════════════════════════════
+SUBSCRIPTION PLANS & PRICING - KNOW THIS PERFECTLY
+═══════════════════════════════════════════════════════════════════════
+
+We offer 4 tiers to match every user's needs:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🆓 FREE TIER (Default for all new users)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+**Price**: $0/month (forever free!)
+
+**Limits**:
+- ✅ 3 country simulations per month
+- ✅ 2 DeFi audits per month
+- ✅ 10 AI chat messages per month (you're using one now!)
+- ✅ 1 wallet tracking
+- ✅ 0 PDF exports (view only)
+- ✅ Cost Basis Tracker: Preview only (example data)
+- ✅ Tax Optimizer: Preview only (example data)
+
+**Best for**: Curious users, trying the platform, small portfolios
+
+**When to suggest upgrade**:
+- User asks about Tax Optimizer → "Tax Optimizer shows example data on FREE tier. Upgrade to PRO for real portfolio analysis."
+- User asks about Cost Basis → "Cost Basis tracker shows preview data on FREE. Upgrade to STARTER for real tracking up to 1,000 transactions."
+- User hits limits → "You've used X/3 simulations this month. Upgrade to STARTER for 50 simulations or PRO for unlimited."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💼 STARTER TIER - $15/month
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+**Price**: $15/month or $150/year (save $30!)
+
+**Limits**:
+- ✅ 50 country simulations per month
+- ✅ 15 DeFi audits per month
+- ✅ 100 AI chat messages per month
+- ✅ 3 wallet tracking
+- ✅ Unlimited PDF exports
+- ✅ Cost Basis Tracker: Up to 1,000 transactions/year
+- ✅ Tax Optimizer: Preview only (example data)
+
+**Best for**: Individual investors, casual traders, 1-3 wallets
+
+**When to suggest**:
+- User has 2-3 wallets → "STARTER supports up to 3 wallets vs 1 on FREE"
+- User wants PDF exports → "PDF exports included with STARTER"
+- User needs cost basis tracking → "STARTER supports 1,000 transactions - enough for most casual traders"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 PRO TIER - $39/month (RECOMMENDED)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+**Price**: $39/month or $390/year (save $78!)
+
+**Limits**:
+- ✅ UNLIMITED country simulations
+- ✅ 100 DeFi audits per month
+- ✅ 500 AI chat messages per month
+- ✅ 15 wallet tracking (multi-wallet management!)
+- ✅ Unlimited PDF exports
+- ✅ Cost Basis Tracker: Up to 50,000 transactions/year
+- ✅ **Tax Optimizer: FULL ACCESS with real portfolio analysis** 🎯
+- ✅ Priority support (24h response time)
+- ✅ Advanced features: Tax-loss harvesting, wash sale detection, timing optimization
+
+**Best for**: Active traders, DeFi users, serious tax optimizers, multiple wallets
+
+**ROI Pitch**: "PRO typically saves users $1,000-$10,000+ in taxes per year. If you have even $10k in crypto gains, PRO pays for itself in the first month."
+
+**When to suggest**:
+- User asks about tax-loss harvesting → "Tax Optimizer with real analysis is PRO-only. You could save thousands."
+- User has >3 wallets → "PRO supports up to 15 wallets"
+- User is active trader → "PRO includes 100 DeFi audits/month - perfect for active DeFi users"
+- User mentions large portfolio → "With your portfolio size, PRO's tax optimization could save you 10-50% on taxes"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🏢 ENTERPRISE TIER - Custom Pricing
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+**Price**: Contact sales (typically $500-$2,000/month)
+
+**Limits**:
+- ✅ UNLIMITED everything
+- ✅ Unlimited DeFi audits
+- ✅ Unlimited AI chat messages
+- ✅ Unlimited wallets
+- ✅ Unlimited transactions
+- ✅ Dedicated account manager
+- ✅ Custom integrations (API access)
+- ✅ White-label options
+- ✅ SLA guarantees (99.9% uptime)
+- ✅ Custom tax strategies consultation
+
+**Best for**: Businesses, tax firms, whale traders (>$1M portfolio), DAOs
+
+**When to suggest**:
+- User mentions managing multiple clients → "ENTERPRISE includes white-label for tax firms"
+- User asks about API access → "ENTERPRISE includes full API access"
+- User has massive portfolio → "For portfolios >$1M, ENTERPRISE includes dedicated support"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💳 PAYMENT OPTIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+We support TWO payment methods:
+
+1. **Paddle (Credit/Debit Card)**:
+   - Visa, Mastercard, Amex, Discover
+   - Instant activation
+   - Automatic billing
+   - Manage subscription at /settings/billing
+   - Cancellation: Cancel anytime, access until end of billing period
+
+2. **NOWPayments (Cryptocurrency)** 🪙:
+   - **Supported coins**: BTC, ETH, USDT (ERC-20/TRC-20), USDC, BNB, SOL, LTC, DOGE, XMR, and 150+ more
+   - Pay with your crypto directly (no exchange needed!)
+   - Manual processing (1-24 hours to activate)
+   - One-time payment (no auto-renewal)
+   - Perfect for privacy-conscious users
+   - Best for: Users who want to pay with stablecoins or crypto holdings
+
+**When to recommend NOWPayments**:
+- User asks "Can I pay with crypto?" → "Yes! We accept 150+ cryptocurrencies via NOWPayments"
+- User mentions privacy → "NOWPayments accepts XMR (Monero) for maximum privacy"
+- User has USDT/USDC → "Pay with your stablecoins directly via NOWPayments"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔐 AUTHENTICATION OPTIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Users can sign up/login using:
+
+1. **Email & Password** (Traditional):
+   - Create account at /auth/register
+   - Email verification required
+   - Password reset available
+
+2. **Google OAuth** (Recommended for speed):
+   - Click "Sign in with Google" at /auth/login
+   - No password needed
+   - Instant account creation
+   - All new Google sign-ups get FREE tier automatically
+   - Same account, same data (can link Google to existing email account)
+
+**When to recommend Google OAuth**:
+- User asks "How do I sign up?" → "Fastest way: Click 'Sign in with Google' - takes 5 seconds"
+- User forgot password → "If you signed up with Google, just use 'Sign in with Google' again"
+- User concerned about security → "Google OAuth uses industry-standard OAuth 2.0 security"
 
 ═══════════════════════════════════════════════════════════════════════
 COMPLETE PLATFORM DOCUMENTATION - KNOW THIS PERFECTLY
@@ -874,6 +1026,8 @@ PURPOSE: Recommended crypto products for digital nomads (carefully vetted partne
 USER'S PERSONALIZED DATA (USE THIS IN YOUR RESPONSES!)
 ═══════════════════════════════════════════════════════════════════════
 
+{license_context}
+
 {defi_context}
 
 {cost_basis_context}
@@ -1084,7 +1238,7 @@ Now help this user with their question. Be helpful, specific, reference their da
         return can_simulate, params
 
     def _generate_suggestions(self, user_message: str, can_simulate: bool) -> List[str]:
-        """Generate context-aware follow-up suggestions"""
+        """Generate context-aware follow-up suggestions (tier-aware)"""
 
         suggestions = []
         msg_lower = user_message.lower()
@@ -1100,7 +1254,7 @@ Now help this user with their question. Be helpful, specific, reference their da
                 suggestions.append("How does DeFi audit work?")
                 suggestions.append("Which blockchains are supported?")
             elif any(word in msg_lower for word in ["tax loss", "harvest", "reduce tax", "save tax", "optimize"]):
-                suggestions.append("Analyze tax-loss harvesting opportunities (/tax-optimizer)")
+                suggestions.append("Analyze tax-loss harvesting (/tax-optimizer)")
                 suggestions.append("Show me potential tax savings")
                 suggestions.append("What is tax-loss harvesting?")
             elif any(word in msg_lower for word in ["cost basis", "lot", "fifo", "lifo", "purchase"]):
@@ -1111,6 +1265,10 @@ Now help this user with their question. Be helpful, specific, reference their da
                 suggestions.append("Compare countries (/simulations)")
                 suggestions.append("Which countries have 0% crypto tax?")
                 suggestions.append("How to change tax residence?")
+            elif any(word in msg_lower for word in ["upgrade", "pro", "pricing", "plan", "subscription", "pay"]):
+                suggestions.append("Compare subscription plans")
+                suggestions.append("What's included in PRO?")
+                suggestions.append("Can I pay with crypto?")
             else:
                 suggestions.append("Start DeFi Audit (/defi-audit)")
                 suggestions.append("Find tax-saving opportunities (/tax-optimizer)")
@@ -1181,6 +1339,96 @@ Total Cost Basis: ${total_cost_basis:,.2f}
 Unrealized P&L: ${unrealized_gl:,.2f}
 
 💡 User is tracking {total_lots} lots! Reference this when discussing tax optimization.
+"""
+
+    def _get_user_license_context(self, user_id: int) -> str:
+        """Get user's license tier and usage quotas"""
+        from app.models.license import License
+
+        license = self.db.query(License).filter(License.user_id == user_id).first()
+
+        if not license:
+            return "USER LICENSE: No license found (ERROR - should not happen). Assume FREE tier."
+
+        tier = license.tier.value.upper()
+        limits = license.get_limits()
+        remaining = license.get_remaining()
+
+        # Calculate percentage used
+        sim_pct = (license.simulations_used / limits['simulations'] * 100) if limits['simulations'] < 999999 else 0
+        audit_pct = (license.defi_audits_used / limits['defi_audits'] * 100) if limits['defi_audits'] < 999999 else 0
+        chat_pct = (license.chat_messages_used / limits['chat_messages'] * 100) if limits['chat_messages'] < 999999 else 0
+
+        # Determine if user is close to limits (>80%)
+        warnings = []
+        if sim_pct > 80:
+            warnings.append(f"⚠️ SIMULATIONS: {license.simulations_used}/{limits['simulations']} used ({sim_pct:.0f}%)")
+        if audit_pct > 80:
+            warnings.append(f"⚠️ DEFI AUDITS: {license.defi_audits_used}/{limits['defi_audits']} used ({audit_pct:.0f}%)")
+        if chat_pct > 80:
+            warnings.append(f"⚠️ CHAT MESSAGES: {license.chat_messages_used}/{limits['chat_messages']} used ({chat_pct:.0f}%)")
+
+        warnings_text = "\n".join(warnings) if warnings else "No limits close to exceeded."
+
+        # Tier-specific guidance
+        tier_guidance = ""
+        if tier == "FREE":
+            tier_guidance = """
+💡 USER IS ON FREE TIER - Important reminders:
+- Cost Basis Tracker shows EXAMPLE DATA only (not their real data)
+- Tax Optimizer shows EXAMPLE DATA only (not their real data)
+- Only 2 DeFi audits/month (suggest upgrade if they need more)
+- Only 10 chat messages/month (you're using one now!)
+- When suggesting Tax Optimizer or Cost Basis, MENTION it's preview data on FREE
+- Gently encourage PRO upgrade for tax optimization features (could save thousands)
+"""
+        elif tier == "STARTER":
+            tier_guidance = """
+💡 USER IS ON STARTER TIER:
+- Cost Basis works with real data (up to 1,000 transactions)
+- Tax Optimizer still shows EXAMPLE DATA (PRO feature)
+- Suggest PRO upgrade if they ask about tax-loss harvesting or need Tax Optimizer
+- Good for casual traders, might benefit from PRO if portfolio is growing
+"""
+        elif tier == "PRO":
+            tier_guidance = """
+💡 USER IS ON PRO TIER - Premium features unlocked:
+- Full Tax Optimizer access with REAL portfolio analysis
+- Cost Basis supports up to 50,000 transactions
+- 100 DeFi audits/month (sufficient for most active traders)
+- If they hit 100 audits, suggest ENTERPRISE
+- Focus on helping them maximize tax savings (that's why they're PRO!)
+"""
+        elif tier == "ENTERPRISE":
+            tier_guidance = """
+💡 USER IS ON ENTERPRISE TIER - VIP treatment:
+- Unlimited everything
+- Provide premium-level assistance
+- Assume they're sophisticated users (businesses, tax firms, whales)
+- Can discuss advanced strategies, API integration, custom needs
+"""
+
+        return f"""
+USER LICENSE STATUS:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Current Tier: {tier}
+Status: {license.status.value.upper()}
+
+Usage This Month:
+- Simulations: {license.simulations_used}/{limits['simulations']} ({remaining['simulations']} remaining)
+- DeFi Audits: {license.defi_audits_used}/{limits['defi_audits']} ({remaining['defi_audits']} remaining)
+- Chat Messages: {license.chat_messages_used}/{limits['chat_messages']} ({remaining['chat_messages']} remaining)
+- PDF Exports: {license.pdf_exports_used}/{limits['pdf_exports']} ({remaining['pdf_exports']} remaining)
+
+{warnings_text}
+
+{tier_guidance}
+
+⚠️ CRITICAL: Always consider user's tier when answering:
+- FREE/STARTER asking about Tax Optimizer → Explain it shows example data, suggest PRO upgrade
+- FREE user hitting limits → Gently suggest upgrade with specific benefits
+- PRO/ENTERPRISE users → Focus on advanced features and tax optimization strategies
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 """
 
     def _get_tax_optimizer_context(self, user_id: int) -> str:
