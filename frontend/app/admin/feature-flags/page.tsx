@@ -7,6 +7,9 @@ import { useAuth } from '@/components/providers/AuthProvider'
 import { useToast } from '@/components/providers/ToastProvider'
 import { ArrowLeft, Plus, Trash2, Save } from 'lucide-react'
 
+// Force dynamic rendering for admin pages
+export const dynamic = 'force-dynamic'
+
 interface FeatureFlag {
   id: number
   name: string

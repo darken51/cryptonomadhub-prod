@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server'
 
+// Force dynamic rendering - don't try to generate at build time
+export const dynamic = 'force-dynamic'
+export const revalidate = 3600 // Revalidate every hour
+
 interface Country {
   country_code: string
   country_name: string
@@ -178,6 +182,3 @@ export async function GET() {
     })
   }
 }
-
-// Enable static generation with revalidation
-export const revalidate = 3600 // Revalidate every hour
