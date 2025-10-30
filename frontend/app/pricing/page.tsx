@@ -362,30 +362,9 @@ export default function Pricing() {
                       </p>
 
                       {/* CTA Button */}
-                      <Link
-                        href={plan.href}
-                        className={`block w-full text-center px-6 py-3 rounded-xl font-semibold transition-all ${
-                          plan.highlight
-                            ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white hover:from-violet-700 hover:to-fuchsia-700 shadow-lg hover:shadow-xl'
-                            : plan.dark
-                            ? 'bg-white text-slate-900 hover:bg-slate-100'
-                            : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100'
-                        }`}
-                      >
-                        {plan.cta}
-                      </Link>
-
-                      {/* Crypto Payment Button (only for paid plans) */}
-                      {(plan.name === 'Starter' || plan.name === 'Pro') && (
+                      {(plan.name === 'Starter' || plan.name === 'Pro') && user ? (
                         <button
                           onClick={() => {
-                            // Check if user is authenticated
-                            if (!user) {
-                              // Redirect to login with return URL
-                              router.push('/auth/login?redirect=/pricing')
-                              return
-                            }
-
                             const tier = plan.name.toLowerCase() as 'starter' | 'pro'
                             const amount = billingCycle === 'monthly' ? plan.monthlyPrice : plan.annualPrice
                             setSelectedPlan({
@@ -395,6 +374,38 @@ export default function Pricing() {
                               amount: amount!
                             })
                             setCryptoModalOpen(true)
+                          }}
+                          className={`block w-full text-center px-6 py-3 rounded-xl font-semibold transition-all ${
+                            plan.highlight
+                              ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white hover:from-violet-700 hover:to-fuchsia-700 shadow-lg hover:shadow-xl'
+                              : plan.dark
+                              ? 'bg-white text-slate-900 hover:bg-slate-100'
+                              : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100'
+                          }`}
+                        >
+                          {plan.cta}
+                        </button>
+                      ) : (
+                        <Link
+                          href={plan.href}
+                          className={`block w-full text-center px-6 py-3 rounded-xl font-semibold transition-all ${
+                            plan.highlight
+                              ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white hover:from-violet-700 hover:to-fuchsia-700 shadow-lg hover:shadow-xl'
+                              : plan.dark
+                              ? 'bg-white text-slate-900 hover:bg-slate-100'
+                              : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 dark:hover:bg-slate-100'
+                          }`}
+                        >
+                          {plan.cta}
+                        </Link>
+                      )}
+
+                      {/* Crypto Payment Button (only for non-authenticated users on paid plans) */}
+                      {(plan.name === 'Starter' || plan.name === 'Pro') && !user && (
+                        <button
+                          onClick={() => {
+                            // Redirect to login with return URL
+                            router.push('/auth/login?redirect=/pricing')
                           }}
                           className="mt-3 w-full text-center px-6 py-3 rounded-xl font-semibold transition-all border-2 border-violet-600 dark:border-fuchsia-400 text-violet-600 dark:text-fuchsia-400 hover:bg-violet-50 dark:hover:bg-violet-900/20 flex items-center justify-center gap-2"
                         >

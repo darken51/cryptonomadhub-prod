@@ -106,9 +106,9 @@ export default function Home() {
             {/* Real Country Examples */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto text-sm">
               {[
-                { flag: '🇵🇹', country: 'Portugal', tax: '0% tax', detail: '€900/mo cost, EU access' },
                 { flag: '🇦🇪', country: 'UAE', tax: '0% tax', detail: 'Golden visa, no winter' },
                 { flag: '🇸🇬', country: 'Singapore', tax: '0% tax', detail: '#1 quality of life' },
+                { flag: '🇭🇰', country: 'Hong Kong', tax: '0% tax', detail: 'Financial hub, low costs' },
                 { flag: '🇵🇦', country: 'Panama', tax: '0% tax', detail: '$1,200/mo, easy visa' }
               ].map((country, idx) => (
                 <motion.div

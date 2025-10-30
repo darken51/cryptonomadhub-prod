@@ -155,9 +155,9 @@ const RecommendationsCard = memo(function RecommendationsCard({
   dashboardData: any
 }) {
   const recommendations = [
-    { code: 'PT', name: 'Portugal', rate: '0%', flag: '🇵🇹', savings: 'Up to 100%' },
     { code: 'AE', name: 'UAE', rate: '0%', flag: '🇦🇪', savings: 'Up to 100%' },
-    { code: 'SG', name: 'Singapore', rate: '0-17%', flag: '🇸🇬', savings: 'Up to 83%' }
+    { code: 'SG', name: 'Singapore', rate: '0%', flag: '🇸🇬', savings: 'Up to 100%' },
+    { code: 'HK', name: 'Hong Kong', rate: '0%', flag: '🇭🇰', savings: 'Up to 100%' }
   ]
 
   return (

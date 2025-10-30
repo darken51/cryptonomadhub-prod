@@ -488,26 +488,53 @@ function NewSimulationPageContent() {
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.5, delay: 0.6 }}
-                  className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-300 dark:border-green-700 rounded-xl p-4 sm:p-6 shadow-lg hover:shadow-2xl transition-shadow"
+                  className={`rounded-xl p-4 sm:p-6 shadow-lg hover:shadow-2xl transition-shadow ${
+                    result.savings >= 0
+                      ? 'bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-2 border-green-300 dark:border-green-700'
+                      : 'bg-gradient-to-br from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 border-2 border-red-300 dark:border-red-700'
+                  }`}
                 >
                   <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
-                    <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-full p-1.5 sm:p-2 shadow-md">
+                    <div className={`rounded-full p-1.5 sm:p-2 shadow-md ${
+                      result.savings >= 0
+                        ? 'bg-gradient-to-br from-green-500 to-emerald-600'
+                        : 'bg-gradient-to-br from-red-500 to-orange-600'
+                    }`}>
                       <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
-                    <p className="text-xs sm:text-sm font-semibold text-green-800 dark:text-green-200">
-                      Potential Annual Savings
+                    <p className={`text-xs sm:text-sm font-semibold ${
+                      result.savings >= 0
+                        ? 'text-green-800 dark:text-green-200'
+                        : 'text-red-800 dark:text-red-200'
+                    }`}>
+                      {result.savings >= 0 ? 'Potential Annual Savings' : 'Additional Annual Tax'}
                     </p>
                   </div>
-                  <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-green-600 dark:text-green-400 mb-2">
-                    ${result.savings.toLocaleString()}
+                  <p className={`text-3xl sm:text-4xl md:text-5xl font-bold mb-2 ${
+                    result.savings >= 0
+                      ? 'text-green-600 dark:text-green-400'
+                      : 'text-red-600 dark:text-red-400'
+                  }`}>
+                    {result.savings >= 0 ? '+' : ''} ${result.savings.toLocaleString()}
                   </p>
                   <div className="flex items-center gap-2">
-                    <span className="inline-block bg-green-200 dark:bg-green-800 text-green-800 dark:text-green-200 text-xs font-bold px-3 py-1 rounded-full">
-                      {result.savings_percent.toFixed(1)}% reduction
+                    <span className={`inline-block text-xs font-bold px-3 py-1 rounded-full ${
+                      result.savings >= 0
+                        ? 'bg-green-200 dark:bg-green-800 text-green-800 dark:text-green-200'
+                        : 'bg-red-200 dark:bg-red-800 text-red-800 dark:text-red-200'
+                    }`}>
+                      {result.savings >= 0
+                        ? `${result.savings_percent.toFixed(1)}% reduction`
+                        : `${Math.abs(result.savings_percent).toFixed(1)}% increase`
+                      }
                     </span>
-                    <span className="text-xs text-green-700 dark:text-green-300">
+                    <span className={`text-xs ${
+                      result.savings >= 0
+                        ? 'text-green-700 dark:text-green-300'
+                        : 'text-red-700 dark:text-red-300'
+                    }`}>
                       per year
                     </span>
                   </div>
