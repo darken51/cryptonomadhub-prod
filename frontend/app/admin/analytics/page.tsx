@@ -33,6 +33,9 @@ export default function AnalyticsAdminPage() {
   useEffect(() => {
     if (!isLoading && !user) {
       router.push('/auth/login')
+    } else if (user && user.role !== 'admin' && user.email !== 'welgolimited@gmail.com') {
+      // Only admin can access this page (check role OR admin email as fallback)
+      router.push('/dashboard')
     }
   }, [user, isLoading, router])
 
@@ -173,7 +176,7 @@ export default function AnalyticsAdminPage() {
     )
   }
 
-  if (!user) {
+  if (!user || (user.role !== 'admin' && user.email !== 'welgolimited@gmail.com')) {
     return null
   }
 
