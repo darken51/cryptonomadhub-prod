@@ -90,6 +90,7 @@ export default function CountryDetailPage() {
       // 2. Use cached list for similar countries lookup (10min TTL)
 
       // Fetch the specific country with analysis (optimized endpoint)
+      console.log('🚀 OPTIMIZED: Fetching single country:', country_code.toUpperCase())
       const countryResponse = await fetch(
         `${apiUrl}/regulations/${country_code.toUpperCase()}?include_analysis=true`
       )
