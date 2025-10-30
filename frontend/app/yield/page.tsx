@@ -6,6 +6,9 @@ import { useAuth } from "@/components/providers/AuthProvider";
 import { AppHeader } from "@/components/AppHeader";
 import { TrendingUp, TrendingDown, DollarSign, Activity, AlertTriangle, Calendar, Droplet, Award } from "lucide-react";
 
+// Force dynamic rendering for authenticated pages
+export const dynamic = 'force-dynamic'
+
 interface YieldPosition {
   id: number;
   position_type: string;

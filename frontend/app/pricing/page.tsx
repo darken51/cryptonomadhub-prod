@@ -9,6 +9,9 @@ import { CryptoPaymentModal } from '@/components/CryptoPaymentModal'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/components/providers/AuthProvider'
 
+// Force dynamic rendering for authenticated pages
+export const dynamic = 'force-dynamic'
+
 export default function Pricing() {
   const router = useRouter()
   const { user } = useAuth()

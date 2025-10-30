@@ -13,6 +13,9 @@ import { Tooltip } from '@/components/Tooltip'
 import { ArrowLeft, Calculator, Sparkles, RotateCcw } from 'lucide-react'
 import { groupCountriesByRegion } from '@/lib/constants'
 
+// Force dynamic rendering for authenticated pages
+export const dynamic = 'force-dynamic'
+
 // Helper to render text with clickable links
 function renderTextWithLinks(text: string) {
   // Split by URLs and internal paths

@@ -24,6 +24,9 @@ import { QuickActionsGrid } from '@/components/dashboard/QuickActionsGrid'
 // ✅ PERFORMANCE: Lazy load non-critical components
 import AlertsSection from '@/components/dashboard/AlertsSection'
 
+// Force dynamic rendering for authenticated pages
+export const dynamic = 'force-dynamic'
+
 // Lazy load heavy components to improve initial page load
 const AIChat = dynamic(() => import('@/components/dashboard/AIChat'), {
   loading: () => <div className="animate-pulse bg-slate-800/50 rounded-2xl h-96 mb-12" />,

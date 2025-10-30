@@ -11,6 +11,9 @@ import { Send, Bot, User as UserIcon, Sparkles, Plus, MessageSquare, Trash2, Men
 import { motion, AnimatePresence } from 'framer-motion'
 import { trackChatMessage } from '@/lib/analytics'
 
+// Force dynamic rendering for authenticated pages
+export const dynamic = 'force-dynamic'
+
 // Helper to render text with clickable links
 function renderTextWithLinks(text: string) {
   // Split by URLs and internal paths

@@ -7,6 +7,9 @@ import { useToast } from '@/components/providers/ToastProvider'
 import { AppHeader } from '@/components/AppHeader'
 import { Footer } from '@/components/Footer'
 import { motion, AnimatePresence } from 'framer-motion'
+
+// Force dynamic rendering for authenticated pages
+export const dynamic = 'force-dynamic'
 import {
   Plus, Upload, Download, Edit2, Trash2,
   Filter, TrendingUp, TrendingDown, DollarSign,

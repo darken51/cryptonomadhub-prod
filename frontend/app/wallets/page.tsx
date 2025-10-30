@@ -10,6 +10,9 @@ import {
 } from "lucide-react";
 import { CurrencyDisplay } from "@/components/CurrencyDisplay";
 
+// Force dynamic rendering for authenticated pages
+export const dynamic = 'force-dynamic'
+
 interface UserWallet {
   id: number;
   wallet_address: string;

@@ -13,6 +13,9 @@ import { CurrencyDisplay, CurrencyBadge } from '@/components/CurrencyDisplay'
 import { parseCurrencyData } from '@/lib/currency'
 import { trackDeFiAudit } from '@/lib/analytics'
 
+// Force dynamic rendering for authenticated pages
+export const dynamic = 'force-dynamic'
+
 // Composant Timer qui se met à jour automatiquement
 function ProcessingTimer({ createdAt }: { createdAt: string }) {
   const [elapsed, setElapsed] = useState(0)

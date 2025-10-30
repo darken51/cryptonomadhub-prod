@@ -25,6 +25,9 @@ import {
 import { JurisdictionSelector } from '@/components/JurisdictionSelector'
 import UsageCounter from '@/components/UsageCounter'
 
+// Force dynamic rendering for authenticated pages
+export const dynamic = 'force-dynamic'
+
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
   animate: { opacity: 1, y: 0 },

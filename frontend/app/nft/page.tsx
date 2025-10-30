@@ -6,6 +6,9 @@ import { useAuth } from "@/components/providers/AuthProvider";
 import { AppHeader } from "@/components/AppHeader";
 import { Image as ImageIcon, TrendingUp, TrendingDown, Filter, Download, Grid, List } from "lucide-react";
 
+// Force dynamic rendering for authenticated pages
+export const dynamic = 'force-dynamic'
+
 interface NFTTransaction {
   id: number;
   user_id: number;
