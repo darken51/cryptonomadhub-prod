@@ -114,7 +114,7 @@ async def google_callback(
 
                 # Create FREE license for new user
                 license_service = LicenseService(db)
-                license_service.create_license(user.id, 'free')
+                license_service.create_free_license(user.id)
 
             # Create OAuth connection
             oauth_connection = OAuthConnection(
