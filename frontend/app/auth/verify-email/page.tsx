@@ -8,6 +8,9 @@ import { CheckCircle2, XCircle, Loader2 } from 'lucide-react'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 
+// Force dynamic rendering for auth pages
+export const dynamic = 'force-dynamic'
+
 function VerifyEmailContent() {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [message, setMessage] = useState('')

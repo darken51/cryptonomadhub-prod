@@ -8,6 +8,9 @@ import { useToast } from '@/components/providers/ToastProvider'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 
+// Force dynamic rendering for auth pages
+export const dynamic = 'force-dynamic'
+
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
   const [isLoading, setIsLoading] = useState(false)

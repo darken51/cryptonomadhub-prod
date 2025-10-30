@@ -6,6 +6,9 @@ import { useAuth } from '@/components/providers/AuthProvider'
 import { useToast } from '@/components/providers/ToastProvider'
 import { trackLogin } from '@/lib/analytics'
 
+// Force dynamic rendering for auth pages
+export const dynamic = 'force-dynamic'
+
 /**
  * Loading spinner component
  */
