@@ -99,8 +99,33 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  // Schema.org Organization markup for SEO
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "CryptoNomadHub",
+    "url": "https://cryptonomadhub.io",
+    "logo": "https://cryptonomadhub.io/logo.svg",
+    "description": "AI-powered crypto tax optimization across 167 countries. Find 0% tax jurisdictions, compare regulations, audit DeFi transactions.",
+    "sameAs": [
+      "https://twitter.com/CryptoNomadHub"
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "Customer Support",
+      "url": "https://cryptonomadhub.io/contact"
+    }
+  };
+
   return (
     <html lang="en">
+      <head>
+        {/* Schema.org Organization markup */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
+      </head>
       <body className={inter.className}>
         {/* ✅ PHASE 2.4: Accessibility improvements */}
         <SkipToContent />

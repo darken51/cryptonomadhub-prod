@@ -239,11 +239,24 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 group">
-            <div className="w-8 h-8 bg-gradient-to-br from-violet-600 to-fuchsia-600 rounded-lg flex items-center justify-center font-bold text-white text-sm group-hover:scale-105 transition-transform">
-              CN
-            </div>
-            <span className="text-lg font-bold text-slate-900 dark:text-white">CryptoNomadHub</span>
+          <Link href="/" className="flex items-center group">
+            {/* Desktop logo with text */}
+            <img
+              src="/logo.svg"
+              alt="CryptoNomadHub"
+              className="h-12 w-auto hidden dark:hidden sm:block group-hover:scale-105 transition-transform"
+            />
+            <img
+              src="/logo-dark.svg"
+              alt="CryptoNomadHub"
+              className="h-12 w-auto hidden dark:block group-hover:scale-105 transition-transform"
+            />
+            {/* Mobile: icon only */}
+            <img
+              src="/logo-icon.svg"
+              alt="CryptoNomadHub"
+              className="h-10 w-10 sm:hidden group-hover:scale-105 transition-transform"
+            />
           </Link>
 
           {/* Desktop Navigation */}
