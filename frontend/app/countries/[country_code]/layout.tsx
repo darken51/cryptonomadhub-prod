@@ -20,14 +20,18 @@ interface Country {
 async function getCountryData(country_code: string): Promise<Country | null> {
   try {
     const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'
-    const response = await fetch(`${apiUrl}/regulations?include_analysis=true`, {
-      next: { revalidate: 3600 } // Revalidate every hour
-    })
+    // ✅ OPTIMIZED: Fetch ONLY the requested country (not all 167)
+    const response = await fetch(
+      `${apiUrl}/regulations/${country_code.toUpperCase()}?include_analysis=true`,
+      {
+        next: { revalidate: 3600 } // Revalidate every hour
+      }
+    )
 
     if (!response.ok) return null
 
-    const data: Country[] = await response.json()
-    return data.find(c => c.country_code === country_code.toUpperCase()) || null
+    const data: Country = await response.json()
+    return data
   } catch (error) {
     console.error(`Error fetching country ${country_code}:`, error)
     return null
