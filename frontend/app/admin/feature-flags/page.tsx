@@ -37,16 +37,20 @@ export default function FeatureFlagsAdminPage() {
   const [newFlagDescription, setNewFlagDescription] = useState('')
 
   useEffect(() => {
-    if (!isLoading && (!user || user.role !== 'admin')) {
-      router.push('/dashboard')
+    if (!isLoading && !user) {
+      router.push('/auth/login')
+    } else if (!isLoading && user && user.role !== 'admin' && user.email !== 'welgolimited@gmail.com') {
       showToast('Admin access required', 'error')
+      router.push('/dashboard')
     }
-  }, [user, isLoading, router, showToast])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, isLoading])
 
   useEffect(() => {
-    if (user && user.role === 'admin') {
+    if (user && (user.role === 'admin' || user.email === 'welgolimited@gmail.com')) {
       fetchFlags()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user])
 
   const fetchFlags = async () => {
@@ -168,7 +172,7 @@ export default function FeatureFlagsAdminPage() {
     )
   }
 
-  if (!user || user.role !== 'admin') {
+  if (!user || (user.role !== 'admin' && user.email !== 'welgolimited@gmail.com')) {
     return null
   }
 
