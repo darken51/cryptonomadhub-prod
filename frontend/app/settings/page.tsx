@@ -23,6 +23,7 @@ import {
   Database
 } from 'lucide-react'
 import { JurisdictionSelector } from '@/components/JurisdictionSelector'
+import UsageCounter from '@/components/UsageCounter'
 
 const fadeInUp = {
   initial: { opacity: 0, y: 20 },
@@ -956,6 +957,11 @@ export default function SettingsPage() {
                 <CreditCard className="w-4 h-4" />
                 Upgrade Plan
               </Link>
+            </motion.section>
+
+            {/* Usage & Quotas Section */}
+            <motion.section variants={fadeInUp}>
+              <UsageCounter />
             </motion.section>
 
             {/* Danger Zone */}

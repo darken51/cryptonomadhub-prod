@@ -14,7 +14,7 @@ from app.routers.auth import get_current_user
 from app.services.defi_audit_service import DeFiAuditService
 from app.middleware import limiter, get_rate_limit
 from app.dependencies import get_exchange_rate_service
-from app.dependencies.license_check import require_defi_audit, require_pdf_export
+from app.dependencies.license_check import require_defi_audit, require_pdf_export, require_csv_export
 from app.data.currency_mapping import get_currency_info
 from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional
@@ -430,6 +430,7 @@ async def get_audit_report(
 async def export_audit_csv(
     audit_id: int,
     current_user: User = Depends(get_current_user),
+    license_check = Depends(require_csv_export),
     db: Session = Depends(get_db)
 ):
     """
@@ -437,6 +438,8 @@ async def export_audit_csv(
 
     Returns all transactions in CSV format for import into Excel, Google Sheets,
     or tax software like TurboTax/TaxAct.
+
+    🔒 PRO feature only
     """
     from fastapi.responses import Response as FastAPIResp
     import csv

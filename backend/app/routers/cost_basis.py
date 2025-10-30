@@ -18,6 +18,7 @@ from app.models.cost_basis import (
 )
 from app.routers.auth import get_current_user
 from app.dependencies import get_exchange_rate_service
+from app.dependencies.license_check import require_starter_plus
 from app.data.currency_mapping import get_currency_info
 from pydantic import BaseModel
 from typing import List, Optional, Dict
@@ -146,6 +147,12 @@ class LotResponse(BaseModel):
     source_tx_hash: Optional[str] = None
     source_audit_id: Optional[int] = None
     wallet_address: Optional[str] = None
+    is_stub: bool = False  # True if this is example data for FREE tier preview
+
+    # Simplified fields for stub data
+    quantity: Optional[float] = None
+    current_price_usd: Optional[float] = None
+    unrealized_gain_loss_percent: Optional[float] = None
 
 
 class PortfolioSummary(BaseModel):
@@ -174,7 +181,59 @@ async def get_cost_basis_lots(
     Get all cost basis lots for the current user
 
     Optionally filter by token or chain.
+
+    ⚠️ FREE tier: Returns example data for preview
     """
+    # Check if user has access to Cost Basis
+    from app.services.license_service import LicenseService
+    from app.models.license import LicenseTier
+
+    license_service = LicenseService(db)
+    license = license_service.get_user_license(current_user.id)
+
+    # FREE tier gets example data
+    if license.tier == LicenseTier.FREE:
+        return [
+            LotResponse(
+                id=0,
+                token="BTC",
+                chain="bitcoin",
+                acquisition_date="2024-01-15T10:00:00",
+                acquisition_method="purchase",
+                acquisition_price_usd=30000.0,
+                original_amount=0.5,
+                remaining_amount=0.5,
+                disposed_amount=0.0,
+                current_value_usd=22500.0,
+                unrealized_gain_loss=7500.0,
+                notes="Example data - Upgrade to STARTER to track your real portfolio",
+                created_at="2024-01-15T10:00:00",
+                is_stub=True,
+                quantity=0.5,
+                current_price_usd=45000.0,
+                unrealized_gain_loss_percent=25.0
+            ),
+            LotResponse(
+                id=0,
+                token="ETH",
+                chain="ethereum",
+                acquisition_date="2024-03-20T14:30:00",
+                acquisition_method="staking",
+                acquisition_price_usd=2000.0,
+                original_amount=5.0,
+                remaining_amount=5.0,
+                disposed_amount=0.0,
+                current_value_usd=12500.0,
+                unrealized_gain_loss=2500.0,
+                notes="Example data - Upgrade to STARTER to track your real portfolio",
+                created_at="2024-03-20T14:30:00",
+                is_stub=True,
+                quantity=5.0,
+                current_price_usd=2500.0,
+                unrealized_gain_loss_percent=25.0
+            )
+        ]
+
     query = db.query(CostBasisLot).filter(
         CostBasisLot.user_id == current_user.id
     )

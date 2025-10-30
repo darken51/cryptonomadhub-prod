@@ -40,6 +40,11 @@ const RecentActivities = dynamic(() => import('@/components/dashboard/RecentActi
   ssr: false
 })
 
+const UsageCounter = dynamic(() => import('@/components/UsageCounter'), {
+  loading: () => <div className="animate-pulse bg-slate-800/50 rounded-2xl h-48 mb-12" />,
+  ssr: false
+})
+
 export default function DashboardPage() {
   const { user, isLoading: authLoading, token } = useAuth()
   const router = useRouter()
@@ -190,6 +195,14 @@ export default function DashboardPage() {
 
         {/* Quick Actions */}
         <QuickActionsGrid />
+
+        {/* Usage & Quotas Widget */}
+        <div className="mb-12">
+          <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 shadow-2xl">
+            <h2 className="text-2xl font-bold text-white mb-6">Your Usage This Month</h2>
+            <UsageCounter compact={true} />
+          </div>
+        </div>
 
         {/* AI Chat */}
         <AIChat token={token} />

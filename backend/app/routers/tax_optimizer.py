@@ -18,6 +18,7 @@ from app.models.tax_opportunity import (
 )
 from app.routers.auth import get_current_user
 from app.dependencies import get_exchange_rate_service
+from app.dependencies.license_check import require_pro_tier
 from app.data.currency_mapping import get_currency_info
 from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional
@@ -102,6 +103,7 @@ class OpportunityResponse(BaseModel):
     confidence_score: float
     risk_level: str
     created_at: str
+    is_stub: bool = False  # Indicates example/preview data for non-PRO users
 
 
 class AnalysisResponse(BaseModel):
@@ -119,6 +121,7 @@ class AnalysisResponse(BaseModel):
     opportunities: List[OpportunityResponse]
     portfolio_summary: dict
     recommendations: List[str]
+    is_stub: bool = False  # Indicates example/preview data for non-PRO users
 
 
 class ExecuteOpportunityRequest(BaseModel):
@@ -147,7 +150,84 @@ async def analyze_tax_optimization(
 
     If audit_id is provided, only analyzes cost basis lots from that audit.
     Otherwise, analyzes all lots (default behavior).
+
+    ⚠️ FREE/STARTER tier: Returns example data for preview
     """
+
+    # Check user's tier - FREE/STARTER get preview data
+    from app.services.license_service import LicenseService
+    from app.models.license import LicenseTier
+
+    license_service = LicenseService(db)
+    license = license_service.get_user_license(current_user.id)
+
+    # FREE/STARTER tier gets example data
+    if license.tier in [LicenseTier.FREE, LicenseTier.STARTER]:
+        current_time = datetime.utcnow()
+        return AnalysisResponse(
+            total_opportunities=2,
+            potential_tax_savings=3250.0,
+            opportunities=[
+                OpportunityResponse(
+                    id=0,
+                    opportunity_type="tax_loss_harvest",
+                    status="active",
+                    token="ETH",
+                    chain="ethereum",
+                    current_amount=5.0,
+                    current_value_usd=10000.0,
+                    unrealized_gain_loss=-2500.0,
+                    unrealized_gain_loss_percent=-20.0,
+                    potential_savings=925.0,
+                    recommended_action="Sell 5.0000 ETH to harvest $2,500.00 loss",
+                    action_description=(
+                        "You have an unrealized loss of $2,500.00 (-20.0%) on ETH. "
+                        "By selling now, you can offset up to $925.00 in gains from other assets. "
+                        "You can repurchase after 30 days to avoid wash sale rules. "
+                        "⚠️ This is example data - Upgrade to PRO to see your real portfolio opportunities."
+                    ),
+                    deadline=(datetime(current_time.year, 12, 31, 23, 59, 59)).isoformat(),
+                    confidence_score=0.9,
+                    risk_level="low",
+                    created_at=current_time.isoformat(),
+                    is_stub=True
+                ),
+                OpportunityResponse(
+                    id=0,
+                    opportunity_type="long_term_wait",
+                    status="active",
+                    token="BTC",
+                    chain="bitcoin",
+                    current_amount=0.5,
+                    current_value_usd=22500.0,
+                    unrealized_gain_loss=7500.0,
+                    unrealized_gain_loss_percent=50.0,
+                    potential_savings=2325.0,
+                    recommended_action="Wait 45 days before selling BTC",
+                    action_description=(
+                        "Your BTC will qualify for long-term capital gains in 45 days. "
+                        "By waiting, you'll save $2,325.00 in taxes (37% vs 20% rate). "
+                        "⚠️ This is example data - Upgrade to PRO to see your real portfolio opportunities."
+                    ),
+                    deadline=(current_time + timedelta(days=45)).isoformat(),
+                    confidence_score=0.85,
+                    risk_level="low",
+                    created_at=current_time.isoformat(),
+                    is_stub=True
+                )
+            ],
+            portfolio_summary={
+                "total_lots": 2,
+                "total_value_usd": 32500.0,
+                "total_unrealized_gain_loss": 5000.0
+            },
+            recommendations=[
+                "⚠️ This is example data to demonstrate Tax Optimizer features",
+                "🔒 Upgrade to PRO to unlock AI-powered tax optimization for your real portfolio",
+                "💡 PRO users get personalized tax-loss harvesting, timing optimization, and wash sale detection"
+            ],
+            is_stub=True
+        )
 
     # Get user's cost basis lots
     lots_query = db.query(CostBasisLot).filter(
@@ -418,7 +498,70 @@ async def get_tax_opportunities(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Get tax optimization opportunities for user"""
+    """
+    Get tax optimization opportunities for user
+
+    ⚠️ FREE/STARTER tier: Returns example data for preview
+    """
+
+    # Check user's tier - FREE/STARTER get preview data
+    from app.services.license_service import LicenseService
+    from app.models.license import LicenseTier
+
+    license_service = LicenseService(db)
+    license = license_service.get_user_license(current_user.id)
+
+    # FREE/STARTER tier gets example data
+    if license.tier in [LicenseTier.FREE, LicenseTier.STARTER]:
+        current_time = datetime.utcnow()
+        return [
+            OpportunityResponse(
+                id=0,
+                opportunity_type="tax_loss_harvest",
+                status="active",
+                token="ETH",
+                chain="ethereum",
+                current_amount=5.0,
+                current_value_usd=10000.0,
+                unrealized_gain_loss=-2500.0,
+                unrealized_gain_loss_percent=-20.0,
+                potential_savings=925.0,
+                recommended_action="Sell 5.0000 ETH to harvest $2,500.00 loss",
+                action_description=(
+                    "You have an unrealized loss of $2,500.00 (-20.0%) on ETH. "
+                    "By selling now, you can offset up to $925.00 in gains from other assets. "
+                    "⚠️ This is example data - Upgrade to PRO to see your real portfolio opportunities."
+                ),
+                deadline=(datetime(current_time.year, 12, 31, 23, 59, 59)).isoformat(),
+                confidence_score=0.9,
+                risk_level="low",
+                created_at=current_time.isoformat(),
+                is_stub=True
+            ),
+            OpportunityResponse(
+                id=0,
+                opportunity_type="long_term_wait",
+                status="active",
+                token="BTC",
+                chain="bitcoin",
+                current_amount=0.5,
+                current_value_usd=22500.0,
+                unrealized_gain_loss=7500.0,
+                unrealized_gain_loss_percent=50.0,
+                potential_savings=2325.0,
+                recommended_action="Wait 45 days before selling BTC",
+                action_description=(
+                    "Your BTC will qualify for long-term capital gains in 45 days. "
+                    "By waiting, you'll save $2,325.00 in taxes (37% vs 20% rate). "
+                    "⚠️ This is example data - Upgrade to PRO to see your real portfolio opportunities."
+                ),
+                deadline=(current_time + timedelta(days=45)).isoformat(),
+                confidence_score=0.85,
+                risk_level="low",
+                created_at=current_time.isoformat(),
+                is_stub=True
+            )
+        ]
     query = db.query(TaxOpportunity).filter(
         TaxOpportunity.user_id == current_user.id
     )

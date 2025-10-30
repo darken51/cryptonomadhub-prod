@@ -223,8 +223,35 @@ async def compare_countries(
     # Validation
     if len(compare_request.target_countries) < 2:
         raise HTTPException(status_code=400, detail="At least 2 target countries required")
-    if len(compare_request.target_countries) > 5:
-        raise HTTPException(status_code=400, detail="Maximum 5 target countries allowed")
+
+    # Check tier-based country limit
+    from app.services.license_service import LicenseService
+    from app.models.license import LicenseTier
+
+    license_service = LicenseService(db)
+    license = license_service.get_user_license(current_user.id)
+
+    max_countries = {
+        LicenseTier.FREE: 2,
+        LicenseTier.STARTER: 5,
+        LicenseTier.PRO: 999,  # Unlimited
+        LicenseTier.ENTERPRISE: 999
+    }
+
+    tier_limit = max_countries.get(license.tier, 2)
+
+    if len(compare_request.target_countries) > tier_limit:
+        raise HTTPException(
+            status_code=402,
+            detail={
+                "error": "tier_limit_exceeded",
+                "message": f"Your {license.tier.value} plan allows comparing up to {tier_limit} countries. Upgrade to compare more.",
+                "current_tier": license.tier.value,
+                "tier_limit": tier_limit,
+                "requested": len(compare_request.target_countries),
+                "upgrade_url": "/pricing"
+            }
+        )
 
     # Calculate current country tax
     from app.models.regulation import Regulation
