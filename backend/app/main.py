@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.sessions import SessionMiddleware
 from slowapi.errors import RateLimitExceeded
 from app.config import settings
 from app.database import engine, Base
@@ -35,6 +36,16 @@ app = FastAPI(
 
 # Add security middleware (HTTPS + security headers)
 setup_security_middleware(app)
+
+# Add Session Middleware (required for OAuth)
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=settings.SECRET_KEY,
+    session_cookie="session",
+    max_age=3600,  # 1 hour
+    same_site="lax",
+    https_only=settings.ENVIRONMENT == "production"
+)
 
 # Add rate limiting
 app.state.limiter = limiter
