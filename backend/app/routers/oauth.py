@@ -141,16 +141,17 @@ async def google_callback(
 
         # Redirect to frontend with tokens
         redirect_url = f"{FRONTEND_URL}/auth/oauth/callback?access_token={access_token}&refresh_token={refresh_token}"
-        logger.info(f"✅ Google OAuth completed, redirecting to: {FRONTEND_URL}/auth/oauth/callback")
+        logger.info(f"✅ Google OAuth completed for user {user.email}")
+        logger.info(f"✅ Redirecting to: {redirect_url}")
 
-        return RedirectResponse(url=redirect_url)
+        return RedirectResponse(url=redirect_url, status_code=302)
 
     except Exception as e:
         logger.error(f"❌ Google OAuth error: {str(e)}", exc_info=True)
 
         # Redirect to frontend with error
         error_url = f"{FRONTEND_URL}/auth/login?error=oauth_failed&message={str(e)}"
-        return RedirectResponse(url=error_url)
+        return RedirectResponse(url=error_url, status_code=302)
 
 
 @router.post("/google/link")
