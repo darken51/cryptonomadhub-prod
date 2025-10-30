@@ -9,6 +9,7 @@ import { useAuth } from '@/components/providers/AuthProvider'
 import { useToast } from '@/components/providers/ToastProvider'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
+import { GoogleSignInButton } from '@/components/GoogleSignInButton'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -139,6 +140,21 @@ export default function LoginPage() {
                 {isLoading ? 'Signing in...' : 'Sign In'}
               </motion.button>
             </form>
+
+            {/* Divider */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-300 dark:border-slate-700"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+
+            {/* Google Sign In */}
+            <GoogleSignInButton mode="signin" />
 
             {/* Sign Up Link */}
             <div className="mt-6 text-center">

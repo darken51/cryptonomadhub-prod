@@ -54,6 +54,7 @@ class User(Base):
     license = relationship("License", back_populates="user", uselist=False, cascade="all, delete-orphan")
     wallets = relationship("UserWallet", back_populates="user", cascade="all, delete-orphan")
     wallet_snapshots = relationship("WalletSnapshot", back_populates="user", cascade="all, delete-orphan")
+    oauth_connections = relationship("OAuthConnection", back_populates="user", cascade="all, delete-orphan")
 
     def to_dict(self):
         return {

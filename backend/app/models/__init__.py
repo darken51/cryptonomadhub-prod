@@ -1,4 +1,5 @@
 from .user import User
+from .oauth_connection import OAuthConnection
 from .regulation import Regulation, RegulationHistory
 from .simulation import Simulation
 from .feature_flag import FeatureFlag
@@ -37,6 +38,7 @@ from .dashboard_activity import DashboardActivity
 
 __all__ = [
     "User",
+    "OAuthConnection",
     "Regulation",
     "RegulationHistory",
     "Simulation",

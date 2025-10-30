@@ -23,6 +23,10 @@ class Settings(BaseSettings):
     GOOGLE_API_KEY: str
     GEMINI_MODEL: str = "gemini-2.5-flash-lite"  # Flash-Lite = 13x faster, 91% cheaper than Haiku
 
+    # OAuth - Google Sign In
+    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str = ""
+
     # Ollama (deprecated - migrated to Claude)
     # OLLAMA_HOST: str
     # OLLAMA_MODEL: str = "meta-llama-3.1-8b-instruct:latest"
