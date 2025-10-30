@@ -457,7 +457,7 @@ export default function ChatPage() {
               AI Tax Assistant
             </h1>
             <p className="text-sm text-slate-600 dark:text-slate-400">
-              Powered by Claude AI • Not financial advice
+              Powered by CryptoNomadHub AI • Not financial advice
             </p>
           </div>
         </motion.div>

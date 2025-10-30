@@ -578,7 +578,7 @@ export default function CountryDetailPage() {
                 OECD Tax Database, PwC Tax Summaries, Deloitte International Tax Guides, and verified legal documentation.
               </p>
               <p>
-                <strong>AI Analysis:</strong> Powered by Claude (Anthropic) and trained on official tax documentation,
+                <strong>AI Analysis:</strong> Powered by CryptoNomadHub AI and trained on official tax documentation,
                 government publications, and international tax treaties. Analysis confidence: {country.ai_analysis ? `${Math.round(country.ai_analysis.confidence * 100)}%` : 'N/A'}.
               </p>
               <p>
