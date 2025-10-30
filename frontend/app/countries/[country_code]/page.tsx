@@ -85,9 +85,9 @@ export default function CountryDetailPage() {
       setIsLoading(true)
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'
 
-      // ✅ PERFORMANCE OPTIMIZATION:
-      // 1. Fetch ONLY the requested country (not all 167 countries)
-      // 2. Use cache for similar countries lookup
+      // ✅ PERFORMANCE OPTIMIZATION (v2):
+      // 1. Fetch ONLY the requested country via /regulations/{code} (not all 167 countries)
+      // 2. Use cached list for similar countries lookup (10min TTL)
 
       // Fetch the specific country with analysis (optimized endpoint)
       const countryResponse = await fetch(
