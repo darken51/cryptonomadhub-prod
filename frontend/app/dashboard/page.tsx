@@ -38,12 +38,12 @@ const TaxOpportunities = NextDynamic(() => import('@/components/dashboard/TaxOpp
   ssr: false
 })
 
-const RecentActivities = dynamic(() => import('@/components/dashboard/RecentActivities'), {
+const RecentActivities = NextDynamic(() => import('@/components/dashboard/RecentActivities'), {
   loading: () => <div className="animate-pulse bg-slate-800/50 rounded-2xl h-64 mb-12" />,
   ssr: false
 })
 
-const UsageCounter = dynamic(() => import('@/components/UsageCounter'), {
+const UsageCounter = NextDynamic(() => import('@/components/UsageCounter'), {
   loading: () => <div className="animate-pulse bg-slate-800/50 rounded-2xl h-48 mb-12" />,
   ssr: false
 })
