@@ -11,6 +11,7 @@ import { LegalDisclaimer } from '@/components/LegalDisclaimer'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { GoogleSignInButton } from '@/components/GoogleSignInButton'
+import { trackSignup } from '@/lib/analytics'
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('')
@@ -62,6 +63,10 @@ export default function RegisterPage() {
 
     try {
       await register(email, password)
+
+      // Track signup event
+      trackSignup('email', email)
+
       showToast('Account created! Check your email to verify your account.', 'success')
       // Redirect to a verification notice page or login
       setTimeout(() => {

@@ -11,6 +11,7 @@ import { Footer } from '@/components/Footer'
 import { Tooltip } from '@/components/Tooltip'
 import { ArrowLeft, Calculator, GitCompare, RotateCcw, ChevronDown } from 'lucide-react'
 import { groupCountriesByRegion } from '@/lib/constants'
+import { trackSimulation } from '@/lib/analytics'
 
 // Helper to render text with clickable links
 function renderTextWithLinks(text: string) {
@@ -229,6 +230,13 @@ export default function ComparePage() {
 
       const data = await response.json()
       setResult(data)
+
+      // Track simulation
+      if (user) {
+        const countries = [currentCountry, ...selectedCountries]
+        trackSimulation(user.id.toString(), countries)
+      }
+
       showToast('Comparison completed! 🎉', 'success')
 
       setTimeout(() => {

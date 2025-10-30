@@ -11,6 +11,7 @@ import { ArrowLeft, Plus, ExternalLink, ChevronDown, Activity } from 'lucide-rea
 import { motion, AnimatePresence } from 'framer-motion'
 import { CurrencyDisplay, CurrencyBadge } from '@/components/CurrencyDisplay'
 import { parseCurrencyData } from '@/lib/currency'
+import { trackDeFiAudit } from '@/lib/analytics'
 
 // Composant Timer qui se met à jour automatiquement
 function ProcessingTimer({ createdAt }: { createdAt: string }) {
@@ -246,6 +247,14 @@ export default function DeFiAuditPage() {
       }
 
       const data = await response.json()
+
+      // Track DeFi audit
+      if (user) {
+        const blockchain = selectedChains.join(', ')
+        const transactionCount = data.transaction_count || 0
+        trackDeFiAudit(user.id.toString(), blockchain, transactionCount)
+      }
+
       showToast('DeFi audit created! Processing transactions...', 'success')
       setShowCreateModal(false)
       setWalletAddress('')

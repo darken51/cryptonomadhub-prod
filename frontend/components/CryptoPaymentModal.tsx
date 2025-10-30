@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Copy, CheckCircle2, ExternalLink, AlertTriangle, Loader2 } from 'lucide-react'
 import QRCode from 'react-qr-code'
+import { useAuth } from '@/components/providers/AuthProvider'
+import { trackUpgrade } from '@/lib/analytics'
 
 interface CryptoPaymentModalProps {
   isOpen: boolean
@@ -85,6 +87,7 @@ const SUPPORTED_CRYPTOS = [
 ]
 
 export function CryptoPaymentModal({ isOpen, onClose, planName, tier, period, amount }: CryptoPaymentModalProps) {
+  const { user } = useAuth()
   const [selectedCrypto, setSelectedCrypto] = useState<string | null>(null)
   const [paymentData, setPaymentData] = useState<PaymentData | null>(null)
   const [loading, setLoading] = useState(false)
@@ -121,6 +124,12 @@ export function CryptoPaymentModal({ isOpen, onClose, planName, tier, period, am
 
           if (data.payment_status === 'finished') {
             // Payment successful!
+            // Track upgrade event
+            if (user) {
+              const fromTier = user.license?.tier || 'FREE'
+              const toTier = tier.toUpperCase()
+              trackUpgrade(fromTier, toTier, amount, user.id.toString())
+            }
             window.location.href = '/dashboard?payment=success'
           } else if (data.payment_status === 'expired' || data.payment_status === 'failed') {
             setError('Payment expired or failed. Please try again.')

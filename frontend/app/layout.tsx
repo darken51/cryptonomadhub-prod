@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/components/providers/AuthProvider'
 import { ToastProvider } from '@/components/providers/ToastProvider'
+import { AnalyticsProvider } from '@/components/providers/AnalyticsProvider'
 import SkipToContent from '@/components/SkipToContent'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import { CookieConsent } from '@/components/CookieConsent'
@@ -125,6 +126,15 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
+
+        {/* Plausible Analytics - Privacy-friendly analytics */}
+        {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN && (
+          <script
+            defer
+            data-domain={process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN}
+            src="https://plausible.io/js/script.js"
+          />
+        )}
       </head>
       <body className={inter.className}>
         {/* ✅ PHASE 2.4: Accessibility improvements */}
@@ -133,7 +143,9 @@ export default function RootLayout({
         <ErrorBoundary>
           <ToastProvider>
             <AuthProvider>
-              {children}
+              <AnalyticsProvider>
+                {children}
+              </AnalyticsProvider>
             </AuthProvider>
           </ToastProvider>
         </ErrorBoundary>

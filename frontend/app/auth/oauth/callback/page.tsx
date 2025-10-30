@@ -4,6 +4,7 @@ import { Suspense, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { useToast } from '@/components/providers/ToastProvider'
+import { trackLogin } from '@/lib/analytics'
 
 /**
  * Loading spinner component
@@ -60,6 +61,9 @@ function OAuthCallbackHandler() {
 
       // Refresh user data
       await refreshUser()
+
+      // Track Google OAuth login (user will be identified in AuthProvider)
+      trackLogin('google', 'oauth_user')
 
       // Show success message
       showToast('Successfully signed in with Google!', 'success')

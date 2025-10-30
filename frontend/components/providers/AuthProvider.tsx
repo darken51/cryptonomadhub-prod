@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react'
 import { useToast } from './ToastProvider'
 import { registerApiHandlers } from '@/lib/api'
+import { analytics } from '@/lib/analytics'
 
 interface LicenseInfo {
   tier: string
@@ -70,6 +71,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (user) {
       setWasAuthenticated(true)
+
+      // Identify user in analytics
+      analytics.identify(user.id.toString(), {
+        email: user.email,
+        tier: user.license?.tier || 'FREE',
+        status: user.license?.status || 'active',
+      })
     }
   }, [user])
 
@@ -151,6 +159,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('access_token')
     setToken(null)
     setUser(null)
+
+    // Reset analytics identity
+    analytics.reset()
   }
 
   const refreshUser = async () => {

@@ -10,6 +10,7 @@ import { useToast } from '@/components/providers/ToastProvider'
 import { Header } from '@/components/Header'
 import { Footer } from '@/components/Footer'
 import { GoogleSignInButton } from '@/components/GoogleSignInButton'
+import { trackLogin, analytics } from '@/lib/analytics'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -26,6 +27,10 @@ export default function LoginPage() {
 
     try {
       await login(email, password)
+
+      // Track login event (user will be identified in AuthProvider)
+      trackLogin('email', email)
+
       showToast('Welcome back!', 'success')
       router.push('/dashboard')
     } catch (error: any) {

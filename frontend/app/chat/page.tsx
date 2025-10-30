@@ -9,6 +9,7 @@ import { AppHeader } from '@/components/AppHeader'
 import { Footer } from '@/components/Footer'
 import { Send, Bot, User as UserIcon, Sparkles, Plus, MessageSquare, Trash2, Menu, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { trackChatMessage } from '@/lib/analytics'
 
 // Helper to render text with clickable links
 function renderTextWithLinks(text: string) {
@@ -293,6 +294,11 @@ export default function ChatPage() {
 
         // Refresh conversations to update timestamp/preview
         await loadConversations()
+      }
+
+      // Track chat message
+      if (user) {
+        trackChatMessage(user.id.toString(), user.license?.tier || 'FREE')
       }
     } catch (error: any) {
       showToast(error.message || 'Failed to send message', 'error')
