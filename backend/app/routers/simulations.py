@@ -8,6 +8,7 @@ from app.routers.auth import get_current_user
 from app.services.tax_simulator import TaxSimulator
 from app.services.pdf_generator import PDFGenerator
 from app.middleware import limiter, get_rate_limit
+from app.dependencies.license_check import require_simulation, require_pdf_export
 from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional
 import re
@@ -114,6 +115,7 @@ async def simulate_residency_change(
     response: FastAPIResponse,
     simulation_request: SimulationRequest,
     current_user: User = Depends(get_current_user),
+    license_check = Depends(require_simulation),
     db: Session = Depends(get_db)
 ):
     """✅ PHASE 3.1: Simulate tax impact of residency change between two countries.
@@ -208,6 +210,7 @@ async def compare_countries(
     response: FastAPIResponse,
     compare_request: CompareRequest,
     current_user: User = Depends(get_current_user),
+    license_check = Depends(require_simulation),
     db: Session = Depends(get_db)
 ):
     """
@@ -346,6 +349,7 @@ async def export_simulation_pdf(
     response: FastAPIResponse,
     simulation_id: int,
     current_user: User = Depends(get_current_user),
+    license_check = Depends(require_pdf_export),
     db: Session = Depends(get_db)
 ):
     """

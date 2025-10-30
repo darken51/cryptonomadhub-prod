@@ -166,14 +166,22 @@ export function CryptoPaymentModal({ isOpen, onClose, planName, tier, period, am
       })
 
       if (!res.ok) {
-        const errorData = await res.json()
-        throw new Error(errorData.detail || 'Failed to create payment')
+        let errorMsg = 'Failed to create payment'
+        try {
+          const errorData = await res.json()
+          errorMsg = errorData.detail || errorData.message || errorMsg
+        } catch {
+          errorMsg = `Server error (${res.status})`
+        }
+        throw new Error(errorMsg)
       }
 
       const data = await res.json()
       setPaymentData(data)
     } catch (err: any) {
-      setError(err.message || 'Failed to create payment. Please try again.')
+      const errorMessage = err.message || 'Failed to create payment. Please try again.'
+      console.error('Crypto payment error:', errorMessage)
+      setError(String(errorMessage)) // Ensure it's a string
       setSelectedCrypto(null)
     } finally {
       setLoading(false)

@@ -6,6 +6,7 @@ from app.models.chat import ChatConversation, ChatMessage as ChatMessageModel
 from app.routers.auth import get_current_user
 from app.services.chat_assistant import ChatAssistant
 from app.middleware import limiter, get_rate_limit
+from app.dependencies.license_check import require_chat_message
 from pydantic import BaseModel
 from typing import List, Dict, Optional
 from sqlalchemy import desc
@@ -162,6 +163,7 @@ async def send_message(
     response: Response,
     message_request: SendMessageRequest,
     current_user: User = Depends(get_current_user),
+    license_check = Depends(require_chat_message),
     db: Session = Depends(get_db)
 ):
     """
@@ -249,6 +251,7 @@ async def send_message_auto_create(
     response: Response,
     message_request: SendMessageRequest,
     current_user: User = Depends(get_current_user),
+    license_check = Depends(require_chat_message),
     db: Session = Depends(get_db)
 ):
     """

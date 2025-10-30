@@ -14,6 +14,7 @@ from app.routers.auth import get_current_user
 from app.services.defi_audit_service import DeFiAuditService
 from app.middleware import limiter, get_rate_limit
 from app.dependencies import get_exchange_rate_service
+from app.dependencies.license_check import require_defi_audit, require_pdf_export
 from app.data.currency_mapping import get_currency_info
 from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional
@@ -188,6 +189,7 @@ async def create_defi_audit(
     response: FastAPIResponse,
     audit_request: CreateAuditRequest,
     current_user: User = Depends(get_current_user),
+    license_check = Depends(require_defi_audit),
     db: Session = Depends(get_db)
 ):
     """
@@ -531,6 +533,7 @@ async def export_audit_csv(
 async def export_audit_pdf(
     audit_id: int,
     current_user: User = Depends(get_current_user),
+    license_check = Depends(require_pdf_export),
     db: Session = Depends(get_db)
 ):
     """
