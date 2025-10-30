@@ -65,7 +65,7 @@ export default function UsageCounter({ compact = false }: UsageCounterProps) {
       setLoading(true)
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/license/usage`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
         }
       })
 
@@ -124,7 +124,7 @@ export default function UsageCounter({ compact = false }: UsageCounterProps) {
     return (
       <Card variant="glass">
         <CardContent>
-          <p className="text-red-500">Failed to load usage data</p>
+          <p className="text-white dark:text-white">Failed to load usage data</p>
         </CardContent>
       </Card>
     )
