@@ -1,16 +1,29 @@
 'use client'
 
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { useToast } from '@/components/providers/ToastProvider'
 
 /**
- * OAuth Callback Page
- * Receives access_token and refresh_token from backend after successful OAuth
- * Stores tokens and redirects to dashboard
+ * Loading spinner component
  */
-export default function OAuthCallbackPage() {
+function LoadingSpinner() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800">
+      <div className="text-center">
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-500 mb-4"></div>
+        <p className="text-white text-lg">Completing sign in...</p>
+        <p className="text-slate-400 text-sm mt-2">Please wait while we set up your account</p>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * OAuth Callback Handler - Wrapped component that uses useSearchParams()
+ */
+function OAuthCallbackHandler() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { refreshUser } = useAuth()
@@ -58,13 +71,18 @@ export default function OAuthCallbackPage() {
     processOAuthCallback()
   }, [searchParams, router, refreshUser, showToast])
 
+  return <LoadingSpinner />
+}
+
+/**
+ * OAuth Callback Page
+ * Receives access_token and refresh_token from backend after successful OAuth
+ * Stores tokens and redirects to dashboard
+ */
+export default function OAuthCallbackPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800">
-      <div className="text-center">
-        <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-500 mb-4"></div>
-        <p className="text-white text-lg">Completing sign in...</p>
-        <p className="text-slate-400 text-sm mt-2">Please wait while we set up your account</p>
-      </div>
-    </div>
+    <Suspense fallback={<LoadingSpinner />}>
+      <OAuthCallbackHandler />
+    </Suspense>
   )
 }
