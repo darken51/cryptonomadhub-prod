@@ -23,8 +23,8 @@ interface FAQ {
 }
 
 function generateFAQs(country: Country): FAQ[] {
-  const shortRate = country.crypto_short_rate ?? country.cgt_short_rate
-  const longRate = country.crypto_long_rate ?? country.cgt_long_rate
+  const shortRate = (country.crypto_short_rate ?? country.cgt_short_rate) * 100
+  const longRate = (country.crypto_long_rate ?? country.cgt_long_rate) * 100
   const isZeroTax = shortRate === 0 && longRate === 0
 
   const faqs: FAQ[] = []
