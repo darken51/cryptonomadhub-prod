@@ -13,7 +13,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import dynamic from 'next/dynamic'
+import NextDynamic from 'next/dynamic'
 import { AppHeader } from '@/components/AppHeader'
 import { Footer } from '@/components/Footer'
 import { useAuth } from '@/components/providers/AuthProvider'
@@ -28,12 +28,12 @@ import AlertsSection from '@/components/dashboard/AlertsSection'
 export const dynamic = 'force-dynamic'
 
 // Lazy load heavy components to improve initial page load
-const AIChat = dynamic(() => import('@/components/dashboard/AIChat'), {
+const AIChat = NextDynamic(() => import('@/components/dashboard/AIChat'), {
   loading: () => <div className="animate-pulse bg-slate-800/50 rounded-2xl h-96 mb-12" />,
   ssr: false
 })
 
-const TaxOpportunities = dynamic(() => import('@/components/dashboard/TaxOpportunities'), {
+const TaxOpportunities = NextDynamic(() => import('@/components/dashboard/TaxOpportunities'), {
   loading: () => <div className="animate-pulse bg-slate-800/50 rounded-2xl h-48 mb-12" />,
   ssr: false
 })
