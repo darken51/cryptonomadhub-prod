@@ -3,6 +3,8 @@
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 
+// Build timestamp: 2025-10-30 17:00 - Force rebuild v3
+
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
