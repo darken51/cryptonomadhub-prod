@@ -224,7 +224,7 @@ export default function UsageCounter({ compact = false }: UsageCounterProps) {
           </div>
           {usage.tier === 'free' && (
             <Link href="/pricing">
-              <Button variant="gradient" size="sm" className="flex items-center gap-2">
+              <Button variant="primary" size="sm" className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4" />
                 Upgrade
               </Button>
