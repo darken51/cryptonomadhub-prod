@@ -20,7 +20,7 @@ export default function Home() {
 
   return (
     <PublicPageLayout>
-      {/* SEO Schema.org Structured Data */}
+      {/* SEO Schema.org Structured Data - SoftwareApplication */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -54,6 +54,67 @@ export default function Home() {
               "Tax-loss harvesting",
               "Wallet portfolio tracking",
               "AI chat with direct portfolio analysis"
+            ]
+          })
+        }}
+      />
+
+      {/* SEO Schema.org Structured Data - FAQPage */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Is this legal? Can I really optimize my crypto taxes this way?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes! Tax residency optimization is completely legal. CryptoNomadHub provides educational tools and simulations based on official tax data from 167 countries. We help you understand different jurisdictions, but you should always consult a licensed tax professional before making any residency changes. Our platform is for informational purposes only."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Which countries do you support?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "We support 167 countries worldwide, making us the most comprehensive crypto tax platform available. This includes all major jurisdictions like the US, UK, EU countries, UAE, Singapore, Australia, Canada, and over 150 others. Each country has official tax rate data, treaty information, and residency requirements."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "How accurate are your tax rate calculations?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Our tax rates are sourced from official government publications, international tax organizations (OECD, Tax Foundation), and reputable tax advisories (PwC, Koinly, KPMG). We update our database regularly and maintain an audit trail of all changes. However, tax laws change frequently, so we always recommend verifying with a local tax professional."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Can I import transactions from exchanges like Binance and Coinbase?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes! We support direct API integration with major exchanges including Binance, Coinbase, and Kraken. You can also import transactions via CSV for any exchange or wallet. Our system automatically categorizes transactions, calculates cost basis using FIFO/LIFO/HIFO methods, and handles complex scenarios like wash sales."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Do you support DeFi protocols and NFTs?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Absolutely! Our DeFi audit feature analyzes on-chain activity across 40+ protocols including Uniswap, Aave, Compound, and more. We also detect NFT transactions, airdrops, and staking rewards. The platform automatically identifies protocol interactions and calculates tax implications for each transaction type."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "What reports can I export?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "You can export professional tax reports in multiple formats: PDF (comprehensive report with charts), Excel (detailed transaction history), CSV (raw data), and TurboTax import format. All reports include full calculation transparency, source references, and legal disclaimers. Perfect for submitting to accountants or tax authorities."
+                }
+              }
             ]
           })
         }}

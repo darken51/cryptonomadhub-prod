@@ -156,7 +156,7 @@ export async function generateMetadata({ params }: { params: Promise<{ country_c
       type: 'article',
       images: [
         {
-          url: `/og-country-${country_code.toLowerCase()}.png`,
+          url: `/api/og/country?code=${country_code.toLowerCase()}`,
           width: 1200,
           height: 630,
           alt: `${country.country_name} Crypto Tax Guide - ${shortRate}% Rate`
@@ -168,7 +168,7 @@ export async function generateMetadata({ params }: { params: Promise<{ country_c
       card: 'summary_large_image',
       title: `${country.flag_emoji || ''} ${country.country_name} Crypto Tax ${new Date().getFullYear()}`,
       description: `${shortRate}% crypto tax rate. ${country.crypto_legal_status === 'legal' ? 'Legal' : country.crypto_legal_status || 'Regulated'}. Complete tax guide.`,
-      images: [`/og-country-${country_code.toLowerCase()}.png`],
+      images: [`/api/og/country?code=${country_code.toLowerCase()}`],
       creator: '@CryptoNomadHub'
     },
 
@@ -190,10 +190,54 @@ export async function generateMetadata({ params }: { params: Promise<{ country_c
   }
 }
 
-export default function CountryLayout({
+export default async function CountryLayout({
   children,
+  params,
 }: {
   children: React.ReactNode
+  params: Promise<{ country_code: string }>
 }) {
-  return <>{children}</>
+  const { country_code } = await params
+  const country = await getCountryData(country_code)
+
+  if (!country) {
+    return <>{children}</>
+  }
+
+  // Breadcrumb JSON-LD for SEO
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: 'https://cryptonomadhub.io',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Countries',
+        item: 'https://cryptonomadhub.io/countries',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: country.country_name,
+        item: `https://cryptonomadhub.io/countries/${country_code.toLowerCase()}`,
+      },
+    ],
+  }
+
+  return (
+    <>
+      {/* Breadcrumb Schema for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      {children}
+    </>
+  )
 }
