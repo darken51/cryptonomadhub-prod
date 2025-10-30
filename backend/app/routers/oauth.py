@@ -132,7 +132,7 @@ async def google_callback(
 
         # Generate JWT tokens for our app
         access_token = create_access_token(data={"sub": user.email})
-        refresh_token = create_refresh_token(data={"sub": user.email})
+        refresh_token = create_refresh_token()
 
         # Update user's refresh token
         user.refresh_token = refresh_token
