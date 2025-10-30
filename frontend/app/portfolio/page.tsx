@@ -1,5 +1,8 @@
 'use client'
 
+// Force dynamic rendering for authenticated pages
+export const dynamic = 'force-dynamic'
+
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
