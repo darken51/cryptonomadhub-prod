@@ -199,17 +199,40 @@ class LicenseService:
 
             tier_names = {
                 LicenseTier.FREE: "FREE",
-                LicenseTier.STARTER: "STARTER ($20/month)",
-                LicenseTier.PRO: "PRO ($50/month)",
+                LicenseTier.STARTER: "STARTER ($15/month)",
+                LicenseTier.PRO: "PRO ($39/month)",
                 LicenseTier.ENTERPRISE: "ENTERPRISE (Custom)"
             }
 
             current_tier_name = tier_names.get(license.tier, license.tier.value)
 
-            return False, (
-                f"You've reached your {resource.replace('_', ' ')} limit ({limit}/{license.usage_reset_at.strftime('%B')}). "
-                f"Current plan: {current_tier_name}. Upgrade to get more!"
-            )
+            # Personalized messages based on tier and resource
+            if license.tier == LicenseTier.FREE and resource == "chat_messages":
+                return False, (
+                    f"You've reached your {limit} FREE chat messages limit for this month. "
+                    f"Upgrade to STARTER ($15/mo) for 100 messages or PRO ($39/mo) for 500 messages. "
+                    f"Your limit resets on {license.usage_reset_at.strftime('%B')} 1st."
+                )
+            elif license.tier == LicenseTier.FREE and resource == "simulations":
+                return False, (
+                    f"You've used all {limit} FREE simulations for this month. "
+                    f"Upgrade to STARTER ($15/mo) for 50 simulations or PRO ($39/mo) for unlimited simulations."
+                )
+            elif license.tier == LicenseTier.FREE and resource == "defi_audits":
+                return False, (
+                    f"You've used all {limit} FREE DeFi audits for this month. "
+                    f"Upgrade to STARTER ($15/mo) for 15 audits or PRO ($39/mo) for 100 audits."
+                )
+            elif license.tier == LicenseTier.STARTER:
+                return False, (
+                    f"You've reached your STARTER limit for {resource.replace('_', ' ')} ({limit}/month). "
+                    f"Upgrade to PRO ($39/mo) for more resources (unlimited simulations, 100 audits, 500 chat messages)."
+                )
+            else:
+                return False, (
+                    f"You've reached your {resource.replace('_', ' ')} limit ({limit}/{license.usage_reset_at.strftime('%B')}). "
+                    f"Current plan: {current_tier_name}. Upgrade to get more!"
+                )
 
         # Increment usage
         license.increment_usage(resource)

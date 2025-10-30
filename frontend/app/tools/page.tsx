@@ -60,10 +60,9 @@ const cryptoCards: CryptoCard[] = [
     fees: 'Competitive fees (check website for current rates)',
     supported_crypto: ['USDT', 'USDC', 'BTC', 'ETH', 'SOL'],
     kyc_required: true,
-    cardImage: 'https://staticsource1.redotpay.com/web/img/home/v3/card-physical.webp',
+    cardImage: '/cards/RedotPay-card-crypto.webp',
     cardImages: [
-      'https://staticsource1.redotpay.com/web/img/home/v3/card-physical.webp',
-      'https://staticsource1.redotpay.com/web/img/home/v3/card-virtual.webp',
+      '/cards/RedotPay-card-crypto.webp',
     ],
   },
   {
@@ -195,7 +194,7 @@ export default function ToolsPage() {
                         "@type": "Brand",
                         "name": "RedotPay"
                       },
-                      "image": "https://staticsource1.redotpay.com/web/img/home/v3/card-physical.webp",
+                      "image": "https://cryptonomadhub.io/cards/RedotPay-card-crypto.webp",
                       "offers": {
                         "@type": "Offer",
                         "availability": "https://schema.org/InStock",
