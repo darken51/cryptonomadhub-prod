@@ -177,10 +177,15 @@ async def get_all_regulations(
 @router.get("/{country_code}", response_model=RegulationResponse)
 async def get_regulation(
     country_code: str,
+    include_analysis: bool = False,
     db: Session = Depends(get_db)
 ):
     """
     Get tax regulation for a specific country
+
+    Args:
+        country_code: ISO 2-letter country code (e.g., US, FR, PT)
+        include_analysis: If True, include AI analysis (crypto_score, nomad_score, etc.)
 
     Returns crypto-specific rates when available
     """
@@ -193,36 +198,44 @@ async def get_regulation(
 
     quality, sources = extract_data_quality(regulation)
 
-    return RegulationResponse(
-        country_code=regulation.country_code,
-        country_name=regulation.country_name,
-        flag_emoji=regulation.flag_emoji,
-        cgt_short_rate=float(regulation.cgt_short_rate),
-        cgt_long_rate=float(regulation.cgt_long_rate),
-        crypto_short_rate=float(regulation.crypto_short_rate) if regulation.crypto_short_rate is not None else None,
-        crypto_long_rate=float(regulation.crypto_long_rate) if regulation.crypto_long_rate is not None else None,
-        crypto_notes=regulation.crypto_notes,
-        staking_rate=float(regulation.staking_rate) if regulation.staking_rate is not None else None,
-        mining_rate=float(regulation.mining_rate) if regulation.mining_rate is not None else None,
-        # Structured crypto tax metadata
-        holding_period_months=regulation.holding_period_months,
-        is_flat_tax=bool(regulation.is_flat_tax) if regulation.is_flat_tax is not None else None,
-        is_progressive=bool(regulation.is_progressive) if regulation.is_progressive is not None else None,
-        is_territorial=bool(regulation.is_territorial) if regulation.is_territorial is not None else None,
-        crypto_specific=bool(regulation.crypto_specific) if regulation.crypto_specific is not None else None,
-        long_term_discount_pct=float(regulation.long_term_discount_pct) if regulation.long_term_discount_pct is not None else None,
-        exemption_threshold=float(regulation.exemption_threshold) if regulation.exemption_threshold is not None else None,
-        exemption_threshold_currency=regulation.exemption_threshold_currency,
-        nft_treatment=regulation.nft_treatment,
-        residency_rule=regulation.residency_rule,
-        defi_reporting=regulation.defi_reporting,
-        penalties_max=regulation.penalties_max,
-        notes=regulation.notes,
-        updated_at=str(regulation.updated_at) if regulation.updated_at else None,
-        source_url=regulation.source_url,
-        data_quality=quality,
-        data_sources=sources if sources else None
-    )
+    response_data = {
+        "country_code": regulation.country_code,
+        "country_name": regulation.country_name,
+        "flag_emoji": regulation.flag_emoji,
+        "cgt_short_rate": float(regulation.cgt_short_rate),
+        "cgt_long_rate": float(regulation.cgt_long_rate),
+        "crypto_short_rate": float(regulation.crypto_short_rate) if regulation.crypto_short_rate is not None else None,
+        "crypto_long_rate": float(regulation.crypto_long_rate) if regulation.crypto_long_rate is not None else None,
+        "crypto_notes": regulation.crypto_notes,
+        "crypto_legal_status": regulation.crypto_legal_status,
+        "staking_rate": float(regulation.staking_rate) if regulation.staking_rate is not None else None,
+        "mining_rate": float(regulation.mining_rate) if regulation.mining_rate is not None else None,
+        "holding_period_months": regulation.holding_period_months,
+        "is_flat_tax": bool(regulation.is_flat_tax) if regulation.is_flat_tax is not None else None,
+        "is_progressive": bool(regulation.is_progressive) if regulation.is_progressive is not None else None,
+        "is_territorial": bool(regulation.is_territorial) if regulation.is_territorial is not None else None,
+        "crypto_specific": bool(regulation.crypto_specific) if regulation.crypto_specific is not None else None,
+        "long_term_discount_pct": float(regulation.long_term_discount_pct) if regulation.long_term_discount_pct is not None else None,
+        "exemption_threshold": float(regulation.exemption_threshold) if regulation.exemption_threshold is not None else None,
+        "exemption_threshold_currency": regulation.exemption_threshold_currency,
+        "nft_treatment": regulation.nft_treatment,
+        "residency_rule": regulation.residency_rule,
+        "defi_reporting": regulation.defi_reporting,
+        "penalties_max": regulation.penalties_max,
+        "notes": regulation.notes,
+        "updated_at": str(regulation.updated_at) if regulation.updated_at else None,
+        "source_url": regulation.source_url,
+        "data_quality": quality,
+        "data_sources": sources if sources else None
+    }
+
+    # Add AI analysis if requested
+    if include_analysis:
+        analysis = db.query(CountryAnalysis).filter_by(country_code=country_code.upper()).first()
+        if analysis:
+            response_data["ai_analysis"] = analysis.to_dict()
+
+    return RegulationResponse(**response_data)
 
 
 # ============================================
