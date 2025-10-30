@@ -1,6 +1,8 @@
 'use client'
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react'
+import { useToast } from './ToastProvider'
+import { registerApiHandlers } from '@/lib/api'
 
 interface LicenseInfo {
   tier: string
@@ -29,10 +31,29 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
+// Internal component that monitors session expiration
+function AuthSessionMonitor({ wasAuthenticated }: { wasAuthenticated: boolean }) {
+  const { user } = useAuth()
+  const { showToast } = useToast()
+  const hasShownToast = useRef(false)
+
+  useEffect(() => {
+    // If user was authenticated but is now null, session expired
+    if (wasAuthenticated && !user && !hasShownToast.current) {
+      hasShownToast.current = true
+      showToast('Votre session a expiré. Veuillez vous reconnecter.', 'error')
+    }
+  }, [user, wasAuthenticated, showToast])
+
+  return null
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [token, setToken] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [wasAuthenticated, setWasAuthenticated] = useState(false)
+  const { showToast } = useToast()
 
   // Load token from localStorage on mount
   useEffect(() => {
@@ -44,6 +65,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setIsLoading(false)
     }
   }, [])
+
+  // Track when user becomes authenticated
+  useEffect(() => {
+    if (user) {
+      setWasAuthenticated(true)
+    }
+  }, [user])
 
   const fetchUser = async (accessToken: string) => {
     try {
@@ -131,8 +159,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  // Register global API handlers for 401 error handling
+  useEffect(() => {
+    registerApiHandlers(logout, showToast)
+  }, [showToast])
+
   return (
     <AuthContext.Provider value={{ user, token, login, register, logout, refreshUser, isLoading }}>
+      <AuthSessionMonitor wasAuthenticated={wasAuthenticated} />
       {children}
     </AuthContext.Provider>
   )

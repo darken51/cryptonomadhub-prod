@@ -106,11 +106,11 @@ export default function RootLayout({
         <SkipToContent />
         {/* ✅ PHASE 2.5: Error boundary for error handling */}
         <ErrorBoundary>
-          <AuthProvider>
-            <ToastProvider>
+          <ToastProvider>
+            <AuthProvider>
               {children}
-            </ToastProvider>
-          </AuthProvider>
+            </AuthProvider>
+          </ToastProvider>
         </ErrorBoundary>
         {/* ✅ GDPR Cookie Consent Banner */}
         <CookieConsent />
