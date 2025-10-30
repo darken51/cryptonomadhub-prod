@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, Suspense } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { analytics } from '@/lib/analytics'
 
-export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
+// Separate component that uses useSearchParams
+function PageViewTracker() {
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
@@ -15,5 +16,16 @@ export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
     }
   }, [pathname, searchParams])
 
-  return <>{children}</>
+  return null
+}
+
+export function AnalyticsProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <Suspense fallback={null}>
+        <PageViewTracker />
+      </Suspense>
+      {children}
+    </>
+  )
 }
