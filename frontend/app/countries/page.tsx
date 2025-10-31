@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { PublicPageLayout } from '@/components/PublicPageLayout'
+import { PublicPageSSR } from '@/components/PublicPageSSR'
 import CountriesClient from './CountriesClient'
 
 // Use ISR (Incremental Static Regeneration) for better performance
@@ -172,7 +172,7 @@ export default async function CountriesPage() {
   ]
 
   return (
-    <PublicPageLayout contentClassName="bg-slate-50 dark:bg-slate-900 py-4 sm:py-8">
+    <PublicPageSSR contentClassName="bg-slate-50 dark:bg-slate-900 py-4 sm:py-8">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -224,6 +224,6 @@ export default async function CountriesPage() {
         }}
       />
       <CountriesClient initialCountries={countries} />
-    </PublicPageLayout>
+    </PublicPageSSR>
   )
 }
