@@ -169,6 +169,46 @@
   select:focus:not(:focus-visible) {
     outline: none;
   }
+
+  /* iOS Safari Input Text Fix - Force text color visibility */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="search"],
+  textarea {
+    -webkit-text-fill-color: rgb(15 23 42) !important;
+    -webkit-opacity: 1 !important;
+    color: rgb(15 23 42) !important;
+  }
+
+  .dark input[type="text"],
+  .dark input[type="email"],
+  .dark input[type="password"],
+  .dark input[type="number"],
+  .dark input[type="search"],
+  .dark textarea {
+    -webkit-text-fill-color: rgb(248 250 252) !important;
+    color: rgb(248 250 252) !important;
+  }
+
+  /* iOS Safari Autocomplete Fix */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-text-fill-color: rgb(15 23 42) !important;
+    -webkit-box-shadow: 0 0 0 1000px white inset !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  .dark input:-webkit-autofill,
+  .dark input:-webkit-autofill:hover,
+  .dark input:-webkit-autofill:focus,
+  .dark input:-webkit-autofill:active {
+    -webkit-text-fill-color: rgb(248 250 252) !important;
+    -webkit-box-shadow: 0 0 0 1000px rgb(30 41 59) inset !important;
+  }
 }
 
 /* ============================================
