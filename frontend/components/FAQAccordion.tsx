@@ -72,7 +72,7 @@ export function FAQAccordion() {
                 {faq.question}
               </span>
               <ChevronDown
-                className={`w-5 h-5 text-slate-500 dark:text-slate-400 flex-shrink-0 transition-transform duration-300 ${
+                className={`w-5 h-5 text-slate-600 dark:text-slate-400 flex-shrink-0 transition-transform duration-300 ${
                   openIndex === index ? 'rotate-180' : ''
                 }`}
               />

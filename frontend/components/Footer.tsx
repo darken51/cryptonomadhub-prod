@@ -17,7 +17,7 @@ export function Footer() {
               </div>
               <div>
                 <span className="text-base font-bold text-slate-900 dark:text-white">CryptoNomadHub</span>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Optimize your crypto taxes globally</p>
+                <p className="text-xs text-slate-600 dark:text-slate-400">Optimize your crypto taxes globally</p>
               </div>
             </div>
 
@@ -44,7 +44,7 @@ export function Footer() {
             <div className="flex items-center gap-3">
               <a
                 href="mailto:support@cryptonomadhub.io"
-                className="p-2 text-slate-500 hover:text-violet-600 dark:hover:text-fuchsia-400 transition-colors"
+                className="p-2 text-slate-600 hover:text-violet-600 dark:hover:text-fuchsia-400 transition-colors"
                 aria-label="Email"
               >
                 <Mail className="w-5 h-5" />
@@ -55,7 +55,7 @@ export function Footer() {
 
         {/* Bottom Bar */}
         <div className="py-6 border-t border-slate-200 dark:border-slate-800">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-600 dark:text-slate-400">
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-2">
               <span>© {currentYear} CryptoNomadHub</span>
               <Link href="/terms" className="hover:text-violet-600 dark:hover:text-fuchsia-400 transition-colors">
