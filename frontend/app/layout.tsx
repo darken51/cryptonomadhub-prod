@@ -1,12 +1,9 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import { AuthProvider } from '@/components/providers/AuthProvider'
-import { ToastProvider } from '@/components/providers/ToastProvider'
-import { AnalyticsProvider } from '@/components/providers/AnalyticsProvider'
 import SkipToContent from '@/components/SkipToContent'
-import ErrorBoundary from '@/components/ErrorBoundary'
 import { CookieConsent } from '@/components/CookieConsent'
+import { ClientProviders } from '@/components/ClientProviders'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -141,16 +138,10 @@ export default function RootLayout({
         <SkipToContent />
         {/* ✅ Server-rendered semantic main tag for SEO */}
         <main id="main-content" className="flex-1">
-          {/* ✅ PHASE 2.5: Error boundary for error handling */}
-          <ErrorBoundary>
-            <ToastProvider>
-              <AuthProvider>
-                <AnalyticsProvider>
-                  {children}
-                </AnalyticsProvider>
-              </AuthProvider>
-            </ToastProvider>
-          </ErrorBoundary>
+          {/* ✅ Client providers wrapper - allows SSR for page content */}
+          <ClientProviders>
+            {children}
+          </ClientProviders>
         </main>
         {/* ✅ GDPR Cookie Consent Banner */}
         <CookieConsent />
