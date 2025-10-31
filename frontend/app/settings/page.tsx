@@ -7,14 +7,12 @@ import { motion } from 'framer-motion'
 import { useAuth } from '@/components/providers/AuthProvider'
 import { AppHeader } from '@/components/AppHeader'
 import { Footer } from '@/components/Footer'
-import LanguageSwitcher from '@/components/LanguageSwitcher'
 import {
   ArrowLeft,
   User,
   Lock,
   Bell,
   CreditCard,
-  Globe,
   Trash2,
   Save,
   Eye,
@@ -61,12 +59,6 @@ export default function SettingsPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [passwordSaving, setPasswordSaving] = useState(false)
   const [passwordMessage, setPasswordMessage] = useState('')
-
-  // Display Preferences state
-  const [language, setLanguage] = useState('en')
-  const [theme, setTheme] = useState('system')
-  const [preferencesSaving, setPreferencesSaving] = useState(false)
-  const [preferencesMessage, setPreferencesMessage] = useState('')
 
   // Tax Jurisdiction state
   const [taxJurisdiction, setTaxJurisdiction] = useState<string | null>(null)
@@ -275,37 +267,6 @@ export default function SettingsPage() {
       setPasswordMessage('Network error. Please try again.')
     } finally {
       setPasswordSaving(false)
-    }
-  }
-
-  const handleSavePreferences = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setPreferencesSaving(true)
-    setPreferencesMessage('')
-
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/preferences`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          language: language,
-          theme: theme
-        })
-      })
-
-      if (response.ok) {
-        setPreferencesMessage('Display preferences saved successfully')
-      } else {
-        const data = await response.json()
-        setPreferencesMessage(data.detail || 'Failed to save preferences')
-      }
-    } catch (error) {
-      setPreferencesMessage('Network error. Please try again.')
-    } finally {
-      setPreferencesSaving(false)
     }
   }
 
@@ -782,65 +743,6 @@ export default function SettingsPage() {
                 >
                   <Save className="w-4 h-4" />
                   {costBasisSaving ? 'Saving...' : 'Save Cost Basis Settings'}
-                </button>
-              </form>
-            </motion.section>
-
-            {/* Display Preferences Section */}
-            <motion.section
-              variants={fadeInUp}
-              className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-xl shadow-violet-500/5 hover:shadow-violet-500/10 transition-shadow"
-            >
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-xl flex items-center justify-center shadow-lg">
-                  <Globe className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Display Preferences</h2>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">Customize how information is displayed</p>
-                </div>
-              </div>
-
-              <form onSubmit={handleSavePreferences} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                    Language
-                  </label>
-                  <LanguageSwitcher variant="dropdown" />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                    Theme
-                  </label>
-                  <select
-                    value={theme}
-                    onChange={(e) => setTheme(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white transition-all"
-                  >
-                    <option value="system">System Default</option>
-                    <option value="light">Light</option>
-                    <option value="dark">Dark</option>
-                  </select>
-                </div>
-
-                {preferencesMessage && (
-                  <motion.p
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className={`text-sm font-medium ${preferencesMessage.includes('success') ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
-                  >
-                    {preferencesMessage}
-                  </motion.p>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={preferencesSaving}
-                  className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white rounded-xl hover:from-violet-700 hover:to-fuchsia-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
-                >
-                  <Save className="w-4 h-4" />
-                  {preferencesSaving ? 'Saving...' : 'Save Preferences'}
                 </button>
               </form>
             </motion.section>
