@@ -227,7 +227,7 @@ function ResetPasswordContent() {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-11 pr-12 py-3 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 dark:focus:ring-fuchsia-500 dark:focus:border-fuchsia-500 dark:bg-slate-800 dark:text-white transition-all"
+                    className="w-full pl-11 pr-12 py-3 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 dark:focus:ring-fuchsia-500 dark:focus:border-fuchsia-500 bg-white text-slate-900 dark:bg-slate-800 dark:text-white transition-all placeholder:text-slate-400"
                     placeholder="Enter new password"
                   />
                   <button
@@ -292,7 +292,7 @@ function ResetPasswordContent() {
                     required
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full pl-11 pr-12 py-3 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 dark:focus:ring-fuchsia-500 dark:focus:border-fuchsia-500 dark:bg-slate-800 dark:text-white transition-all"
+                    className="w-full pl-11 pr-12 py-3 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 dark:focus:ring-fuchsia-500 dark:focus:border-fuchsia-500 bg-white text-slate-900 dark:bg-slate-800 dark:text-white transition-all placeholder:text-slate-400"
                     placeholder="Confirm new password"
                   />
                   <button
