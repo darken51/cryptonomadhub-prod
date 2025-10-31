@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Check, X, Zap, Crown, Rocket, Building2, Mail } from 'lucide-react'
-import { PublicPageLayout } from '@/components/PublicPageLayout'
+import { PublicPageSSR } from '@/components/PublicPageSSR'
 import { CryptoPaymentModal } from '@/components/CryptoPaymentModal'
 import { motion } from 'framer-motion'
 import { useAuth } from '@/components/providers/AuthProvider'
@@ -127,7 +127,7 @@ export default function Pricing() {
   }
 
   return (
-    <PublicPageLayout>
+    <PublicPageSSR>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -551,6 +551,6 @@ export default function Pricing() {
           amount={selectedPlan.amount}
         />
       )}
-    </PublicPageLayout>
+    </PublicPageSSR>
   )
 }

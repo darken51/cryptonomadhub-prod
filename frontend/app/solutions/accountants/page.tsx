@@ -5,12 +5,12 @@ export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
 import { ArrowRight, Briefcase, Users, FileText, CheckCircle, Shield, Clock, TrendingUp, Globe, Calculator, BarChart3, Zap } from 'lucide-react'
-import { PublicPageLayout } from '@/components/PublicPageLayout'
+import { PublicPageSSR } from '@/components/PublicPageSSR'
 import { motion } from 'framer-motion'
 
 export default function AccountantsPage() {
   return (
-    <PublicPageLayout>
+    <PublicPageSSR>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -338,6 +338,6 @@ export default function AccountantsPage() {
           </p>
         </div>
       </section>
-    </PublicPageLayout>
+    </PublicPageSSR>
   )
 }

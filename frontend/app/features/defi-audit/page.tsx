@@ -5,12 +5,12 @@ export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
 import { ArrowRight, Activity, Layers, Sparkles, CheckCircle, Zap, FileDown, TrendingUp } from 'lucide-react'
-import { PublicPageLayout } from '@/components/PublicPageLayout'
+import { PublicPageSSR } from '@/components/PublicPageSSR'
 import { motion } from 'framer-motion'
 
 export default function DeFiAuditFeaturePage() {
   return (
-    <PublicPageLayout>
+    <PublicPageSSR>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -204,6 +204,6 @@ export default function DeFiAuditFeaturePage() {
           </Link>
         </div>
       </section>
-    </PublicPageLayout>
+    </PublicPageSSR>
   )
 }

@@ -5,12 +5,12 @@ export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
 import { ArrowRight, BookOpen, Code, Rocket, FileText, Shield, Zap, Globe, Terminal, Book, MessageCircle, CheckCircle } from 'lucide-react'
-import { PublicPageLayout } from '@/components/PublicPageLayout'
+import { PublicPageSSR } from '@/components/PublicPageSSR'
 import { motion } from 'framer-motion'
 
 export default function DocsPage() {
   return (
-    <PublicPageLayout>
+    <PublicPageSSR>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -265,6 +265,6 @@ export default function DocsPage() {
           </p>
         </div>
       </section>
-    </PublicPageLayout>
+    </PublicPageSSR>
   )
 }

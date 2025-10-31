@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic'
 import Link from 'next/link'
 import { useState } from 'react'
 import { ArrowRight, HelpCircle, MessageCircle, Mail, BookOpen, ChevronDown, Search, Zap, Globe, Activity, Calculator, Users, Shield } from 'lucide-react'
-import { PublicPageLayout } from '@/components/PublicPageLayout'
+import { PublicPageSSR } from '@/components/PublicPageSSR'
 import { motion, AnimatePresence } from 'framer-motion'
 
 interface FAQ {
@@ -166,7 +166,7 @@ export default function HelpPage() {
   ]
 
   return (
-    <PublicPageLayout>
+    <PublicPageSSR>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -370,6 +370,6 @@ export default function HelpPage() {
           </p>
         </div>
       </section>
-    </PublicPageLayout>
+    </PublicPageSSR>
   )
 }

@@ -5,11 +5,11 @@ export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
 import { ArrowLeft, DollarSign, Calendar, AlertCircle, Globe } from 'lucide-react'
-import { PublicPageLayout } from '@/components/PublicPageLayout'
+import { PublicPageSSR } from '@/components/PublicPageSSR'
 
 export default function USCitizensAbroadBlogPost() {
   return (
-    <PublicPageLayout>
+    <PublicPageSSR>
 
       <article className="flex-1 py-12 px-4">
         <div className="max-w-4xl mx-auto">
@@ -363,6 +363,6 @@ export default function USCitizensAbroadBlogPost() {
         </div>
       </article>
 
-      </PublicPageLayout>
+      </PublicPageSSR>
   )
 }

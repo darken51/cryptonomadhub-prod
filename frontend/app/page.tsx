@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
 import { Globe, MessageCircle, Activity, DollarSign, Calculator, RefreshCw, ArrowRight, Shield, Lock, CheckCircle, Sparkles, TrendingUp, Zap, LineChart, FileText, AlertTriangle, Trophy, BarChart3, Layers, Target, CreditCard } from 'lucide-react'
-import { PublicPageLayout } from '@/components/PublicPageLayout'
+import { PublicPageSSR } from '@/components/PublicPageSSR'
 import { LegalDisclaimer } from '@/components/LegalDisclaimer'
 import { AnimatedCounter } from '@/components/AnimatedCounter'
 import { ComparisonTable } from '@/components/ComparisonTable'
@@ -19,7 +19,7 @@ export default function Home() {
   const { ref: statsRef, inView: statsInView } = useInView({ threshold: 0.3, triggerOnce: true })
 
   return (
-    <PublicPageLayout>
+    <PublicPageSSR>
       {/* SEO Schema.org Structured Data - SoftwareApplication */}
       <script
         type="application/ld+json"
@@ -1140,6 +1140,6 @@ export default function Home() {
           animation-delay: 4s;
         }
       `}</style>
-    </PublicPageLayout>
+    </PublicPageSSR>
   )
 }

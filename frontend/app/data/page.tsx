@@ -1,4 +1,4 @@
-import { PublicPageLayout } from '@/components/PublicPageLayout'
+import { PublicPageSSR } from '@/components/PublicPageSSR'
 import { Database, Download, Code, FileJson, Calendar, Shield } from 'lucide-react'
 
 interface Country {
@@ -136,7 +136,7 @@ export default async function DataPage() {
   }
 
   return (
-    <PublicPageLayout>
+    <PublicPageSSR>
       {/* JSON-LD for AI consumption */}
       <script
         type="application/ld+json"
@@ -391,6 +391,6 @@ export default async function DataPage() {
           </div>
         </div>
       </div>
-    </PublicPageLayout>
+    </PublicPageSSR>
   )
 }

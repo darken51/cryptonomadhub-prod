@@ -5,12 +5,12 @@ export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
 import { ArrowRight, Globe, Map, Database, Shield, CheckCircle, Sparkles, TrendingUp, FileText } from 'lucide-react'
-import { PublicPageLayout } from '@/components/PublicPageLayout'
+import { PublicPageSSR } from '@/components/PublicPageSSR'
 import { motion } from 'framer-motion'
 
 export default function CountriesFeaturePage() {
   return (
-    <PublicPageLayout>
+    <PublicPageSSR>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -212,6 +212,6 @@ export default function CountriesFeaturePage() {
           </Link>
         </div>
       </section>
-    </PublicPageLayout>
+    </PublicPageSSR>
   )
 }

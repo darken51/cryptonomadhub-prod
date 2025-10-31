@@ -5,12 +5,12 @@ export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
 import { ArrowRight, TrendingUp, BarChart3, Calculator, Activity, DollarSign, Shield, CheckCircle, LineChart, Zap, Target, Clock } from 'lucide-react'
-import { PublicPageLayout } from '@/components/PublicPageLayout'
+import { PublicPageSSR } from '@/components/PublicPageSSR'
 import { motion } from 'framer-motion'
 
 export default function CryptoTradersPage() {
   return (
-    <PublicPageLayout>
+    <PublicPageSSR>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -287,6 +287,6 @@ export default function CryptoTradersPage() {
           </p>
         </div>
       </section>
-    </PublicPageLayout>
+    </PublicPageSSR>
   )
 }

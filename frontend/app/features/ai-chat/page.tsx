@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
 import { ArrowRight, MessageCircle, Brain, Sparkles, CheckCircle, Zap, Shield, Globe, FileText, TrendingUp, History, Lightbulb, Calculator, Database } from 'lucide-react'
-import { PublicPageLayout } from '@/components/PublicPageLayout'
+import { PublicPageSSR } from '@/components/PublicPageSSR'
 import { motion } from 'framer-motion'
 
 export default function AIChatFeaturePage() {
@@ -75,7 +75,7 @@ export default function AIChatFeaturePage() {
   ]
 
   return (
-    <PublicPageLayout>
+    <PublicPageSSR>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -403,6 +403,6 @@ export default function AIChatFeaturePage() {
           </p>
         </div>
       </section>
-    </PublicPageLayout>
+    </PublicPageSSR>
   )
 }

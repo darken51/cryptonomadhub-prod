@@ -5,11 +5,11 @@ export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
 import { ArrowLeft, CheckCircle, AlertTriangle, Shield } from 'lucide-react'
-import { PublicPageLayout } from '@/components/PublicPageLayout'
+import { PublicPageSSR } from '@/components/PublicPageSSR'
 
 export default function ConnectWalletDoc() {
   return (
-    <PublicPageLayout>
+    <PublicPageSSR>
 
       <article className="flex-1 py-12 px-4">
         <div className="max-w-4xl mx-auto">
@@ -265,6 +265,6 @@ export default function ConnectWalletDoc() {
         </div>
       </article>
 
-      </PublicPageLayout>
+      </PublicPageSSR>
   )
 }

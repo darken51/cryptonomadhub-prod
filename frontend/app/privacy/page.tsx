@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic'
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { PublicPageLayout } from '@/components/PublicPageLayout'
+import { PublicPageSSR } from '@/components/PublicPageSSR'
 import { ArrowLeft, Shield, Lock, Database, Globe, Mail, CheckCircle2, FileText } from 'lucide-react'
 
 const fadeInUp = {
@@ -24,7 +24,7 @@ const staggerContainer = {
 
 export default function PrivacyPolicy() {
   return (
-    <PublicPageLayout contentClassName="min-h-screen bg-gradient-to-br from-slate-50 via-violet-50/30 to-fuchsia-50/30 dark:from-slate-950 dark:via-violet-950/20 dark:to-fuchsia-950/20">
+    <PublicPageSSR contentClassName="min-h-screen bg-gradient-to-br from-slate-50 via-violet-50/30 to-fuchsia-50/30 dark:from-slate-950 dark:via-violet-950/20 dark:to-fuchsia-950/20">
         {/* Hero Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -416,6 +416,6 @@ export default function PrivacyPolicy() {
             </motion.section>
           </motion.div>
         </div>
-      </PublicPageLayout>
+      </PublicPageSSR>
   )
 }

@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic'
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { PublicPageLayout } from '@/components/PublicPageLayout'
+import { PublicPageSSR } from '@/components/PublicPageSSR'
 import { CreditCard, ArrowRight, ExternalLink, Check, Info, MapPin, Shield } from 'lucide-react'
 
 interface CryptoCard {
@@ -170,7 +170,7 @@ export default function ToolsPage() {
   const [selectedCard, setSelectedCard] = useState<CryptoCard | null>(null)
 
   return (
-    <PublicPageLayout>
+    <PublicPageSSR>
       <div className="bg-gray-50 dark:bg-gray-900 py-8">
         <script
           type="application/ld+json"
@@ -882,6 +882,6 @@ export default function ToolsPage() {
           </div>
         </div>
       )}
-    </PublicPageLayout>
+    </PublicPageSSR>
   )
 }
