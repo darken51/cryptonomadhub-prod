@@ -381,7 +381,7 @@ export default function ComparePage() {
                     placeholder="🔍 Search countries..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full px-4 py-2.5 text-sm border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                    className="w-full px-4 py-2.5 text-sm border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-white text-slate-900 dark:bg-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   />
                   {searchTerm && (
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
@@ -441,7 +441,7 @@ export default function ComparePage() {
                       min="0"
                       value={shortTermGains}
                       onChange={(e) => setShortTermGains(e.target.value)}
-                      className="w-full pl-7 sm:pl-8 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white hover:border-violet-400 transition-colors"
+                      className="w-full pl-7 sm:pl-8 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-white text-slate-900 dark:bg-slate-800 dark:text-white hover:border-violet-400 transition-colors placeholder:text-slate-400"
                       placeholder="0.00"
                     />
                   </div>
@@ -464,7 +464,7 @@ export default function ComparePage() {
                       min="0"
                       value={longTermGains}
                       onChange={(e) => setLongTermGains(e.target.value)}
-                      className="w-full pl-7 sm:pl-8 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white hover:border-violet-400 transition-colors"
+                      className="w-full pl-7 sm:pl-8 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-white text-slate-900 dark:bg-slate-800 dark:text-white hover:border-violet-400 transition-colors placeholder:text-slate-400"
                       placeholder="0.00"
                     />
                   </div>

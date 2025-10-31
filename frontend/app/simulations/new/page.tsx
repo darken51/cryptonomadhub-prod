@@ -307,7 +307,7 @@ function NewSimulationPageContent() {
                     min="0"
                     value={shortTermGains}
                     onChange={(e) => setShortTermGains(e.target.value)}
-                    className="w-full pl-7 sm:pl-8 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white hover:border-violet-400 transition-colors"
+                    className="w-full pl-7 sm:pl-8 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-white text-slate-900 dark:bg-slate-800 dark:text-white hover:border-violet-400 transition-colors placeholder:text-slate-400"
                     placeholder="0.00"
                   />
                 </div>
@@ -330,7 +330,7 @@ function NewSimulationPageContent() {
                     min="0"
                     value={longTermGains}
                     onChange={(e) => setLongTermGains(e.target.value)}
-                    className="w-full pl-7 sm:pl-8 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent dark:bg-slate-800 dark:text-white hover:border-violet-400 transition-colors"
+                    className="w-full pl-7 sm:pl-8 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-white text-slate-900 dark:bg-slate-800 dark:text-white hover:border-violet-400 transition-colors placeholder:text-slate-400"
                     placeholder="0.00"
                   />
                 </div>
