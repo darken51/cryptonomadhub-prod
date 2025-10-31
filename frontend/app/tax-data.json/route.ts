@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 
-export const dynamic = 'force-static'
+// Force dynamic to avoid build timeouts when API is not accessible
+export const dynamic = 'force-dynamic'
 export const revalidate = 3600
 
 interface Country {

@@ -2,6 +2,9 @@ import { notFound } from 'next/navigation'
 import { PublicPageSSR } from '@/components/PublicPageSSR'
 import CountryPageClient from './CountryPageClient'
 
+// Force dynamic rendering (SSR) instead of static generation
+export const dynamic = 'force-dynamic'
+
 interface AIAnalysis {
   crypto_score: number
   nomad_score: number

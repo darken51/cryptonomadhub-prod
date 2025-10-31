@@ -38,34 +38,10 @@ async function getCountryData(country_code: string): Promise<Country | null> {
   }
 }
 
-// Generate static params for all 167 countries
-export async function generateStaticParams() {
-  try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'
-    const response = await fetch(`${apiUrl}/regulations?reliable_only=true`)
-
-    if (!response.ok) {
-      // Fallback to static list if API fails
-      const STATIC_COUNTRY_CODES = [
-        'ae', 'pt', 'sg', 'de', 'ch', 'my', 'mt', 'bh', 'bm', 'ky', 'hk', 'pr', 'gi', 'ee', 'si',
-        'us', 'gb', 'fr', 'es', 'it', 'nl', 'be', 'at', 'dk', 'se', 'no', 'fi', 'ie', 'lu',
-        'jp', 'kr', 'au', 'nz', 'ca', 'mx', 'br', 'ar', 'cl', 'co', 'pe',
-        'th', 'id', 'ph', 'vn', 'in', 'cn', 'tw', 'sa', 'tr', 'il', 'za', 'ng', 'ke'
-      ]
-      return STATIC_COUNTRY_CODES.map((code) => ({
-        country_code: code
-      }))
-    }
-
-    const data: Country[] = await response.json()
-    return data.map((country) => ({
-      country_code: country.country_code.toLowerCase()
-    }))
-  } catch (error) {
-    console.error('Error generating static params:', error)
-    return []
-  }
-}
+// DISABLED: generateStaticParams to avoid build timeouts on Vercel
+// Pages use dynamic rendering (SSR) instead of static generation
+// This prevents 60s timeouts when trying to fetch API during build
+// export async function generateStaticParams() { ... }
 
 // Generate metadata dynamically based on real country data
 export async function generateMetadata({ params }: { params: Promise<{ country_code: string }> }): Promise<Metadata> {
