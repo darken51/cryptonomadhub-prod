@@ -115,36 +115,9 @@ const STATIC_FALLBACK_COUNTRIES: Country[] = [
 ]
 
 async function getCountries(): Promise<Country[]> {
-  try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'
-    const url = `${apiUrl}/regulations/?reliable_only=true&include_analysis=true`
-
-    console.log('[SSR] Fetching countries from:', url)
-
-    const response = await fetch(url, {
-      cache: 'no-store', // Force fresh data on each request
-      headers: { 'Accept': 'application/json' },
-      signal: AbortSignal.timeout(5000) // 5s timeout
-    })
-
-    if (!response.ok) {
-      console.error('[SSR] API failed:', response.status, '- Using static fallback')
-      return STATIC_FALLBACK_COUNTRIES
-    }
-
-    const data = await response.json()
-    console.log('[SSR] Successfully fetched', data.length, 'countries')
-
-    if (!data || data.length === 0) {
-      console.warn('[SSR] API returned empty data - Using static fallback')
-      return STATIC_FALLBACK_COUNTRIES
-    }
-
-    return data.sort((a: Country, b: Country) => a.country_name.localeCompare(b.country_name))
-  } catch (error) {
-    console.error('[SSR] Error fetching countries:', error, '- Using static fallback')
-    return STATIC_FALLBACK_COUNTRIES
-  }
+  // Return empty array to force 100% client-side fetch
+  // This avoids hydration mismatch errors
+  return []
 }
 
 export default async function CountriesPage() {
