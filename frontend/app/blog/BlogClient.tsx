@@ -6,7 +6,6 @@ export const dynamic = 'force-dynamic'
 import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, FileText, Clock, Tag, TrendingUp, Globe, DollarSign, Shield, Calendar } from 'lucide-react'
-import { PublicPageSSR } from '@/components/PublicPageSSR'
 import { motion } from 'framer-motion'
 
 export default function BlogPage() {
@@ -149,7 +148,7 @@ export default function BlogPage() {
     : blogPosts.filter(post => post.category === selectedCategory)
 
   return (
-    <PublicPageSSR>
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -320,6 +319,6 @@ export default function BlogPage() {
           </div>
         </div>
       </section>
-    </PublicPageSSR>
+    </>
   )
 }
