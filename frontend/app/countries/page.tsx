@@ -2,8 +2,8 @@ import { Metadata } from 'next'
 import { PublicPageSSR } from '@/components/PublicPageSSR'
 import CountriesClient from './CountriesClient'
 
-// Force dynamic rendering for SSR
-export const dynamic = 'force-dynamic'
+// Use ISR for instant page loads with hourly revalidation
+export const revalidate = 3600
 
 export const metadata: Metadata = {
   title: '167 Countries Crypto Tax Database | 43 with 0% Tax',
@@ -115,9 +115,36 @@ const STATIC_FALLBACK_COUNTRIES: Country[] = [
 ]
 
 async function getCountries(): Promise<Country[]> {
-  // Return empty array to force 100% client-side fetch
-  // This avoids hydration mismatch errors
-  return []
+  try {
+    const apiUrl = 'https://cryptonomadhub-prod-1.onrender.com'
+    const url = `${apiUrl}/regulations/?reliable_only=true&include_analysis=true`
+
+    console.log('[SSR] Fetching countries from:', url)
+
+    const response = await fetch(url, {
+      next: { revalidate: 3600 }, // Cache for 1 hour - INSTANT display
+      headers: { 'Accept': 'application/json' },
+      signal: AbortSignal.timeout(45000)
+    })
+
+    if (!response.ok) {
+      console.error('[SSR] API failed:', response.status)
+      return STATIC_FALLBACK_COUNTRIES
+    }
+
+    const data = await response.json()
+    console.log('[SSR] ✅ Successfully fetched', data.length, 'countries')
+
+    if (!data || data.length === 0) {
+      console.warn('[SSR] API returned empty data')
+      return STATIC_FALLBACK_COUNTRIES
+    }
+
+    return data.sort((a: Country, b: Country) => a.country_name.localeCompare(b.country_name))
+  } catch (error) {
+    console.error('[SSR] Error fetching countries:', error)
+    return STATIC_FALLBACK_COUNTRIES
+  }
 }
 
 export default async function CountriesPage() {

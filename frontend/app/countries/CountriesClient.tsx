@@ -133,45 +133,7 @@ export default function CountriesClient({ initialCountries }: CountriesClientPro
     filterCountries()
   }, [filterCountries])
 
-  // Fetch client-side if SSR data is empty
-  useEffect(() => {
-    if (initialCountries.length === 0) {
-      const fetchCountries = async () => {
-        try {
-          setIsLoading(true)
-          console.log('[Client] Fetching all countries from API...')
-
-          const apiUrl = 'https://cryptonomadhub-prod-1.onrender.com'
-          const response = await fetch(`${apiUrl}/regulations/?reliable_only=true&include_analysis=true`, {
-            cache: 'no-store',
-            headers: {
-              'Accept': 'application/json'
-            }
-          })
-
-          if (!response.ok) {
-            throw new Error(`API returned ${response.status}`)
-          }
-
-          const data = await response.json()
-          console.log('[Client] ✅ FETCHED', data.length, 'countries from API')
-
-          const sortedData = data.sort((a: Country, b: Country) =>
-            a.country_name.localeCompare(b.country_name)
-          )
-
-          setCountries(sortedData)
-          console.log('[Client] ✅ SET countries state to', sortedData.length, 'countries')
-        } catch (error) {
-          console.error('[Client] ❌ Error fetching countries:', error)
-        } finally {
-          setIsLoading(false)
-        }
-      }
-
-      fetchCountries()
-    }
-  }, [initialCountries.length])
+  // No client-side fetch needed - SSR provides all data with ISR caching
 
   const getCryptoBannedBadge = (country: Country) => {
     if (!isCryptoBanned(country)) return null
