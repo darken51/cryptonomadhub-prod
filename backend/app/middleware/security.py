@@ -73,18 +73,20 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
                 "max-age=31536000; includeSubDomains; preload"
             )
 
-        # Content Security Policy - Allow only same origin + frontend
+        # Content Security Policy - Allow same origin + frontend + external APIs
         # This prevents XSS attacks by controlling which resources can be loaded
         frontend_domain = settings.FRONTEND_URL.replace("http://", "").replace("https://", "").split(":")[0]
 
         csp_directives = [
             "default-src 'self'",
-            f"connect-src 'self' {settings.FRONTEND_URL}",
+            f"connect-src 'self' {settings.FRONTEND_URL} https://*.onrender.com https://*.vercel.app https://*.helius-rpc.com https://api.coingecko.com https://api.anthropic.com https://generativelanguage.googleapis.com",
             "font-src 'self' data:",
-            "img-src 'self' data: https:",
-            "script-src 'self'",
-            "style-src 'self' 'unsafe-inline'",  # unsafe-inline needed for some styling
+            "img-src 'self' data: https: blob:",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net",  # unsafe-inline/eval needed for FastAPI docs
+            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
             "frame-ancestors 'none'",  # Prevent embedding in iframes
+            "base-uri 'self'",  # Restrict <base> tag
+            "form-action 'self'",  # Only allow form submissions to same origin
         ]
 
         response.headers["Content-Security-Policy"] = "; ".join(csp_directives)
@@ -101,9 +103,17 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             "usb=()",
             "magnetometer=()",
             "gyroscope=()",
-            "accelerometer=()"
+            "accelerometer=()",
+            "interest-cohort=()"  # Disable FLoC tracking
         ]
         response.headers["Permissions-Policy"] = ", ".join(permissions_policy)
+
+        # Cross-Origin-Opener-Policy (COOP) - Isolate browsing context
+        response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
+
+        # Cross-Origin-Embedder-Policy (COEP) - Require CORS for resources
+        # Using "unsafe-none" for compatibility - can upgrade to "require-corp" later
+        response.headers["Cross-Origin-Embedder-Policy"] = "unsafe-none"
 
         # Remove server header to hide FastAPI/Uvicorn version
         if "Server" in response.headers:
