@@ -646,106 +646,147 @@ export default function SettingsPage() {
             </motion.section>
 
             {/* Cost Basis Settings Section */}
-            <motion.section
-              variants={fadeInUp}
-              className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-xl shadow-blue-500/5 hover:shadow-blue-500/10 transition-shadow"
-            >
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg">
-                  <Database className="w-6 h-6 text-white" />
+            {(user?.license?.tier === 'free' || !user?.license?.tier) ? (
+              <motion.section
+                variants={fadeInUp}
+                className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30 rounded-2xl p-6 border border-blue-200 dark:border-blue-800 shadow-xl"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg">
+                    <Database className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Cost Basis Settings</h2>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Available on Starter plan and above</p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Cost Basis Settings</h2>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">Configure how crypto sales are calculated for tax purposes</p>
-                </div>
-              </div>
-
-              <div className="bg-blue-50 dark:bg-blue-950/30 rounded-xl p-4 mb-4 border border-blue-200 dark:border-blue-800">
-                <p className="text-sm text-blue-800 dark:text-blue-300">
-                  <strong>ℹ️ Info:</strong> Your cost basis method determines which cryptocurrency units are considered sold first when you make a transaction.
+                <p className="text-sm text-slate-700 dark:text-slate-300 mb-4">
+                  Cost basis tracking helps you calculate crypto taxes accurately using FIFO, LIFO, HIFO methods. Upgrade to Starter to unlock this feature.
                 </p>
-              </div>
+                <Link
+                  href="/pricing"
+                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
+                >
+                  Upgrade to Starter ($15/mo)
+                </Link>
+              </motion.section>
+            ) : (
+              <motion.section
+                variants={fadeInUp}
+                className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-xl shadow-blue-500/5 hover:shadow-blue-500/10 transition-shadow"
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl flex items-center justify-center shadow-lg">
+                    <Database className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Cost Basis Settings</h2>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                      {user?.license?.tier === 'starter' && 'FIFO method • 1,000 transactions/year'}
+                      {user?.license?.tier === 'pro' && 'All methods • 50,000 transactions/year'}
+                      {user?.license?.tier === 'enterprise' && 'All methods • Unlimited transactions'}
+                    </p>
+                  </div>
+                </div>
 
-              <form onSubmit={handleSaveCostBasisSettings} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                    Default Cost Basis Method
-                  </label>
-                  <select
-                    value={costBasisMethod}
-                    onChange={(e) => setCostBasisMethod(e.target.value)}
-                    className="w-full px-4 py-2.5 border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-800 dark:text-white transition-all"
-                  >
-                    <option value="fifo">FIFO - First In First Out (Default)</option>
-                    <option value="lifo">LIFO - Last In First Out</option>
-                    <option value="hifo">HIFO - Highest In First Out</option>
-                    <option value="specific_id">Specific Identification</option>
-                  </select>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-                    <strong>FIFO:</strong> Sells oldest units first. <strong>LIFO:</strong> Sells newest units first. <strong>HIFO:</strong> Sells highest cost units first to minimize gains.
+                <div className="bg-blue-50 dark:bg-blue-950/30 rounded-xl p-4 mb-4 border border-blue-200 dark:border-blue-800">
+                  <p className="text-sm text-blue-800 dark:text-blue-300">
+                    <strong>ℹ️ Info:</strong> Your cost basis method determines which cryptocurrency units are considered sold first when you make a transaction.
                   </p>
                 </div>
 
-                <div className="space-y-3">
-                  <label className="flex items-start gap-3 p-4 border border-slate-200 dark:border-slate-700 rounded-xl cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all group">
-                    <input
-                      type="checkbox"
-                      checked={washSaleTracking}
-                      onChange={(e) => setWashSaleTracking(e.target.checked)}
-                      className="w-5 h-5 mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 transition-all"
-                    />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                        Enable Wash Sale Tracking
-                        <span className="ml-2 px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 text-xs rounded-full">US Only</span>
+                <form onSubmit={handleSaveCostBasisSettings} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                      Default Cost Basis Method
+                    </label>
+                    <select
+                      value={costBasisMethod}
+                      onChange={(e) => setCostBasisMethod(e.target.value)}
+                      className="w-full px-4 py-2.5 border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-slate-800 dark:text-white transition-all"
+                    >
+                      <option value="fifo">FIFO - First In First Out (Default)</option>
+                      {(user?.license?.tier === 'pro' || user?.license?.tier === 'enterprise') && (
+                        <>
+                          <option value="lifo">LIFO - Last In First Out</option>
+                          <option value="hifo">HIFO - Highest In First Out</option>
+                          <option value="specific_id">Specific Identification</option>
+                        </>
+                      )}
+                    </select>
+                    {user?.license?.tier === 'starter' && (
+                      <p className="text-xs text-amber-600 dark:text-amber-400 mt-2">
+                        <strong>Starter plan:</strong> FIFO method only. <Link href="/pricing" className="underline hover:text-amber-700">Upgrade to Pro</Link> for LIFO, HIFO & Specific ID methods.
                       </p>
-                      <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
-                        Track and disallow losses from substantially identical securities sold and repurchased within 30 days (US tax rule)
-                      </p>
-                      <p className="text-xs text-slate-500 dark:text-slate-500 mt-1 italic">
-                        Note: Currently not enforced for crypto by IRS, but may change
-                      </p>
-                    </div>
-                  </label>
+                    )}
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                      <strong>FIFO:</strong> Sells oldest units first. <strong>LIFO:</strong> Sells newest units first. <strong>HIFO:</strong> Sells highest cost units first to minimize gains.
+                    </p>
+                  </div>
 
-                  <label className="flex items-start gap-3 p-4 border border-slate-200 dark:border-slate-700 rounded-xl cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all group">
-                    <input
-                      type="checkbox"
-                      checked={stakingAsIncome}
-                      onChange={(e) => setStakingAsIncome(e.target.checked)}
-                      className="w-5 h-5 mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 transition-all"
-                    />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                        Treat Staking Rewards as Ordinary Income
-                      </p>
-                      <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
-                        Staking rewards will be treated as income at the time of receipt (recommended by most tax authorities)
-                      </p>
-                    </div>
-                  </label>
-                </div>
+                  <div className="space-y-3">
+                    {(user?.license?.tier === 'pro' || user?.license?.tier === 'enterprise') && (
+                      <label className="flex items-start gap-3 p-4 border border-slate-200 dark:border-slate-700 rounded-xl cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all group">
+                        <input
+                          type="checkbox"
+                          checked={washSaleTracking}
+                          onChange={(e) => setWashSaleTracking(e.target.checked)}
+                          className="w-5 h-5 mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 transition-all"
+                        />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                            Enable Wash Sale Tracking
+                            <span className="ml-2 px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 text-xs rounded-full">US Only</span>
+                          </p>
+                          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                            Track and disallow losses from substantially identical securities sold and repurchased within 30 days (US tax rule)
+                          </p>
+                          <p className="text-xs text-slate-500 dark:text-slate-500 mt-1 italic">
+                            Note: Currently not enforced for crypto by IRS, but may change
+                          </p>
+                        </div>
+                      </label>
+                    )}
 
-                {costBasisMessage && (
-                  <motion.p
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className={`text-sm font-medium ${costBasisMessage.includes('success') ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
+                    <label className="flex items-start gap-3 p-4 border border-slate-200 dark:border-slate-700 rounded-xl cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all group">
+                      <input
+                        type="checkbox"
+                        checked={stakingAsIncome}
+                        onChange={(e) => setStakingAsIncome(e.target.checked)}
+                        className="w-5 h-5 mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 transition-all"
+                      />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                          Treat Staking Rewards as Ordinary Income
+                        </p>
+                        <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                          Staking rewards will be treated as income at the time of receipt (recommended by most tax authorities)
+                        </p>
+                      </div>
+                    </label>
+                  </div>
+
+                  {costBasisMessage && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`text-sm font-medium ${costBasisMessage.includes('success') ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
+                    >
+                      {costBasisMessage}
+                    </motion.p>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={costBasisSaving}
+                    className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
                   >
-                    {costBasisMessage}
-                  </motion.p>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={costBasisSaving}
-                  className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
-                >
-                  <Save className="w-4 h-4" />
-                  {costBasisSaving ? 'Saving...' : 'Save Cost Basis Settings'}
-                </button>
-              </form>
-            </motion.section>
+                    <Save className="w-4 h-4" />
+                    {costBasisSaving ? 'Saving...' : 'Save Cost Basis Settings'}
+                  </button>
+                </form>
+              </motion.section>
+            )}
 
             {/* Notifications Section */}
             <motion.section
