@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Wallet & Portfolio Tracker - Connect 15+ Wallets | CryptoNomadHub',
+  title: 'Wallet & Portfolio Tracker - Connect 15+ Wallets',
   description: 'Connect and track up to 15 wallets across Ethereum, Solana, Bitcoin, and more. Real-time portfolio tracking, 24h price sync, profit/loss analysis, and automated transaction history for tax reporting.',
   keywords: [
     'crypto wallet tracker',

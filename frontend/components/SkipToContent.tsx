@@ -1,6 +1,6 @@
 /**
  * ✅ PHASE 2.4: Accessibility - Skip to main content link
- * Permet aux utilisateurs de clavier de sauter la navigation
+ * Allows keyboard users to skip navigation
  */
 
 export default function SkipToContent() {
@@ -12,7 +12,7 @@ export default function SkipToContent() {
                  focus:rounded-lg focus:shadow-lg focus:outline-none focus:ring-2
                  focus:ring-violet-400 focus:ring-offset-2"
     >
-      Aller au contenu principal
+      Skip to main content
     </a>
   );
 }

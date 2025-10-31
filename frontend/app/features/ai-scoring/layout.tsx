@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'AI Country Scoring - Rank Best Crypto Tax Jurisdictions | CryptoNomadHub',
+  title: 'AI Country Scoring - Rank Best Crypto Tax Jurisdictions',
   description: 'AI analyzes 167 countries across 15+ factors: tax rates, regulations, quality of life, visa requirements. Get personalized country rankings based on your portfolio and lifestyle preferences.',
   keywords: [
     'AI country scoring',

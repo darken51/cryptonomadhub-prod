@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Cost Basis Tracking - FIFO, LIFO, HIFO & More | CryptoNomadHub',
+  title: 'Cost Basis Tracking - FIFO, LIFO, HIFO & More',
   description: 'Track crypto cost basis with multiple methods: FIFO, LIFO, HIFO, Specific ID. Handle up to 50k transactions per year. Automated wash sale detection and IRS-compliant reporting for tax optimization.',
   keywords: [
     'crypto cost basis',

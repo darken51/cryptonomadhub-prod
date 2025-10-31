@@ -74,7 +74,7 @@ export async function generateMetadata({ params }: { params: Promise<{ country_c
 
   if (!country) {
     return {
-      title: 'Country Not Found | CryptoNomadHub',
+      title: 'Country Not Found',
       description: 'Crypto tax information for this country is not available.'
     }
   }
@@ -145,7 +145,7 @@ export async function generateMetadata({ params }: { params: Promise<{ country_c
   }
 
   return {
-    title: `${country.flag_emoji || ''} ${country.country_name} Crypto Tax 2025${titleSuffix} | CryptoNomadHub`,
+    title: `${country.flag_emoji || ''} ${country.country_name} Crypto Tax 2025${titleSuffix}`,
     description,
     keywords: countryKeywords,
 

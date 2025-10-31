@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: '167 Countries Crypto Tax Database - Compare Regulations Globally | CryptoNomadHub',
+  title: '167 Countries Crypto Tax Database - Compare Regulations Globally',
   description: 'Complete database of crypto tax regulations in 167 countries. AI-powered scoring, real-time updates, and detailed analysis from official government sources. Find 0% tax jurisdictions and compare worldwide.',
   keywords: [
     'crypto tax by country',

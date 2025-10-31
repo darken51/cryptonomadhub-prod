@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Multi-Country Tax Comparison - Compare Crypto Taxes Side-by-Side | CryptoNomadHub',
+  title: 'Multi-Country Tax Comparison - Compare Crypto Taxes Side-by-Side',
   description: 'Compare crypto tax regulations across multiple countries simultaneously. Side-by-side analysis of tax rates, capital gains rules, DeFi treatment, and reporting requirements up to 10 jurisdictions at once.',
   keywords: [
     'crypto tax comparison',

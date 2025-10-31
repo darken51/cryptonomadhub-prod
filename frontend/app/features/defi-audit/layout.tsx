@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'DeFi Audit Tool - Analyze Solana, Ethereum & Multi-Chain Transactions | CryptoNomadHub',
+  title: 'DeFi Audit Tool - Analyze Solana, Ethereum & Multi-Chain Transactions',
   description: 'Audit your DeFi transactions across Solana, Ethereum, and multiple blockchains. Automatic categorization of swaps, LP, staking, and lending. Generate tax-compliant PDF reports instantly.',
   keywords: [
     'DeFi audit',

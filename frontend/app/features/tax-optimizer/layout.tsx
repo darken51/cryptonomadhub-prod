@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'AI Tax Optimizer - Minimize Crypto Taxes Across 167 Countries | CryptoNomadHub',
+  title: 'AI Tax Optimizer - Minimize Crypto Taxes Across 167 Countries',
   description: 'AI-powered tax optimization engine analyzes your portfolio and recommends the best countries for relocation. Save thousands in crypto taxes with personalized residency planning across 167 jurisdictions.',
   keywords: [
     'crypto tax optimizer',

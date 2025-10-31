@@ -331,7 +331,7 @@ export default function WorldTaxMap({ countries }: WorldTaxMapProps) {
                           onClick={() => router.push(`/countries/${selectedCountryCode.toLowerCase()}`)}
                           className="flex-1 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white py-2 px-4 rounded-lg font-semibold transition-all"
                         >
-                          Voir détails →
+                          View details →
                         </button>
                         <button
                           onClick={() => {
@@ -340,7 +340,7 @@ export default function WorldTaxMap({ countries }: WorldTaxMapProps) {
                           }}
                           className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
                         >
-                          Fermer
+                          Close
                         </button>
                       </div>
                     )}

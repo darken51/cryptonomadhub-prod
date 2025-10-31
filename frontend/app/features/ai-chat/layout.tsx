@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'AI Chat Assistant - Crypto Tax Expert for 167 Countries | CryptoNomadHub',
+  title: 'AI Chat Assistant - Crypto Tax Expert for 167 Countries',
   description: 'AI-powered crypto tax chat assistant that analyzes your portfolio data across 167 countries. Get personalized tax advice, country comparisons, and optimization strategies based on your actual holdings and transactions.',
   keywords: [
     'crypto tax AI',

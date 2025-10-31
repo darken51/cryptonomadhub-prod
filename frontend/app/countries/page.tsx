@@ -90,27 +90,28 @@ interface Country {
 }
 
 // Minimal static fallback data for SSR (ensures Google sees content even if API fails)
+// NOTE: All rates stored as decimals (0.30 = 30%), NOT percentages
 const STATIC_FALLBACK_COUNTRIES: Country[] = [
   { country_code: 'AE', country_name: 'United Arab Emirates', flag_emoji: '🇦🇪', cgt_short_rate: 0, cgt_long_rate: 0, crypto_short_rate: 0, crypto_long_rate: 0, crypto_legal_status: 'legal', data_quality: 'high' },
-  { country_code: 'PT', country_name: 'Portugal', flag_emoji: '🇵🇹', cgt_short_rate: 28, cgt_long_rate: 28, crypto_short_rate: 0, crypto_long_rate: 0, crypto_legal_status: 'legal', data_quality: 'high' },
+  { country_code: 'PT', country_name: 'Portugal', flag_emoji: '🇵🇹', cgt_short_rate: 0.28, cgt_long_rate: 0, crypto_short_rate: 0.28, crypto_long_rate: 0, crypto_legal_status: 'legal', data_quality: 'high' },
   { country_code: 'SG', country_name: 'Singapore', flag_emoji: '🇸🇬', cgt_short_rate: 0, cgt_long_rate: 0, crypto_short_rate: 0, crypto_long_rate: 0, crypto_legal_status: 'legal', data_quality: 'high' },
-  { country_code: 'DE', country_name: 'Germany', flag_emoji: '🇩🇪', cgt_short_rate: 25, cgt_long_rate: 0, crypto_short_rate: 25, crypto_long_rate: 0, crypto_legal_status: 'legal', data_quality: 'high', holding_period_months: 12 },
+  { country_code: 'DE', country_name: 'Germany', flag_emoji: '🇩🇪', cgt_short_rate: 0.45, cgt_long_rate: 0, crypto_short_rate: 0.45, crypto_long_rate: 0, crypto_legal_status: 'legal', data_quality: 'high', holding_period_months: 12 },
   { country_code: 'CH', country_name: 'Switzerland', flag_emoji: '🇨🇭', cgt_short_rate: 0, cgt_long_rate: 0, crypto_short_rate: 0, crypto_long_rate: 0, crypto_legal_status: 'legal', data_quality: 'high' },
   { country_code: 'MY', country_name: 'Malaysia', flag_emoji: '🇲🇾', cgt_short_rate: 0, cgt_long_rate: 0, crypto_short_rate: 0, crypto_long_rate: 0, crypto_legal_status: 'legal', data_quality: 'medium' },
   { country_code: 'MT', country_name: 'Malta', flag_emoji: '🇲🇹', cgt_short_rate: 0, cgt_long_rate: 0, crypto_short_rate: 0, crypto_long_rate: 0, crypto_legal_status: 'legal', data_quality: 'high' },
   { country_code: 'BH', country_name: 'Bahrain', flag_emoji: '🇧🇭', cgt_short_rate: 0, cgt_long_rate: 0, crypto_short_rate: 0, crypto_long_rate: 0, crypto_legal_status: 'legal', data_quality: 'medium' },
   { country_code: 'HK', country_name: 'Hong Kong', flag_emoji: '🇭🇰', cgt_short_rate: 0, cgt_long_rate: 0, crypto_short_rate: 0, crypto_long_rate: 0, crypto_legal_status: 'legal', data_quality: 'high' },
-  { country_code: 'EE', country_name: 'Estonia', flag_emoji: '🇪🇪', cgt_short_rate: 20, cgt_long_rate: 0, crypto_short_rate: 20, crypto_long_rate: 0, crypto_legal_status: 'legal', data_quality: 'high' },
-  { country_code: 'US', country_name: 'United States', flag_emoji: '🇺🇸', cgt_short_rate: 37, cgt_long_rate: 20, crypto_short_rate: 37, crypto_long_rate: 20, crypto_legal_status: 'legal', data_quality: 'high' },
-  { country_code: 'GB', country_name: 'United Kingdom', flag_emoji: '🇬🇧', cgt_short_rate: 20, cgt_long_rate: 20, crypto_short_rate: 20, crypto_long_rate: 20, crypto_legal_status: 'legal', data_quality: 'high' },
-  { country_code: 'FR', country_name: 'France', flag_emoji: '🇫🇷', cgt_short_rate: 30, cgt_long_rate: 30, crypto_short_rate: 30, crypto_long_rate: 30, crypto_legal_status: 'legal', data_quality: 'high' },
-  { country_code: 'ES', country_name: 'Spain', flag_emoji: '🇪🇸', cgt_short_rate: 26, cgt_long_rate: 26, crypto_short_rate: 26, crypto_long_rate: 26, crypto_legal_status: 'legal', data_quality: 'high' },
-  { country_code: 'IT', country_name: 'Italy', flag_emoji: '🇮🇹', cgt_short_rate: 26, cgt_long_rate: 26, crypto_short_rate: 26, crypto_long_rate: 26, crypto_legal_status: 'legal', data_quality: 'high' },
-  { country_code: 'JP', country_name: 'Japan', flag_emoji: '🇯🇵', cgt_short_rate: 55, cgt_long_rate: 55, crypto_short_rate: 55, crypto_long_rate: 55, crypto_legal_status: 'legal', data_quality: 'high' },
-  { country_code: 'AU', country_name: 'Australia', flag_emoji: '🇦🇺', cgt_short_rate: 45, cgt_long_rate: 22.5, crypto_short_rate: 45, crypto_long_rate: 22.5, crypto_legal_status: 'legal', data_quality: 'high' },
-  { country_code: 'CA', country_name: 'Canada', flag_emoji: '🇨🇦', cgt_short_rate: 26.5, cgt_long_rate: 13.25, crypto_short_rate: 26.5, crypto_long_rate: 13.25, crypto_legal_status: 'legal', data_quality: 'high' },
-  { country_code: 'BR', country_name: 'Brazil', flag_emoji: '🇧🇷', cgt_short_rate: 15, cgt_long_rate: 15, crypto_short_rate: 15, crypto_long_rate: 15, crypto_legal_status: 'legal', data_quality: 'medium' },
-  { country_code: 'MX', country_name: 'Mexico', flag_emoji: '🇲🇽', cgt_short_rate: 30, cgt_long_rate: 30, crypto_short_rate: 30, crypto_long_rate: 30, crypto_legal_status: 'legal', data_quality: 'medium' },
+  { country_code: 'EE', country_name: 'Estonia', flag_emoji: '🇪🇪', cgt_short_rate: 0.20, cgt_long_rate: 0, crypto_short_rate: 0.20, crypto_long_rate: 0, crypto_legal_status: 'legal', data_quality: 'high' },
+  { country_code: 'US', country_name: 'United States', flag_emoji: '🇺🇸', cgt_short_rate: 0.37, cgt_long_rate: 0.20, crypto_short_rate: 0.37, crypto_long_rate: 0.20, crypto_legal_status: 'legal', data_quality: 'high' },
+  { country_code: 'GB', country_name: 'United Kingdom', flag_emoji: '🇬🇧', cgt_short_rate: 0.24, cgt_long_rate: 0.24, crypto_short_rate: 0.24, crypto_long_rate: 0.24, crypto_legal_status: 'legal', data_quality: 'high' },
+  { country_code: 'FR', country_name: 'France', flag_emoji: '🇫🇷', cgt_short_rate: 0.30, cgt_long_rate: 0.30, crypto_short_rate: 0.30, crypto_long_rate: 0.30, crypto_legal_status: 'legal', data_quality: 'high' },
+  { country_code: 'ES', country_name: 'Spain', flag_emoji: '🇪🇸', cgt_short_rate: 0.28, cgt_long_rate: 0.28, crypto_short_rate: 0.28, crypto_long_rate: 0.28, crypto_legal_status: 'legal', data_quality: 'high' },
+  { country_code: 'IT', country_name: 'Italy', flag_emoji: '🇮🇹', cgt_short_rate: 0.26, cgt_long_rate: 0.26, crypto_short_rate: 0.26, crypto_long_rate: 0.26, crypto_legal_status: 'legal', data_quality: 'high' },
+  { country_code: 'JP', country_name: 'Japan', flag_emoji: '🇯🇵', cgt_short_rate: 0.55, cgt_long_rate: 0.55, crypto_short_rate: 0.55, crypto_long_rate: 0.55, crypto_legal_status: 'legal', data_quality: 'high' },
+  { country_code: 'AU', country_name: 'Australia', flag_emoji: '🇦🇺', cgt_short_rate: 0.47, cgt_long_rate: 0.235, crypto_short_rate: 0.47, crypto_long_rate: 0.235, crypto_legal_status: 'legal', data_quality: 'high' },
+  { country_code: 'CA', country_name: 'Canada', flag_emoji: '🇨🇦', cgt_short_rate: 0.27, cgt_long_rate: 0.135, crypto_short_rate: 0.27, crypto_long_rate: 0.135, crypto_legal_status: 'legal', data_quality: 'high' },
+  { country_code: 'BR', country_name: 'Brazil', flag_emoji: '🇧🇷', cgt_short_rate: 0.175, cgt_long_rate: 0.175, crypto_short_rate: 0.175, crypto_long_rate: 0.175, crypto_legal_status: 'legal', data_quality: 'medium' },
+  { country_code: 'MX', country_name: 'Mexico', flag_emoji: '🇲🇽', cgt_short_rate: 0.35, cgt_long_rate: 0.35, crypto_short_rate: 0.35, crypto_long_rate: 0.35, crypto_legal_status: 'legal', data_quality: 'medium' },
 ]
 
 async function getCountries(): Promise<Country[]> {

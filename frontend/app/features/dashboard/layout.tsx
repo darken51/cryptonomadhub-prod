@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Tax Dashboard - Unified Crypto Tax Management | CryptoNomadHub',
+  title: 'Tax Dashboard - Unified Crypto Tax Management',
   description: 'Centralized dashboard to manage all your crypto tax activities: portfolio overview, recent audits, tax simulations, AI recommendations, and quick access to all tools in one place.',
   keywords: [
     'crypto tax dashboard',
