@@ -181,7 +181,7 @@ export default function HomeClient() {
                   <div className="text-3xl mb-2">{country.flag}</div>
                   <div className="font-bold text-slate-900 dark:text-white">{country.country}</div>
                   <div className="text-emerald-600 dark:text-emerald-400 font-semibold">{country.tax}</div>
-                  <div className="text-xs text-slate-600 dark:text-slate-400 mt-1">{country.detail}</div>
+                  <div className="text-xs text-slate-700 dark:text-slate-400 mt-1">{country.detail}</div>
                 </motion.div>
               ))}
             </div>
@@ -248,7 +248,7 @@ export default function HomeClient() {
               <div className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600 mb-2">
                 <AnimatedCounter value={167} />
               </div>
-              <div className="text-sm md:text-base text-slate-600 dark:text-slate-400 font-medium">
+              <div className="text-sm md:text-base text-slate-700 dark:text-slate-400 font-medium">
                 Countries Analyzed
               </div>
               <div className="text-xs text-slate-500 dark:text-slate-500 mt-1">
@@ -265,7 +265,7 @@ export default function HomeClient() {
               <div className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 mb-2">
                 <AnimatedCounter value={43} />
               </div>
-              <div className="text-sm md:text-base text-slate-600 dark:text-slate-400 font-medium">
+              <div className="text-sm md:text-base text-slate-700 dark:text-slate-400 font-medium">
                 Tax-Free Jurisdictions
               </div>
               <div className="text-xs text-slate-500 dark:text-slate-500 mt-1">
@@ -282,7 +282,7 @@ export default function HomeClient() {
               <div className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 mb-2">
                 $<AnimatedCounter value={127} />k
               </div>
-              <div className="text-sm md:text-base text-slate-600 dark:text-slate-400 font-medium">
+              <div className="text-sm md:text-base text-slate-700 dark:text-slate-400 font-medium">
                 Average Tax Savings
               </div>
               <div className="text-xs text-slate-500 dark:text-slate-500 mt-1">
@@ -299,7 +299,7 @@ export default function HomeClient() {
               <div className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 mb-2">
                 <AnimatedCounter value={1200} />+
               </div>
-              <div className="text-sm md:text-base text-slate-600 dark:text-slate-400 font-medium">
+              <div className="text-sm md:text-base text-slate-700 dark:text-slate-400 font-medium">
                 Digital Nomads Helped
               </div>
               <div className="text-xs text-slate-500 dark:text-slate-500 mt-1">
