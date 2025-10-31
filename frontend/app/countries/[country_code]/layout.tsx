@@ -127,7 +127,7 @@ export async function generateMetadata({ params }: { params: Promise<{ country_c
     `${country.country_name.toLowerCase()} crypto regulations`,
   ]
 
-  if (shortRate === 0) {
+  if (shortRateNum === 0) {
     countryKeywords.push(
       `${country.country_name.toLowerCase()} 0% crypto tax`,
       `${country.country_name.toLowerCase()} tax free crypto`,
