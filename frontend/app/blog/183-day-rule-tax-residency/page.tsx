@@ -1,5 +1,5 @@
 import { PublicPageSSR } from '@/components/PublicPageSSR'
-import 183dayruletaxresidencyClient from './183dayruletaxresidencyClient'
+import DayRuleTaxResidencyClient from './DayRuleTaxResidencyClient'
 import { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function BlogPostPage() {
   return (
     <PublicPageSSR>
-      <183dayruletaxresidencyClient />
+      <DayRuleTaxResidencyClient />
     </PublicPageSSR>
   )
 }
