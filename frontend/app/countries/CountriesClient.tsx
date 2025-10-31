@@ -141,25 +141,29 @@ export default function CountriesClient({ initialCountries }: CountriesClientPro
         console.log('[Client] Fetching all countries from API...')
 
         const apiUrl = 'https://cryptonomadhub-prod-1.onrender.com'
-        const response = await fetch(`${apiUrl}/regulations/?reliable_only=true&include_analysis=true`)
+        const response = await fetch(`${apiUrl}/regulations/?reliable_only=true&include_analysis=true`, {
+          cache: 'no-store',
+          headers: {
+            'Accept': 'application/json'
+          }
+        })
 
         if (!response.ok) {
           throw new Error(`API returned ${response.status}`)
         }
 
         const data = await response.json()
-        console.log('[Client] Successfully fetched', data.length, 'countries')
+        console.log('[Client] ✅ FETCHED', data.length, 'countries from API')
 
-        if (data.length > initialCountries.length) {
-          const sortedData = data.sort((a: Country, b: Country) =>
-            a.country_name.localeCompare(b.country_name)
-          )
+        // ALWAYS update - no condition
+        const sortedData = data.sort((a: Country, b: Country) =>
+          a.country_name.localeCompare(b.country_name)
+        )
 
-          setCountries(sortedData)
-          setFilteredCountries(sortedData)
-        }
+        setCountries(sortedData)
+        console.log('[Client] ✅ SET countries state to', sortedData.length, 'countries')
       } catch (error) {
-        console.error('[Client] Error fetching countries:', error)
+        console.error('[Client] ❌ Error fetching countries:', error)
       } finally {
         setIsLoading(false)
       }
