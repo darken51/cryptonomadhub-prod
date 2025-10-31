@@ -142,9 +142,9 @@ export function TestimonialCarousel() {
                     </div>
 
                     <div>
-                      <h4 className="font-semibold text-slate-900 dark:text-white">
+                      <h3 className="font-semibold text-slate-900 dark:text-white">
                         {testimonials[currentIndex].name}
-                      </h4>
+                      </h3>
                       <p className="text-sm text-slate-600 dark:text-slate-400">
                         {testimonials[currentIndex].role}
                       </p>
