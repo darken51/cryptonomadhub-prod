@@ -5,7 +5,10 @@ import SkipToContent from '@/components/SkipToContent'
 import { CookieConsent } from '@/components/CookieConsent'
 import { ClientProviders } from '@/components/ClientProviders'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap', // Optimize font loading
+})
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://cryptonomadhub.io'),
@@ -118,6 +121,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Preconnect to external resources for faster loading */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN && (
+          <link rel="preconnect" href="https://plausible.io" />
+        )}
+        <link rel="dns-prefetch" href="https://vercel.live" />
+
         {/* Schema.org Organization markup */}
         <script
           type="application/ld+json"

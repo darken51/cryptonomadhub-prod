@@ -1,14 +1,23 @@
 'use client'
 
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { Globe, MessageCircle, Activity, DollarSign, Calculator, RefreshCw, ArrowRight, Shield, Lock, CheckCircle, Sparkles, TrendingUp, Zap, LineChart, FileText, AlertTriangle, Trophy, BarChart3, Layers, Target, CreditCard } from 'lucide-react'
 import { LegalDisclaimer } from '@/components/LegalDisclaimer'
 import { AnimatedCounter } from '@/components/AnimatedCounter'
-import { ComparisonTable } from '@/components/ComparisonTable'
-import { TestimonialCarousel } from '@/components/TestimonialCarousel'
-import { FAQAccordion } from '@/components/FAQAccordion'
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
+
+// Lazy load non-critical below-the-fold components
+const ComparisonTable = dynamic(() => import('@/components/ComparisonTable').then(mod => ({ default: mod.ComparisonTable })), {
+  loading: () => <div className="h-96 animate-pulse bg-slate-100 dark:bg-slate-800 rounded-2xl" />
+})
+const TestimonialCarousel = dynamic(() => import('@/components/TestimonialCarousel').then(mod => ({ default: mod.TestimonialCarousel })), {
+  loading: () => <div className="h-80 animate-pulse bg-slate-100 dark:bg-slate-800 rounded-2xl" />
+})
+const FAQAccordion = dynamic(() => import('@/components/FAQAccordion').then(mod => ({ default: mod.FAQAccordion })), {
+  loading: () => <div className="h-96 animate-pulse bg-slate-100 dark:bg-slate-800 rounded-2xl" />
+})
 
 export default function HomeClient() {
   const { ref: heroRef, inView: heroInView } = useInView({ threshold: 0.1, triggerOnce: true })
