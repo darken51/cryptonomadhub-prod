@@ -7,6 +7,7 @@ import { AnalyticsProvider } from '@/components/providers/AnalyticsProvider'
 import SkipToContent from '@/components/SkipToContent'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import { CookieConsent } from '@/components/CookieConsent'
+import { MainContentWrapper } from '@/components/MainContentWrapper'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -144,7 +145,9 @@ export default function RootLayout({
           <ToastProvider>
             <AuthProvider>
               <AnalyticsProvider>
-                {children}
+                <MainContentWrapper>
+                  {children}
+                </MainContentWrapper>
               </AnalyticsProvider>
             </AuthProvider>
           </ToastProvider>

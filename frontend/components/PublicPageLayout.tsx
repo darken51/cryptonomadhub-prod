@@ -40,9 +40,9 @@ export function PublicPageLayout({
       {isAuthenticated ? <AppHeader /> : <Header />}
 
       {/* Content area */}
-      <main id="main-content" className={`flex-1 ${contentClassName}`}>
+      <div className={`flex-1 ${contentClassName}`}>
         {children}
-      </main>
+      </div>
 
       {/* Show Footer only for non-authenticated users (unless explicitly hidden) */}
       {!isAuthenticated && !hideFooter && <Footer />}

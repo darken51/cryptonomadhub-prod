@@ -303,7 +303,7 @@ export default function CountryDetailPage() {
         </nav>
 
         {/* Main Content */}
-        <main id="main-content">
+        <>
           {/* Country Header */}
           <motion.div
           className="mb-8"
@@ -659,7 +659,7 @@ export default function CountryDetailPage() {
             </div>
           </Link>
         </motion.div>
-        </main>
+        </>
       </div>
     </div>
   )
