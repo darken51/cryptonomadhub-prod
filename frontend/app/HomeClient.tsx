@@ -260,7 +260,7 @@ export default function HomeClient() {
               <div className="text-sm md:text-base text-slate-700 dark:text-slate-400 font-medium">
                 Countries Analyzed
               </div>
-              <div className="text-xs text-slate-500 dark:text-slate-500 mt-1">
+              <div className="text-xs text-slate-600 dark:text-slate-500 mt-1">
                 Most comprehensive database
               </div>
             </motion.div>
@@ -277,7 +277,7 @@ export default function HomeClient() {
               <div className="text-sm md:text-base text-slate-700 dark:text-slate-400 font-medium">
                 Tax-Free Jurisdictions
               </div>
-              <div className="text-xs text-slate-500 dark:text-slate-500 mt-1">
+              <div className="text-xs text-slate-600 dark:text-slate-500 mt-1">
                 Pay zero legally
               </div>
             </motion.div>
@@ -294,7 +294,7 @@ export default function HomeClient() {
               <div className="text-sm md:text-base text-slate-700 dark:text-slate-400 font-medium">
                 Average Tax Savings
               </div>
-              <div className="text-xs text-slate-500 dark:text-slate-500 mt-1">
+              <div className="text-xs text-slate-600 dark:text-slate-500 mt-1">
                 Per year by moving
               </div>
             </motion.div>
@@ -311,7 +311,7 @@ export default function HomeClient() {
               <div className="text-sm md:text-base text-slate-700 dark:text-slate-400 font-medium">
                 Digital Nomads Helped
               </div>
-              <div className="text-xs text-slate-500 dark:text-slate-500 mt-1">
+              <div className="text-xs text-slate-600 dark:text-slate-500 mt-1">
                 No capital gains tax
               </div>
             </motion.div>
@@ -914,7 +914,7 @@ export default function HomeClient() {
               </Link>
             </div>
 
-            <p className="text-sm text-slate-500 dark:text-slate-400">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
               ⚠️ For informational purposes only. This is not financial, tax, or legal advice. Consult licensed professionals.
             </p>
           </div>
