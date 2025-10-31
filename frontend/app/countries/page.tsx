@@ -2,8 +2,8 @@ import { Metadata } from 'next'
 import { PublicPageSSR } from '@/components/PublicPageSSR'
 import CountriesClient from './CountriesClient'
 
-// Use ISR (Incremental Static Regeneration) for better performance
-export const revalidate = 3600 // Revalidate every hour
+// Force dynamic rendering for SSR
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: '167 Countries Crypto Tax Database | 43 with 0% Tax',
