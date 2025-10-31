@@ -222,7 +222,7 @@ export default function HomeClient() {
               initial={{ opacity: 0 }}
               animate={heroInView ? { opacity: 1 } : {}}
               transition={{ delay: 0.6 }}
-              className="flex flex-wrap justify-center items-center gap-6 pt-8 text-sm text-slate-700 dark:text-slate-400"
+              className="flex flex-wrap justify-center items-center gap-6 pt-8 text-sm text-slate-900 dark:text-slate-400"
             >
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-emerald-500" />
