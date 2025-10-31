@@ -7,7 +7,6 @@ import { AnalyticsProvider } from '@/components/providers/AnalyticsProvider'
 import SkipToContent from '@/components/SkipToContent'
 import ErrorBoundary from '@/components/ErrorBoundary'
 import { CookieConsent } from '@/components/CookieConsent'
-import { MainContentWrapper } from '@/components/MainContentWrapper'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -140,18 +139,19 @@ export default function RootLayout({
       <body className={inter.className}>
         {/* ✅ PHASE 2.4: Accessibility improvements */}
         <SkipToContent />
-        {/* ✅ PHASE 2.5: Error boundary for error handling */}
-        <ErrorBoundary>
-          <ToastProvider>
-            <AuthProvider>
-              <AnalyticsProvider>
-                <MainContentWrapper>
+        {/* ✅ Server-rendered semantic main tag for SEO */}
+        <main id="main-content" className="flex-1">
+          {/* ✅ PHASE 2.5: Error boundary for error handling */}
+          <ErrorBoundary>
+            <ToastProvider>
+              <AuthProvider>
+                <AnalyticsProvider>
                   {children}
-                </MainContentWrapper>
-              </AnalyticsProvider>
-            </AuthProvider>
-          </ToastProvider>
-        </ErrorBoundary>
+                </AnalyticsProvider>
+              </AuthProvider>
+            </ToastProvider>
+          </ErrorBoundary>
+        </main>
         {/* ✅ GDPR Cookie Consent Banner */}
         <CookieConsent />
       </body>
