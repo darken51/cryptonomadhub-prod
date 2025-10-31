@@ -23,9 +23,11 @@ interface FAQ {
 }
 
 function generateFAQs(country: Country): FAQ[] {
-  const shortRate = (country.crypto_short_rate ?? country.cgt_short_rate) * 100
-  const longRate = (country.crypto_long_rate ?? country.cgt_long_rate) * 100
-  const isZeroTax = shortRate === 0 && longRate === 0
+  const shortRateNum = (country.crypto_short_rate ?? country.cgt_short_rate) * 100
+  const longRateNum = (country.crypto_long_rate ?? country.cgt_long_rate) * 100
+  const shortRate = shortRateNum.toFixed(1)
+  const longRate = longRateNum.toFixed(1)
+  const isZeroTax = shortRateNum === 0 && longRateNum === 0
 
   const faqs: FAQ[] = []
 
@@ -39,7 +41,7 @@ function generateFAQs(country: Country): FAQ[] {
     faqs.push({
       question: `What is the crypto tax rate in ${country.country_name}?`,
       answer: `${country.country_name} applies a ${shortRate}% capital gains tax rate on short-term cryptocurrency gains${
-        shortRate !== longRate
+        shortRateNum !== longRateNum
           ? ` and ${longRate}% on long-term gains`
           : ''
       }. This applies to profits from selling, trading, or exchanging cryptocurrency.`

@@ -131,7 +131,7 @@ export default async function DataPage() {
       '@type': 'Place',
       name: country.country_name,
       identifier: country.country_code,
-      description: `${country.country_name} cryptocurrency tax: ${(country.crypto_short_rate ?? country.cgt_short_rate) * 100}% short-term, ${(country.crypto_long_rate ?? country.cgt_long_rate) * 100}% long-term`
+      description: `${country.country_name} cryptocurrency tax: ${((country.crypto_short_rate ?? country.cgt_short_rate) * 100).toFixed(1)}% short-term, ${((country.crypto_long_rate ?? country.cgt_long_rate) * 100).toFixed(1)}% long-term`
     }))
   }
 
@@ -297,8 +297,10 @@ export default async function DataPage() {
                 </thead>
                 <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
                   {countries.map((country) => {
-                    const shortRate = (country.crypto_short_rate ?? country.cgt_short_rate) * 100
-                    const longRate = (country.crypto_long_rate ?? country.cgt_long_rate) * 100
+                    const shortRate = ((country.crypto_short_rate ?? country.cgt_short_rate) * 100).toFixed(1)
+                    const longRate = ((country.crypto_long_rate ?? country.cgt_long_rate) * 100).toFixed(1)
+                    const shortRateNum = parseFloat(shortRate)
+                    const longRateNum = parseFloat(longRate)
 
                     return (
                       <tr
@@ -319,7 +321,7 @@ export default async function DataPage() {
                         </td>
                         <td className="px-4 py-3 text-right">
                           <span className={`font-semibold ${
-                            shortRate === 0
+                            shortRateNum === 0
                               ? 'text-emerald-600 dark:text-emerald-400'
                               : 'text-slate-900 dark:text-white'
                           }`}>
@@ -328,7 +330,7 @@ export default async function DataPage() {
                         </td>
                         <td className="px-4 py-3 text-right">
                           <span className={`font-semibold ${
-                            longRate === 0
+                            longRateNum === 0
                               ? 'text-emerald-600 dark:text-emerald-400'
                               : 'text-slate-900 dark:text-white'
                           }`}>

@@ -40,8 +40,10 @@ export async function GET(request: NextRequest) {
     return new Response('Country not found', { status: 404 })
   }
 
-  const shortRate = (country.crypto_short_rate ?? country.cgt_short_rate) * 100
-  const longRate = (country.crypto_long_rate ?? country.cgt_long_rate) * 100
+  const shortRateNum = (country.crypto_short_rate ?? country.cgt_short_rate) * 100
+  const longRateNum = (country.crypto_long_rate ?? country.cgt_long_rate) * 100
+  const shortRate = shortRateNum.toFixed(1)
+  const longRate = longRateNum.toFixed(1)
 
   return new ImageResponse(
     (
@@ -111,13 +113,13 @@ export async function GET(request: NextRequest) {
                 style={{
                   fontSize: '64px',
                   fontWeight: 'bold',
-                  color: shortRate === 0 ? '#10b981' : 'white',
+                  color: shortRateNum === 0 ? '#10b981' : 'white',
                 }}
               >
                 {shortRate}%
               </div>
             </div>
-            {shortRate !== longRate && (
+            {shortRateNum !== longRateNum && (
               <div
                 style={{
                   display: 'flex',
@@ -135,7 +137,7 @@ export async function GET(request: NextRequest) {
                   style={{
                     fontSize: '64px',
                     fontWeight: 'bold',
-                    color: longRate === 0 ? '#10b981' : 'white',
+                    color: longRateNum === 0 ? '#10b981' : 'white',
                   }}
                 >
                   {longRate}%

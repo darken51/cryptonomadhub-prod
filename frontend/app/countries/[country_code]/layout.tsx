@@ -80,21 +80,24 @@ export async function generateMetadata({ params }: { params: Promise<{ country_c
   }
 
   // Determine tax rate to display (convert to percentage)
-  const shortRate = ((country.crypto_short_rate !== null && country.crypto_short_rate !== undefined
+  const shortRateNum = (country.crypto_short_rate !== null && country.crypto_short_rate !== undefined
     ? country.crypto_short_rate
-    : country.cgt_short_rate) * 100)
+    : country.cgt_short_rate) * 100
 
-  const longRate = ((country.crypto_long_rate !== null && country.crypto_long_rate !== undefined
+  const longRateNum = (country.crypto_long_rate !== null && country.crypto_long_rate !== undefined
     ? country.crypto_long_rate
-    : country.cgt_long_rate) * 100)
+    : country.cgt_long_rate) * 100
+
+  const shortRate = shortRateNum.toFixed(1)
+  const longRate = longRateNum.toFixed(1)
 
   // Build title suffix
   let titleSuffix = ''
-  if (shortRate === 0) {
+  if (shortRateNum === 0) {
     titleSuffix = ' - 0% Crypto Tax Guide'
   } else if (country.holding_period_months) {
     titleSuffix = ` - ${country.holding_period_months} Month Holding Period`
-  } else if (shortRate !== longRate) {
+  } else if (shortRateNum !== longRateNum) {
     titleSuffix = ` - ${shortRate}% Short / ${longRate}% Long Term`
   } else {
     titleSuffix = ` - ${shortRate}% Tax Rate`
@@ -103,7 +106,7 @@ export async function generateMetadata({ params }: { params: Promise<{ country_c
   // Build description
   let description = `Complete guide to ${country.country_name} crypto tax regulations 2025: `
 
-  if (shortRate === 0 && longRate === 0) {
+  if (shortRateNum === 0 && longRateNum === 0) {
     description += `0% capital gains tax on cryptocurrency. Tax-free crypto trading and investments. `
   } else if (country.is_territorial) {
     description += `Territorial tax system. ${shortRate}% short-term, ${longRate}% long-term capital gains. `
