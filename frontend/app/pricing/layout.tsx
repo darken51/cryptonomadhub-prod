@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Pricing | Crypto Tax Plans from $0/month',
-  description: 'Transparent crypto tax optimization pricing. Free plan with 5 simulations, Starter ($20) for individuals, Pro ($50) for traders, Enterprise for teams. 7-day free trial, cancel anytime.',
+  description: 'Transparent crypto tax optimization pricing. Free plan with 5 simulations, Starter ($20) for individuals, Pro ($50) for traders, Enterprise for teams. Cancel anytime.',
   keywords: [
     'crypto tax software pricing',
     'crypto tax calculator cost',

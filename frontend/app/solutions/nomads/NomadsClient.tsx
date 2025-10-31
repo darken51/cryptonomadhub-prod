@@ -491,7 +491,7 @@ export default function NomadsClient() {
           </div>
 
           <p className="text-white/80 text-sm mt-6">
-            No credit card required • 7-day free trial • 167 countries analyzed
+            No credit card required • 167 countries analyzed
           </p>
         </div>
       </section>

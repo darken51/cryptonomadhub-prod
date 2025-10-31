@@ -480,10 +480,10 @@ export default function Pricing() {
 
               <div className="bg-white dark:bg-slate-800 rounded-xl p-6 border border-slate-200 dark:border-slate-700">
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
-                  What's included in the free trial?
+                  What payment methods do you accept?
                 </h3>
                 <p className="text-slate-600 dark:text-slate-400">
-                  14-day free trial on Starter and Pro plans, no credit card required. Full access to all features of your chosen plan.
+                  We accept all major credit cards (Visa, Mastercard, American Express) and cryptocurrency payments (BTC, ETH, USDC, USDT) via NOWPayments.
                 </p>
               </div>
 

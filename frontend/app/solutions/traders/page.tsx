@@ -283,7 +283,7 @@ export default function CryptoTradersPage() {
           </div>
 
           <p className="text-white/80 text-sm mt-6">
-            No credit card required • 7-day free trial • 50+ chains supported
+            No credit card required • 50+ chains supported
           </p>
         </div>
       </section>

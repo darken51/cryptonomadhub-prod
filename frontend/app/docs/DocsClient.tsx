@@ -261,7 +261,7 @@ export default function DocsPage() {
           </div>
 
           <p className="text-white/80 text-sm mt-6">
-            No credit card required • 7-day free trial • Full documentation access
+            No credit card required • Full documentation access
           </p>
         </div>
       </section>

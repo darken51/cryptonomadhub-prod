@@ -191,26 +191,24 @@ export default function TermsOfService() {
                 </h2>
               </div>
               <div className="space-y-4 text-slate-700 dark:text-slate-300">
-                <p className="font-semibold text-emerald-900 dark:text-emerald-200">14-Day Money-Back Guarantee:</p>
+                <p className="font-semibold text-emerald-900 dark:text-emerald-200">Refund Policy:</p>
                 <ul className="list-disc pl-6 space-y-2">
-                  <li>If you are not satisfied with your purchase, you may request a full refund within <strong>14 days</strong> of your initial subscription payment</li>
-                  <li>To request a refund, contact us at <strong className="text-violet-600 dark:text-fuchsia-400">contact@cryptonomadhub.io</strong> with your account email and subscription details</li>
-                  <li>Refunds are processed within 5-10 business days via Paddle (our payment processor)</li>
-                  <li>After the 14-day period, subscriptions are non-refundable</li>
+                  <li>All subscriptions are <strong>non-refundable</strong></li>
+                  <li>To request a refund in exceptional cases, contact us at <strong className="text-violet-600 dark:text-fuchsia-400">contact@cryptonomadhub.io</strong> with your account email and subscription details</li>
+                  <li>Refunds are processed at our discretion within 5-10 business days via our payment processor</li>
                 </ul>
 
-                <p className="font-semibold text-emerald-900 dark:text-emerald-200 mt-4">No Partial Month Refunds:</p>
+                <p className="font-semibold text-emerald-900 dark:text-emerald-200 mt-4">No Partial Refunds:</p>
                 <ul className="list-disc pl-6 space-y-2">
-                  <li>If you cancel your subscription after the 14-day refund period, you will NOT receive a prorated refund for the unused portion of your billing period</li>
+                  <li>If you cancel your subscription, you will NOT receive a prorated refund for the unused portion of your billing period</li>
                   <li>Your subscription will remain active until the end of the current billing cycle</li>
                   <li>You can continue using all paid features until your subscription expires</li>
                 </ul>
 
                 <p className="font-semibold text-emerald-900 dark:text-emerald-200 mt-4">Annual Subscriptions:</p>
                 <ul className="list-disc pl-6 space-y-2">
-                  <li>Annual subscriptions are eligible for the 14-day money-back guarantee</li>
-                  <li>After 14 days, annual subscriptions are non-refundable even if cancelled mid-year</li>
-                  <li>You will retain access until the end of your annual billing period</li>
+                  <li>Annual subscriptions are non-refundable</li>
+                  <li>You will retain access until the end of your annual billing period after cancellation</li>
                 </ul>
 
                 <p className="font-semibold text-emerald-900 dark:text-emerald-200 mt-4">Refund Exceptions:</p>

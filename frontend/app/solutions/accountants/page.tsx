@@ -334,7 +334,7 @@ export default function AccountantsPage() {
           </div>
 
           <p className="text-white/80 text-sm mt-6">
-            No credit card required • 7-day free trial • 167 countries covered
+            No credit card required • 167 countries covered
           </p>
         </div>
       </section>
