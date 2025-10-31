@@ -131,7 +131,7 @@ export default async function DataPage() {
       '@type': 'Place',
       name: country.country_name,
       identifier: country.country_code,
-      description: `${country.country_name} cryptocurrency tax: ${country.crypto_short_rate ?? country.cgt_short_rate}% short-term, ${country.crypto_long_rate ?? country.cgt_long_rate}% long-term`
+      description: `${country.country_name} cryptocurrency tax: ${(country.crypto_short_rate ?? country.cgt_short_rate) * 100}% short-term, ${(country.crypto_long_rate ?? country.cgt_long_rate) * 100}% long-term`
     }))
   }
 
@@ -297,8 +297,8 @@ export default async function DataPage() {
                 </thead>
                 <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
                   {countries.map((country) => {
-                    const shortRate = country.crypto_short_rate ?? country.cgt_short_rate
-                    const longRate = country.crypto_long_rate ?? country.cgt_long_rate
+                    const shortRate = (country.crypto_short_rate ?? country.cgt_short_rate) * 100
+                    const longRate = (country.crypto_long_rate ?? country.cgt_long_rate) * 100
 
                     return (
                       <tr
