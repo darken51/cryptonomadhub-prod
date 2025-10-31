@@ -2,11 +2,27 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Search, TrendingDown, Info } from 'lucide-react'
-import WorldTaxMap from '@/components/WorldTaxMap'
-import CountryScoreCard from '@/components/CountryScoreCard'
-import TopCountriesPodium from '@/components/TopCountriesPodium'
+
+// Lazy load heavy components to improve initial page load
+const WorldTaxMap = dynamic(() => import('@/components/WorldTaxMap'), {
+  loading: () => <div className="h-[400px] bg-gradient-to-br from-violet-50 to-fuchsia-50 dark:from-violet-900/20 dark:to-fuchsia-900/20 rounded-xl border border-slate-200 dark:border-slate-700 animate-pulse flex items-center justify-center">
+    <div className="text-slate-400 dark:text-slate-500">Loading world map...</div>
+  </div>,
+  ssr: false // Don't render on server - reduces server load
+})
+
+const TopCountriesPodium = dynamic(() => import('@/components/TopCountriesPodium'), {
+  loading: () => <div className="h-[300px] bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20 rounded-xl border border-slate-200 dark:border-slate-700 animate-pulse" />,
+  ssr: false
+})
+
+const CountryScoreCard = dynamic(() => import('@/components/CountryScoreCard'), {
+  loading: () => <div className="h-[200px] bg-slate-50 dark:bg-slate-800 rounded-lg animate-pulse" />,
+  ssr: false
+})
 
 interface AIAnalysis {
   crypto_score: number
