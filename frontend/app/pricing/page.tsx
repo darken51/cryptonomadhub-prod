@@ -214,7 +214,7 @@ export default function Pricing() {
           })
         }}
       />
-      <main className="flex-1 py-12 md:py-20 px-4">
+      <div className="py-12 md:py-20 px-4">
         <div className="max-w-7xl mx-auto">
 
           {/* Header */}
@@ -535,7 +535,7 @@ export default function Pricing() {
             </Link>
           </motion.div>
         </div>
-      </main>
+      </div>
 
       {/* Crypto Payment Modal */}
       {selectedPlan && (

@@ -302,8 +302,10 @@ export default function CountryDetailPage() {
           </span>
         </nav>
 
-        {/* Country Header */}
-        <motion.div
+        {/* Main Content */}
+        <main id="main-content">
+          {/* Country Header */}
+          <motion.div
           className="mb-8"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -657,6 +659,7 @@ export default function CountryDetailPage() {
             </div>
           </Link>
         </motion.div>
+        </main>
       </div>
     </div>
   )
