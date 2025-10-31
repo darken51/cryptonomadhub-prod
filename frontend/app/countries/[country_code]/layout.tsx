@@ -79,14 +79,14 @@ export async function generateMetadata({ params }: { params: Promise<{ country_c
     }
   }
 
-  // Determine tax rate to display
-  const shortRate = country.crypto_short_rate !== null && country.crypto_short_rate !== undefined
+  // Determine tax rate to display (convert to percentage)
+  const shortRate = ((country.crypto_short_rate !== null && country.crypto_short_rate !== undefined
     ? country.crypto_short_rate
-    : country.cgt_short_rate
+    : country.cgt_short_rate) * 100)
 
-  const longRate = country.crypto_long_rate !== null && country.crypto_long_rate !== undefined
+  const longRate = ((country.crypto_long_rate !== null && country.crypto_long_rate !== undefined
     ? country.crypto_long_rate
-    : country.cgt_long_rate
+    : country.cgt_long_rate) * 100)
 
   // Build title suffix
   let titleSuffix = ''

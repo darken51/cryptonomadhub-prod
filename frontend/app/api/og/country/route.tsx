@@ -40,8 +40,8 @@ export async function GET(request: NextRequest) {
     return new Response('Country not found', { status: 404 })
   }
 
-  const shortRate = country.crypto_short_rate ?? country.cgt_short_rate
-  const longRate = country.crypto_long_rate ?? country.cgt_long_rate
+  const shortRate = (country.crypto_short_rate ?? country.cgt_short_rate) * 100
+  const longRate = (country.crypto_long_rate ?? country.cgt_long_rate) * 100
 
   return new ImageResponse(
     (
