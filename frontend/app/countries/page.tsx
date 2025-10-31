@@ -115,19 +115,14 @@ const STATIC_FALLBACK_COUNTRIES: Country[] = [
 ]
 
 async function getCountries(): Promise<Country[]> {
-  // Use static fallback by default to avoid SSR issues
-  // API fetching will happen client-side in CountriesClient
-  return STATIC_FALLBACK_COUNTRIES
-
-  /* Disabled API fetch during SSR to prevent BAILOUT
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'
     const url = `${apiUrl}/regulations/?reliable_only=true&include_analysis=true`
 
     console.log('[SSR] Fetching countries from:', url)
 
     const response = await fetch(url, {
-      next: { revalidate: 3600 },
+      cache: 'no-store', // Force fresh data on each request
       headers: { 'Accept': 'application/json' },
       signal: AbortSignal.timeout(5000) // 5s timeout
     })
@@ -150,7 +145,6 @@ async function getCountries(): Promise<Country[]> {
     console.error('[SSR] Error fetching countries:', error, '- Using static fallback')
     return STATIC_FALLBACK_COUNTRIES
   }
-  */
 }
 
 export default async function CountriesPage() {
