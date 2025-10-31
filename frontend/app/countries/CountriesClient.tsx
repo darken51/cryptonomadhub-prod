@@ -133,15 +133,16 @@ export default function CountriesClient({ initialCountries }: CountriesClientPro
     filterCountries()
   }, [filterCountries])
 
-  // Fallback: fetch client-side if SSR data is empty
+  // Fallback: fetch client-side if SSR data is empty or fallback (20 countries)
   useEffect(() => {
-    if (initialCountries.length === 0) {
+    // Fetch if we have 0 countries OR if we have exactly 20 (static fallback)
+    if (initialCountries.length === 0 || initialCountries.length === 20) {
       const fetchCountries = async () => {
         try {
           setIsLoading(true)
-          console.log('[Client] SSR data empty, fetching countries client-side...')
+          console.log('[Client] SSR data empty/fallback, fetching countries client-side...')
 
-          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://cryptonomadhub-prod-1.onrender.com'
           const response = await fetch(`${apiUrl}/regulations/?reliable_only=true&include_analysis=true`)
 
           if (!response.ok) {
