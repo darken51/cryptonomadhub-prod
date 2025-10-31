@@ -133,41 +133,40 @@ export default function CountriesClient({ initialCountries }: CountriesClientPro
     filterCountries()
   }, [filterCountries])
 
-  // Fallback: fetch client-side if SSR data is empty or fallback (20 countries)
+  // ALWAYS fetch client-side to get all 167 countries
   useEffect(() => {
-    // Fetch if we have 0 countries OR if we have exactly 20 (static fallback)
-    if (initialCountries.length === 0 || initialCountries.length === 20) {
-      const fetchCountries = async () => {
-        try {
-          setIsLoading(true)
-          console.log('[Client] SSR data empty/fallback, fetching countries client-side...')
+    const fetchCountries = async () => {
+      try {
+        setIsLoading(true)
+        console.log('[Client] Fetching all countries from API...')
 
-          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://cryptonomadhub-prod-1.onrender.com'
-          const response = await fetch(`${apiUrl}/regulations/?reliable_only=true&include_analysis=true`)
+        const apiUrl = 'https://cryptonomadhub-prod-1.onrender.com'
+        const response = await fetch(`${apiUrl}/regulations/?reliable_only=true&include_analysis=true`)
 
-          if (!response.ok) {
-            throw new Error(`API returned ${response.status}`)
-          }
+        if (!response.ok) {
+          throw new Error(`API returned ${response.status}`)
+        }
 
-          const data = await response.json()
-          console.log('[Client] Successfully fetched', data.length, 'countries')
+        const data = await response.json()
+        console.log('[Client] Successfully fetched', data.length, 'countries')
 
+        if (data.length > initialCountries.length) {
           const sortedData = data.sort((a: Country, b: Country) =>
             a.country_name.localeCompare(b.country_name)
           )
 
           setCountries(sortedData)
           setFilteredCountries(sortedData)
-        } catch (error) {
-          console.error('[Client] Error fetching countries:', error)
-        } finally {
-          setIsLoading(false)
         }
+      } catch (error) {
+        console.error('[Client] Error fetching countries:', error)
+      } finally {
+        setIsLoading(false)
       }
-
-      fetchCountries()
     }
-  }, [initialCountries.length])
+
+    fetchCountries()
+  }, [])
 
   const getCryptoBannedBadge = (country: Country) => {
     if (!isCryptoBanned(country)) return null
