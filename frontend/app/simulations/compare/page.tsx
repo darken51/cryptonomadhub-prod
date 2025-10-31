@@ -75,11 +75,49 @@ interface CountryComparison {
   long_term_tax?: number
   short_term_rate?: number
   long_term_rate?: number
+  // AI Analysis
+  ai_analysis?: {
+    crypto_score: number
+    nomad_score: number
+    overall_score: number
+  }
+  // Tax metadata
+  holding_period_months?: number
+  is_flat_tax?: boolean
+  is_progressive?: boolean
+  is_territorial?: boolean
+  exemption_threshold?: number
+  exemption_threshold_currency?: string
+  crypto_legal_status?: string
+  source_url?: string
+  crypto_notes?: string
 }
 
 interface CompareResult {
   current_country: string
+  current_country_name: string
+  current_country_flag?: string
   current_tax: number
+  current_effective_rate: number
+  current_short_term_tax: number
+  current_long_term_tax: number
+  current_short_term_rate: number
+  current_long_term_rate: number
+  // Current country metadata
+  current_ai_analysis?: {
+    crypto_score: number
+    nomad_score: number
+    overall_score: number
+  }
+  current_holding_period_months?: number
+  current_is_flat_tax?: boolean
+  current_is_progressive?: boolean
+  current_is_territorial?: boolean
+  current_exemption_threshold?: number
+  current_exemption_threshold_currency?: string
+  current_crypto_notes?: string
+  current_source_url?: string
+  // Comparison data
   comparisons: CountryComparison[]
   short_term_gains: number
   long_term_gains: number
@@ -500,14 +538,6 @@ export default function ComparePage() {
                     whileHover={{ scale: 1.02 }}
                     className="p-4 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700"
                   >
-                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Current Country</p>
-                    <p className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">{result.current_country}</p>
-                    <p className="text-sm text-slate-500">${result.current_tax.toLocaleString()} tax</p>
-                  </motion.div>
-                  <motion.div
-                    whileHover={{ scale: 1.02 }}
-                    className="p-4 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700"
-                  >
                     <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Total Gains</p>
                     <p className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white">
                       ${result.total_gains.toLocaleString()}
@@ -522,8 +552,193 @@ export default function ComparePage() {
                       {result.comparisons.length}
                     </p>
                   </motion.div>
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    className="p-4 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700"
+                  >
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">Best Potential Savings</p>
+                    <p className="text-lg sm:text-xl font-bold text-green-600 dark:text-green-400">
+                      {result.comparisons.length > 0 && result.comparisons[0].savings > 0
+                        ? `$${result.comparisons[0].savings.toLocaleString()}`
+                        : 'N/A'
+                      }
+                    </p>
+                  </motion.div>
                 </div>
               </div>
+
+              {/* Current Country Section */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-2 border-blue-300 dark:border-blue-700 rounded-2xl p-4 sm:p-6 shadow-xl"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-3xl">{result.current_country_flag || '🏠'}</span>
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-bold text-blue-900 dark:text-blue-100">
+                      Your Current Country: {result.current_country_name}
+                    </h2>
+                    <p className="text-sm text-blue-700 dark:text-blue-300">
+                      Current tax residence baseline for comparison
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {/* Total Tax Card */}
+                  <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-blue-200 dark:border-blue-800 shadow-md">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">Total Tax</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                      ${result.current_tax.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                      Effective Rate: {result.current_effective_rate.toFixed(2)}%
+                    </p>
+                  </div>
+
+                  {/* Short-Term Tax Card */}
+                  <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-orange-200 dark:border-orange-700 shadow-md">
+                    <p className="text-xs text-orange-600 dark:text-orange-400 mb-1">Short-Term (&lt;1 year)</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                      ${result.current_short_term_tax.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                      Rate: {result.current_short_term_rate.toFixed(2)}%
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      On ${result.short_term_gains.toLocaleString()} gains
+                    </p>
+                  </div>
+
+                  {/* Long-Term Tax Card */}
+                  <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-green-200 dark:border-green-700 shadow-md">
+                    <p className="text-xs text-green-600 dark:text-green-400 mb-1">Long-Term (&gt;1 year)</p>
+                    <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                      ${result.current_long_term_tax.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                      Rate: {result.current_long_term_rate.toFixed(2)}%
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      On ${result.long_term_gains.toLocaleString()} gains
+                    </p>
+                  </div>
+                </div>
+
+                {/* Additional Details */}
+                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Tax System Info */}
+                  <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
+                    <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-200 mb-3">Tax System</h3>
+                    <div className="space-y-2 text-sm">
+                      {result.current_holding_period_months !== null && result.current_holding_period_months !== undefined && (
+                        <div className="flex justify-between">
+                          <span className="text-slate-600 dark:text-slate-400">Holding Period:</span>
+                          <span className="font-semibold text-slate-900 dark:text-white">{result.current_holding_period_months} months</span>
+                        </div>
+                      )}
+                      {result.current_exemption_threshold && (
+                        <div className="flex justify-between">
+                          <span className="text-slate-600 dark:text-slate-400">Exemption:</span>
+                          <span className="font-semibold text-slate-900 dark:text-white">
+                            {result.current_exemption_threshold.toLocaleString()} {result.current_exemption_threshold_currency || ''}
+                          </span>
+                        </div>
+                      )}
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {result.current_is_flat_tax && (
+                          <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full font-semibold">
+                            Flat Tax
+                          </span>
+                        )}
+                        {result.current_is_progressive && (
+                          <span className="text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-2 py-1 rounded-full font-semibold">
+                            Progressive
+                          </span>
+                        )}
+                        {result.current_is_territorial && (
+                          <span className="text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-2 py-1 rounded-full font-semibold">
+                            Territorial
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* AI Analysis */}
+                  {result.current_ai_analysis && (
+                    <div className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-purple-200 dark:border-purple-800">
+                      <h3 className="text-sm font-semibold text-purple-900 dark:text-purple-200 mb-3">🤖 AI Analysis</h3>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between items-center">
+                          <span className="text-slate-600 dark:text-slate-400">🪙 Crypto Score:</span>
+                          <div className="flex items-center gap-2">
+                            <div className="w-20 h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-gradient-to-r from-violet-500 to-fuchsia-500"
+                                style={{ width: `${result.current_ai_analysis.crypto_score}%` }}
+                              />
+                            </div>
+                            <span className="font-bold text-violet-600 dark:text-violet-400">{result.current_ai_analysis.crypto_score}/100</span>
+                          </div>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-slate-600 dark:text-slate-400">✈️ Nomad Score:</span>
+                          <div className="flex items-center gap-2">
+                            <div className="w-20 h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-gradient-to-r from-fuchsia-500 to-pink-500"
+                                style={{ width: `${result.current_ai_analysis.nomad_score}%` }}
+                              />
+                            </div>
+                            <span className="font-bold text-fuchsia-600 dark:text-fuchsia-400">{result.current_ai_analysis.nomad_score}/100</span>
+                          </div>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-slate-600 dark:text-slate-400">⭐ Overall:</span>
+                          <div className="flex items-center gap-2">
+                            <div className="w-20 h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-gradient-to-r from-amber-500 to-orange-500"
+                                style={{ width: `${result.current_ai_analysis.overall_score}%` }}
+                              />
+                            </div>
+                            <span className="font-bold text-amber-600 dark:text-amber-400">{result.current_ai_analysis.overall_score}/100</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Notes */}
+                {result.current_crypto_notes && (
+                  <div className="mt-4 bg-white dark:bg-slate-900 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
+                    <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-200 mb-2">📝 Notes</h3>
+                    <p className="text-sm text-slate-700 dark:text-slate-300">{result.current_crypto_notes}</p>
+                  </div>
+                )}
+
+                {/* Source Link */}
+                {result.current_source_url && (
+                  <div className="mt-4">
+                    <a
+                      href={result.current_source_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition"
+                    >
+                      <span>📎</span>
+                      <span>Official Tax Source</span>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                  </div>
+                )}
+              </motion.div>
 
               {/* Reset Button */}
               <motion.div
@@ -637,7 +852,8 @@ export default function ComparePage() {
                                 className="bg-slate-50 dark:bg-slate-800/50"
                               >
                                 <td colSpan={5} className="px-4 sm:px-6 py-4">
-                                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                  {/* Tax Breakdown */}
+                                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                                     <div className="bg-white dark:bg-slate-900 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
                                       <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">Total Tax</p>
                                       <p className="text-xl font-bold text-slate-900 dark:text-white">
@@ -682,7 +898,129 @@ export default function ComparePage() {
                                       </div>
                                     )}
                                   </div>
-                                  <div className="mt-3 text-xs text-slate-500 dark:text-slate-400 italic">
+
+                                  {/* Additional Details Grid */}
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                    {/* Tax System Info */}
+                                    <div className="bg-white dark:bg-slate-900 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                                      <h4 className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-3">Tax System</h4>
+                                      <div className="space-y-2 text-sm">
+                                        {comparison.holding_period_months !== null && comparison.holding_period_months !== undefined && (
+                                          <div className="flex justify-between">
+                                            <span className="text-slate-600 dark:text-slate-400">Holding Period:</span>
+                                            <span className="font-semibold text-slate-900 dark:text-white">{comparison.holding_period_months} months</span>
+                                          </div>
+                                        )}
+                                        {comparison.exemption_threshold && (
+                                          <div className="flex justify-between">
+                                            <span className="text-slate-600 dark:text-slate-400">Exemption:</span>
+                                            <span className="font-semibold text-slate-900 dark:text-white">
+                                              {comparison.exemption_threshold.toLocaleString()} {comparison.exemption_threshold_currency || ''}
+                                            </span>
+                                          </div>
+                                        )}
+                                        <div className="flex flex-wrap gap-2 mt-3">
+                                          {comparison.is_flat_tax && (
+                                            <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-1 rounded-full font-semibold">
+                                              Flat Tax
+                                            </span>
+                                          )}
+                                          {comparison.is_progressive && (
+                                            <span className="text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-2 py-1 rounded-full font-semibold">
+                                              Progressive
+                                            </span>
+                                          )}
+                                          {comparison.is_territorial && (
+                                            <span className="text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-2 py-1 rounded-full font-semibold">
+                                              Territorial
+                                            </span>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    {/* AI Analysis */}
+                                    {comparison.ai_analysis && (
+                                      <div className="bg-white dark:bg-slate-900 rounded-lg p-4 border border-purple-200 dark:border-purple-800">
+                                        <h4 className="text-xs font-semibold text-purple-700 dark:text-purple-300 mb-3">🤖 AI Analysis</h4>
+                                        <div className="space-y-2.5 text-sm">
+                                          <div className="flex justify-between items-center">
+                                            <span className="text-slate-600 dark:text-slate-400 text-xs">🪙 Crypto:</span>
+                                            <div className="flex items-center gap-2">
+                                              <div className="w-16 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                                <div
+                                                  className="h-full bg-gradient-to-r from-violet-500 to-fuchsia-500"
+                                                  style={{ width: `${comparison.ai_analysis.crypto_score}%` }}
+                                                />
+                                              </div>
+                                              <span className="font-bold text-violet-600 dark:text-violet-400 text-xs">{comparison.ai_analysis.crypto_score}</span>
+                                            </div>
+                                          </div>
+                                          <div className="flex justify-between items-center">
+                                            <span className="text-slate-600 dark:text-slate-400 text-xs">✈️ Nomad:</span>
+                                            <div className="flex items-center gap-2">
+                                              <div className="w-16 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                                <div
+                                                  className="h-full bg-gradient-to-r from-fuchsia-500 to-pink-500"
+                                                  style={{ width: `${comparison.ai_analysis.nomad_score}%` }}
+                                                />
+                                              </div>
+                                              <span className="font-bold text-fuchsia-600 dark:text-fuchsia-400 text-xs">{comparison.ai_analysis.nomad_score}</span>
+                                            </div>
+                                          </div>
+                                          <div className="flex justify-between items-center">
+                                            <span className="text-slate-600 dark:text-slate-400 text-xs">⭐ Overall:</span>
+                                            <div className="flex items-center gap-2">
+                                              <div className="w-16 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                                <div
+                                                  className="h-full bg-gradient-to-r from-amber-500 to-orange-500"
+                                                  style={{ width: `${comparison.ai_analysis.overall_score}%` }}
+                                                />
+                                              </div>
+                                              <span className="font-bold text-amber-600 dark:text-amber-400 text-xs">{comparison.ai_analysis.overall_score}</span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {/* Notes */}
+                                  {comparison.crypto_notes && (
+                                    <div className="bg-white dark:bg-slate-900 rounded-lg p-4 border border-slate-200 dark:border-slate-700 mb-4">
+                                      <h4 className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">📝 Notes</h4>
+                                      <p className="text-sm text-slate-700 dark:text-slate-300">{comparison.crypto_notes}</p>
+                                    </div>
+                                  )}
+
+                                  {/* Action Buttons */}
+                                  <div className="flex flex-wrap gap-3">
+                                    <Link
+                                      href={`/countries/${comparison.country_code.toLowerCase()}`}
+                                      className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white text-sm font-semibold rounded-lg shadow-md hover:shadow-lg transition-all"
+                                    >
+                                      <span>View Full Country Analysis</span>
+                                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                      </svg>
+                                    </Link>
+                                    {comparison.source_url && (
+                                      <a
+                                        href={comparison.source_url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-medium rounded-lg border border-slate-300 dark:border-slate-600 transition-all"
+                                      >
+                                        <span>📎</span>
+                                        <span>Official Source</span>
+                                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                        </svg>
+                                      </a>
+                                    )}
+                                  </div>
+
+                                  <div className="mt-4 text-xs text-slate-500 dark:text-slate-400 italic text-center">
                                     Click on row to collapse details
                                   </div>
                                 </td>
