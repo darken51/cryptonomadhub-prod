@@ -96,11 +96,46 @@ class CountryComparison(BaseModel):
     savings: float
     savings_percent: float
     effective_rate: float
+    # Tax breakdown
+    short_term_tax: Optional[float] = None
+    long_term_tax: Optional[float] = None
+    short_term_rate: Optional[float] = None
+    long_term_rate: Optional[float] = None
+    # AI Analysis
+    ai_analysis: Optional[dict] = None
+    # Tax metadata
+    holding_period_months: Optional[int] = None
+    is_flat_tax: Optional[bool] = None
+    is_progressive: Optional[bool] = None
+    is_territorial: Optional[bool] = None
+    exemption_threshold: Optional[float] = None
+    exemption_threshold_currency: Optional[str] = None
+    crypto_legal_status: Optional[str] = None
+    source_url: Optional[str] = None
+    crypto_notes: Optional[str] = None
 
 
 class CompareResponse(BaseModel):
     current_country: str
+    current_country_name: str
+    current_country_flag: Optional[str] = None
     current_tax: float
+    current_effective_rate: float
+    current_short_term_tax: float
+    current_long_term_tax: float
+    current_short_term_rate: float
+    current_long_term_rate: float
+    # Current country metadata
+    current_ai_analysis: Optional[dict] = None
+    current_holding_period_months: Optional[int] = None
+    current_is_flat_tax: Optional[bool] = None
+    current_is_progressive: Optional[bool] = None
+    current_is_territorial: Optional[bool] = None
+    current_exemption_threshold: Optional[float] = None
+    current_exemption_threshold_currency: Optional[str] = None
+    current_crypto_notes: Optional[str] = None
+    current_source_url: Optional[str] = None
+    # Comparison data
     comparisons: List[CountryComparison]
     short_term_gains: float
     long_term_gains: float
@@ -263,9 +298,26 @@ async def compare_countries(
         raise HTTPException(status_code=404, detail=f"Country {compare_request.current_country} not found")
 
     # Calculate current tax using same logic as TaxSimulator
-    current_tax_short = compare_request.short_term_gains * float(current_reg.cgt_short_rate)
-    current_tax_long = compare_request.long_term_gains * float(current_reg.cgt_long_rate)
+    # Use crypto-specific rates if available, otherwise fall back to CGT rates
+    current_short_rate = float(current_reg.crypto_short_rate if current_reg.crypto_short_rate is not None else current_reg.cgt_short_rate)
+    current_long_rate = float(current_reg.crypto_long_rate if current_reg.crypto_long_rate is not None else current_reg.cgt_long_rate)
+
+    current_tax_short = compare_request.short_term_gains * current_short_rate
+    current_tax_long = compare_request.long_term_gains * current_long_rate
     current_tax = current_tax_short + current_tax_long
+
+    # Calculate current effective rate
+    total_gains = compare_request.short_term_gains + compare_request.long_term_gains
+    current_effective_rate = (current_tax / total_gains * 100) if total_gains > 0 else 0
+
+    # Get AI analysis for current country
+    current_ai_analysis = None
+    if hasattr(current_reg, 'ai_analysis') and current_reg.ai_analysis:
+        current_ai_analysis = {
+            "crypto_score": current_reg.ai_analysis.get("crypto_score"),
+            "nomad_score": current_reg.ai_analysis.get("nomad_score"),
+            "overall_score": current_reg.ai_analysis.get("overall_score")
+        }
 
     # Calculate tax for each target country
     comparisons = []
@@ -282,15 +334,28 @@ async def compare_countries(
             if target_reg.crypto_legal_status == 'banned':
                 continue  # Silently skip banned countries from comparison
 
+            # Use crypto-specific rates if available, otherwise fall back to CGT rates
+            target_short_rate = float(target_reg.crypto_short_rate if target_reg.crypto_short_rate is not None else target_reg.cgt_short_rate)
+            target_long_rate = float(target_reg.crypto_long_rate if target_reg.crypto_long_rate is not None else target_reg.cgt_long_rate)
+
             # Calculate target tax
-            target_tax_short = compare_request.short_term_gains * float(target_reg.cgt_short_rate)
-            target_tax_long = compare_request.long_term_gains * float(target_reg.cgt_long_rate)
+            target_tax_short = compare_request.short_term_gains * target_short_rate
+            target_tax_long = compare_request.long_term_gains * target_long_rate
             target_tax = target_tax_short + target_tax_long
 
             savings = current_tax - target_tax
             savings_percent = (savings / current_tax * 100) if current_tax > 0 else 0
             total_gains = compare_request.short_term_gains + compare_request.long_term_gains
             effective_rate = (target_tax / total_gains * 100) if total_gains > 0 else 0
+
+            # Get AI analysis
+            ai_analysis = None
+            if hasattr(target_reg, 'ai_analysis') and target_reg.ai_analysis:
+                ai_analysis = {
+                    "crypto_score": target_reg.ai_analysis.get("crypto_score"),
+                    "nomad_score": target_reg.ai_analysis.get("nomad_score"),
+                    "overall_score": target_reg.ai_analysis.get("overall_score")
+                }
 
             comparisons.append(CountryComparison(
                 country_code=country_code,
@@ -299,7 +364,24 @@ async def compare_countries(
                 tax_amount=target_tax,
                 savings=savings,
                 savings_percent=savings_percent,
-                effective_rate=effective_rate
+                effective_rate=effective_rate,
+                # Tax breakdown
+                short_term_tax=target_tax_short,
+                long_term_tax=target_tax_long,
+                short_term_rate=target_short_rate * 100,  # Convert to percentage
+                long_term_rate=target_long_rate * 100,    # Convert to percentage
+                # AI Analysis
+                ai_analysis=ai_analysis,
+                # Tax metadata
+                holding_period_months=target_reg.holding_period_months,
+                is_flat_tax=target_reg.is_flat_tax,
+                is_progressive=target_reg.is_progressive,
+                is_territorial=target_reg.is_territorial,
+                exemption_threshold=target_reg.exemption_threshold,
+                exemption_threshold_currency=target_reg.exemption_threshold_currency,
+                crypto_legal_status=target_reg.crypto_legal_status,
+                source_url=target_reg.source_url,
+                crypto_notes=target_reg.crypto_notes
             ))
         except Exception as e:
             print(f"Error processing {country_code}: {e}")
@@ -318,7 +400,25 @@ async def compare_countries(
 
     return CompareResponse(
         current_country=compare_request.current_country,
+        current_country_name=current_reg.country_name,
+        current_country_flag=current_reg.flag_emoji,
         current_tax=current_tax,
+        current_effective_rate=current_effective_rate,
+        current_short_term_tax=current_tax_short,
+        current_long_term_tax=current_tax_long,
+        current_short_term_rate=current_short_rate * 100,  # Convert to percentage
+        current_long_term_rate=current_long_rate * 100,    # Convert to percentage
+        # Current country metadata
+        current_ai_analysis=current_ai_analysis,
+        current_holding_period_months=current_reg.holding_period_months,
+        current_is_flat_tax=current_reg.is_flat_tax,
+        current_is_progressive=current_reg.is_progressive,
+        current_is_territorial=current_reg.is_territorial,
+        current_exemption_threshold=current_reg.exemption_threshold,
+        current_exemption_threshold_currency=current_reg.exemption_threshold_currency,
+        current_crypto_notes=current_reg.crypto_notes,
+        current_source_url=current_reg.source_url,
+        # Comparison data
         comparisons=comparisons,
         short_term_gains=compare_request.short_term_gains,
         long_term_gains=compare_request.long_term_gains,
