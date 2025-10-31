@@ -147,7 +147,7 @@ export default function HelpPage() {
       faqs: [
         {
           question: 'How much does it cost?',
-          answer: 'We offer a free plan with 5 simulations per month (no credit card required). Paid plans start at $29/month for individuals. Professional and enterprise plans available for accountants.'
+          answer: 'We offer a free plan with 5 simulations per month (no credit card required). Paid plans start at $15/month for individuals. Professional and enterprise plans available for accountants.'
         },
         {
           question: 'Can I cancel anytime?',
