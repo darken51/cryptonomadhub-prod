@@ -54,7 +54,44 @@ async def test_apis_status():
         }
     except Exception as e:
         results["price_service"] = {"status": f"❌ ERROR: {str(e)}"}
-    
+
+    # 5. BlockCypher (Bitcoin API)
+    blockcypher_key = os.getenv("BLOCKCYPHER_API_KEY", "")
+    if blockcypher_key:
+        try:
+            # Test with a known Bitcoin address (Satoshi's genesis block reward)
+            test_btc_address = "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
+            url = f"https://api.blockcypher.com/v1/btc/main/addrs/{test_btc_address}/balance"
+            params = {"token": blockcypher_key}
+            r = requests.get(url, params=params, timeout=10)
+
+            if r.status_code == 200:
+                data = r.json()
+                balance_btc = data.get("balance", 0) / 100000000  # satoshis to BTC
+                results["blockcypher"] = {
+                    "status": "✅ ACTIVE",
+                    "key_prefix": blockcypher_key[:10] + "...",
+                    "test_address": test_btc_address[:10] + "...",
+                    "balance": f"{balance_btc:.8f} BTC"
+                }
+            else:
+                results["blockcypher"] = {
+                    "status": f"❌ ERROR {r.status_code}",
+                    "key_prefix": blockcypher_key[:10] + "...",
+                    "error": r.text[:100]
+                }
+        except Exception as e:
+            results["blockcypher"] = {"status": f"❌ ERROR: {str(e)}"}
+    else:
+        results["blockcypher"] = {"status": "❌ NOT CONFIGURED"}
+
+    # 6. Etherscan (EVM fallback)
+    etherscan_key = os.getenv("ETHERSCAN_API_KEY", "")
+    results["etherscan"] = {
+        "status": "✅ CONFIGURED" if etherscan_key else "❌ NOT CONFIGURED",
+        "key_prefix": etherscan_key[:10] + "..." if etherscan_key else "N/A"
+    }
+
     return {
         "environment": os.getenv("ENVIRONMENT", "unknown"),
         "apis": results
