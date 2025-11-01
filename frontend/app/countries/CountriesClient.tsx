@@ -113,6 +113,18 @@ export default function CountriesClient({ initialCountries }: CountriesClientPro
         </div>
       </div>
 
+      {/* World Map */}
+      {initialCountries.length > 0 && (
+        <div className="mb-8">
+          <WorldTaxMap countries={initialCountries} />
+        </div>
+      )}
+
+      {/* Top Countries Podium */}
+      {initialCountries.length > 0 && (
+        <TopCountriesPodium countries={initialCountries} />
+      )}
+
     {/* SEO Content Section - Moved up for better UX */}
     <motion.div
       className="my-8 bg-white dark:bg-slate-800 rounded-xl p-8 border border-slate-200 dark:border-slate-700"
@@ -212,24 +224,9 @@ export default function CountriesClient({ initialCountries }: CountriesClientPro
       {/* Can't find your country notice */}
       <div className="mt-8 mb-12 bg-slate-50 dark:bg-slate-900 rounded-lg p-6 text-center border border-slate-200 dark:border-slate-700">
         <p className="text-slate-700 dark:text-slate-300 text-lg">
-          Can't find your country? Use the <strong>search bar above</strong> or click on the <strong>interactive map below</strong> to explore all {initialCountries.length} countries!
+          Can't find your country? Use the <strong>search bar above</strong> or click on the <strong>interactive map</strong> to explore all {initialCountries.length} countries!
         </p>
       </div>
-
-      {/* World Map - Moved below fold for better LCP */}
-      {initialCountries.length > 0 && (
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
-            Interactive World Tax Map
-          </h2>
-          <WorldTaxMap countries={initialCountries} />
-        </div>
-      )}
-
-      {/* Top Countries Podium - Moved below fold */}
-      {initialCountries.length > 0 && (
-        <TopCountriesPodium countries={initialCountries} />
-      )}
 
     {/* Disclaimer */}
     <motion.div

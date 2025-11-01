@@ -23,16 +23,29 @@ export default function CountryAutocomplete({ countries }: CountryAutocompletePr
   const [query, setQuery] = useState('')
   const [isOpen, setIsOpen] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState(0)
+  const [filterType, setFilterType] = useState<'all' | '0tax' | 'crypto'>('all')
   const inputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
 
-  // Filter countries based on search query
+  // Filter countries based on search query and filter type
   const filteredCountries = query.trim()
     ? countries
-        .filter(c =>
-          c.country_name.toLowerCase().includes(query.toLowerCase()) ||
-          c.country_code.toLowerCase().includes(query.toLowerCase())
-        )
+        .filter(c => {
+          // Search filter
+          const matchesSearch = c.country_name.toLowerCase().includes(query.toLowerCase()) ||
+                                c.country_code.toLowerCase().includes(query.toLowerCase())
+          if (!matchesSearch) return false
+
+          // Type filter
+          if (filterType === '0tax') {
+            const longTermRate = c.crypto_long_rate ?? c.cgt_long_rate
+            return longTermRate === 0
+          }
+          if (filterType === 'crypto') {
+            return c.crypto_short_rate !== null && c.crypto_short_rate !== undefined
+          }
+          return true
+        })
         .slice(0, 8) // Limit to 8 results
     : []
 
@@ -83,6 +96,40 @@ export default function CountryAutocomplete({ countries }: CountryAutocompletePr
 
   return (
     <div className="relative w-full max-w-2xl mx-auto">
+      {/* Filter buttons */}
+      <div className="flex gap-2 mb-3">
+        <button
+          onClick={() => setFilterType('all')}
+          className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+            filterType === 'all'
+              ? 'bg-violet-600 text-white shadow-md'
+              : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+          }`}
+        >
+          All Countries
+        </button>
+        <button
+          onClick={() => setFilterType('0tax')}
+          className={`px-4 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-1.5 ${
+            filterType === '0tax'
+              ? 'bg-green-600 text-white shadow-md'
+              : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+          }`}
+        >
+          ⭐ 0% Tax Only
+        </button>
+        <button
+          onClick={() => setFilterType('crypto')}
+          className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+            filterType === 'crypto'
+              ? 'bg-fuchsia-600 text-white shadow-md'
+              : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+          }`}
+        >
+          🪙 Crypto-Specific
+        </button>
+      </div>
+
       <div className="relative">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
         <input
@@ -122,48 +169,68 @@ export default function CountryAutocomplete({ countries }: CountryAutocompletePr
             className="absolute z-50 w-full mt-2 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl overflow-hidden"
           >
             <div className="max-h-96 overflow-y-auto">
-              {filteredCountries.map((country, index) => (
-                <motion.button
-                  key={country.country_code}
-                  onClick={() => navigateToCountry(country.country_code)}
-                  className={`w-full px-4 py-3 flex items-center justify-between gap-3 transition-colors ${
-                    index === selectedIndex
-                      ? 'bg-violet-50 dark:bg-violet-900/20'
-                      : 'hover:bg-slate-50 dark:hover:bg-slate-700/50'
-                  }`}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: index * 0.03 }}
-                >
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    {country.flag_emoji && (
-                      <span className="text-2xl flex-shrink-0">{country.flag_emoji}</span>
-                    )}
-                    <div className="text-left min-w-0">
-                      <div className="font-semibold text-slate-900 dark:text-white truncate">
-                        {country.country_name}
-                      </div>
-                      <div className="text-xs text-slate-500 dark:text-slate-400">
-                        {country.country_code}
+              {filteredCountries.map((country, index) => {
+                const hasCryptoData = country.crypto_short_rate !== null && country.crypto_short_rate !== undefined
+                const shortTermRate = (hasCryptoData ? country.crypto_short_rate! : country.cgt_short_rate) * 100
+                const longTermRate = ((hasCryptoData ? country.crypto_long_rate : country.cgt_long_rate) ?? shortTermRate / 100) * 100
+
+                return (
+                  <motion.button
+                    key={country.country_code}
+                    onClick={() => navigateToCountry(country.country_code)}
+                    className={`w-full px-4 py-3 flex items-center justify-between gap-3 transition-colors border-b border-slate-100 dark:border-slate-700 last:border-0 ${
+                      index === selectedIndex
+                        ? 'bg-violet-50 dark:bg-violet-900/20'
+                        : 'hover:bg-slate-50 dark:hover:bg-slate-700/50'
+                    }`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: index * 0.03 }}
+                  >
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      {country.flag_emoji && (
+                        <span className="text-2xl flex-shrink-0">{country.flag_emoji}</span>
+                      )}
+                      <div className="text-left min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-slate-900 dark:text-white truncate">
+                            {country.country_name}
+                          </span>
+                          {hasCryptoData && (
+                            <span className="text-xs px-1.5 py-0.5 bg-fuchsia-100 dark:bg-fuchsia-900/30 text-fuchsia-700 dark:text-fuchsia-300 rounded font-medium">
+                              🪙
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                          <span>{country.country_code}</span>
+                          <span className="text-slate-400">•</span>
+                          <span>Short: {shortTermRate.toFixed(0)}%</span>
+                          <span className="text-slate-400">•</span>
+                          <span>Long: {longTermRate.toFixed(0)}%</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="flex-shrink-0 text-right">
-                    <div className={`text-sm font-bold ${
-                      getTaxRate(country) === '0'
-                        ? 'text-green-600 dark:text-green-400'
-                        : 'text-slate-700 dark:text-slate-300'
-                    }`}>
-                      {getTaxRate(country)}% tax
+                    <div className="flex-shrink-0 text-right">
+                      {longTermRate === 0 ? (
+                        <div className="flex flex-col items-end">
+                          <div className="text-lg font-bold text-green-600 dark:text-green-400">
+                            0% Tax
+                          </div>
+                          <div className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
+                            <span>⭐</span>
+                            <span>Tax Haven</span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-sm font-bold text-slate-700 dark:text-slate-300">
+                          {longTermRate.toFixed(0)}% long-term
+                        </div>
+                      )}
                     </div>
-                    {getTaxRate(country) === '0' && (
-                      <div className="text-xs text-green-600 dark:text-green-400">
-                        ⭐ Tax haven
-                      </div>
-                    )}
-                  </div>
-                </motion.button>
-              ))}
+                  </motion.button>
+                )
+              })}
             </div>
 
             {filteredCountries.length === 8 && (
