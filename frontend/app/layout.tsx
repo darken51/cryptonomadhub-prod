@@ -8,6 +8,7 @@ import { ClientProviders } from '@/components/ClientProviders'
 const inter = Inter({
   subsets: ['latin'],
   display: 'swap', // Optimize font loading
+  preload: true, // Preload font for faster rendering
 })
 
 export const metadata: Metadata = {
