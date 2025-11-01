@@ -12,9 +12,6 @@ import { useInView } from 'react-intersection-observer'
 const ComparisonTable = dynamic(() => import('@/components/ComparisonTable').then(mod => ({ default: mod.ComparisonTable })), {
   loading: () => <div className="h-96 animate-pulse bg-slate-100 dark:bg-slate-800 rounded-2xl" />
 })
-const TestimonialCarousel = dynamic(() => import('@/components/TestimonialCarousel').then(mod => ({ default: mod.TestimonialCarousel })), {
-  loading: () => <div className="h-80 animate-pulse bg-slate-100 dark:bg-slate-800 rounded-2xl" />
-})
 const FAQAccordion = dynamic(() => import('@/components/FAQAccordion').then(mod => ({ default: mod.FAQAccordion })), {
   loading: () => <div className="h-96 animate-pulse bg-slate-100 dark:bg-slate-800 rounded-2xl" />
 })
@@ -972,36 +969,6 @@ export default function HomeClient() {
       {/* COMPARISON TABLE */}
       <section className="py-20 md:py-32 px-4 bg-white dark:bg-slate-950">
         <ComparisonTable />
-      </section>
-
-      {/* TESTIMONIALS */}
-      <section className="py-20 md:py-32 px-4 bg-gradient-to-b from-slate-50 to-white dark:from-slate-900 dark:to-slate-950">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
-              Trusted by Digital Nomads Worldwide
-            </h2>
-            <p className="text-xl text-slate-600 dark:text-slate-400">
-              Real stories from users optimizing their crypto taxes
-            </p>
-          </div>
-
-          <TestimonialCarousel />
-
-          {/* Trust Badges */}
-          <div className="flex flex-wrap justify-center gap-8 mt-16">
-            {[
-              { icon: Shield, text: 'SOC 2 Compliant' },
-              { icon: Lock, text: 'Bank-Level Security' },
-              { icon: CheckCircle, text: 'GDPR Ready' }
-            ].map((badge, index) => (
-              <div key={index} className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
-                <badge.icon className="w-5 h-5" />
-                <span className="font-medium">{badge.text}</span>
-              </div>
-            ))}
-          </div>
-        </div>
       </section>
 
       {/* RESOURCES SECTION */}
