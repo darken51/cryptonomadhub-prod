@@ -122,6 +122,7 @@ class AnalysisResponse(BaseModel):
     portfolio_summary: dict
     recommendations: List[str]
     is_stub: bool = False  # Indicates example/preview data for non-PRO users
+    preview_mode_message: Optional[str] = None  # Prominent message for preview/example data
 
 
 class ExecuteOpportunityRequest(BaseModel):
@@ -226,7 +227,8 @@ async def analyze_tax_optimization(
                 "🔒 Upgrade to PRO to unlock AI-powered tax optimization for your real portfolio",
                 "💡 PRO users get personalized tax-loss harvesting, timing optimization, and wash sale detection"
             ],
-            is_stub=True
+            is_stub=True,
+            preview_mode_message="⚠️ PREVIEW DATA - This is example data to demonstrate features. Upgrade to PRO to see your real portfolio opportunities."
         )
 
     # Get user's cost basis lots

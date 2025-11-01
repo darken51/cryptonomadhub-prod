@@ -86,10 +86,11 @@ async def root():
 from app.routers import (
     auth, oauth, simulations, paddle_webhook, nowpayments_webhook, chat, admin, regulations,
     defi_audit, health, users, cost_basis, tax_optimizer, wallets, user_wallets,
-    dashboard, wallet_portfolio, license
+    dashboard, wallet_portfolio, license, test_apis
 )
 
 app.include_router(health.router)
+app.include_router(test_apis.router)  # Testing endpoints
 app.include_router(auth.router)
 app.include_router(oauth.router)  # Google OAuth
 app.include_router(users.router)

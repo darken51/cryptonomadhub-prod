@@ -356,6 +356,18 @@ async def list_user_audits(
     # Enrich each audit with local currency values
     results = []
     for audit in audits:
+        # ✅ TIMEOUT CHECK: Mark audit as failed if stuck for > 1 hour
+        if audit.status in ["pending", "processing"]:
+            timeout_hours = 1
+            time_elapsed = datetime.utcnow() - audit.created_at
+            if time_elapsed.total_seconds() > timeout_hours * 3600:
+                logger.warning(f"Audit {audit.id} timed out after {time_elapsed.total_seconds() / 3600:.1f} hours")
+                audit.status = "failed"
+                audit.error_message = f"Audit timed out after {timeout_hours} hour(s). The Celery worker may be unavailable. Please try again or contact support."
+                audit.completed_at = datetime.utcnow()
+                db.commit()
+                db.refresh(audit)
+
         local_currency_data = await enrich_audit_with_local_currency(audit, current_user.id, db)
 
         results.append(AuditResponse(
@@ -418,6 +430,18 @@ async def get_audit_report(
 
     if not audit:
         raise HTTPException(status_code=404, detail="Audit not found")
+
+    # ✅ TIMEOUT CHECK: Mark audit as failed if stuck for > 1 hour
+    if audit.status in ["pending", "processing"]:
+        timeout_hours = 1
+        time_elapsed = datetime.utcnow() - audit.created_at
+        if time_elapsed.total_seconds() > timeout_hours * 3600:
+            logger.warning(f"Audit {audit.id} timed out after {time_elapsed.total_seconds() / 3600:.1f} hours")
+            audit.status = "failed"
+            audit.error_message = f"Audit timed out after {timeout_hours} hour(s). The Celery worker may be unavailable. Please try again or contact support."
+            audit.completed_at = datetime.utcnow()
+            db.commit()
+            db.refresh(audit)
 
     # Get full report with pagination
     service = DeFiAuditService(db)
@@ -753,6 +777,18 @@ async def get_audit_status(
 
     if not audit:
         raise HTTPException(status_code=404, detail="Audit not found")
+
+    # ✅ TIMEOUT CHECK: Mark audit as failed if stuck for > 1 hour
+    if audit.status in ["pending", "processing"]:
+        timeout_hours = 1
+        time_elapsed = datetime.utcnow() - audit.created_at
+        if time_elapsed.total_seconds() > timeout_hours * 3600:
+            logger.warning(f"Audit {audit.id} timed out after {time_elapsed.total_seconds() / 3600:.1f} hours")
+            audit.status = "failed"
+            audit.error_message = f"Audit timed out after {timeout_hours} hour(s). The Celery worker may be unavailable. Please try again or contact support."
+            audit.completed_at = datetime.utcnow()
+            db.commit()
+            db.refresh(audit)
 
     # Calculate progress based on status
     if audit.status == "completed":

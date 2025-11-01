@@ -531,6 +531,162 @@ async def get_portfolio_summary(
     )
 
 
+@router.post("/import-exchange-csv")
+async def import_exchange_csv(
+    file: UploadFile = File(...),
+    exchange: Optional[str] = None,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Import transactions from exchange CSV (Binance, Coinbase, Kraken)
+
+    Auto-detects exchange format or specify with `exchange` param.
+    Supported: binance, coinbase, kraken
+
+    Only imports BUY transactions as cost basis acquisitions.
+    SELL transactions are ignored (will be handled in future update).
+
+    Returns:
+        Imported count and any errors/warnings
+    """
+    if not file.filename.endswith('.csv'):
+        raise HTTPException(status_code=400, detail="File must be a CSV")
+
+    try:
+        contents = await file.read()
+        csv_data = io.StringIO(contents.decode('utf-8'))
+        reader = csv.DictReader(csv_data)
+
+        # Auto-detect exchange from headers if not specified
+        headers = reader.fieldnames or []
+        if not exchange:
+            if any('UTC' in h for h in headers) and 'Pair' in headers:
+                exchange = 'binance'
+            elif 'Timestamp' in headers and 'Transaction Type' in headers:
+                exchange = 'coinbase'
+            elif 'txid' in headers and 'pair' in headers:
+                exchange = 'kraken'
+            else:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Could not auto-detect exchange format. Specify exchange parameter (binance/coinbase/kraken)"
+                )
+
+        logger.info(f"Importing from {exchange.upper()} CSV for user {current_user.id}")
+
+        imported_count = 0
+        errors = []
+        warnings = []
+
+        # Parser for each exchange
+        for row_num, row in enumerate(reader, start=2):
+            try:
+                if exchange.lower() == 'binance':
+                    # Binance format: Date(UTC), Pair, Type, Side, Price, Executed, Amount, Fee
+                    side = row.get('Side', '').strip().upper()
+                    if side != 'BUY':
+                        continue  # Skip sells for now
+
+                    date_str = row.get('Date(UTC)', '').strip()
+                    pair = row.get('Pair', '').strip()  # e.g., "ETHUSDT"
+                    price = float(row.get('Price', 0))
+                    amount = float(row.get('Executed', 0))
+
+                    # Extract token from pair (assumes USDT/BUSD/USD quote)
+                    token = pair.replace('USDT', '').replace('BUSD', '').replace('USD', '')
+                    acquisition_date = datetime.fromisoformat(date_str.replace('Z', '+00:00'))
+
+                elif exchange.lower() == 'coinbase':
+                    # Coinbase format: Timestamp, Transaction Type, Asset, Quantity Transacted, Spot Price Currency, Spot Price at Transaction
+                    tx_type = row.get('Transaction Type', '').strip().lower()
+                    if tx_type not in ['buy', 'receive']:
+                        continue  # Skip non-acquisitions
+
+                    date_str = row.get('Timestamp', '').strip()
+                    token = row.get('Asset', '').strip().upper()
+                    amount = abs(float(row.get('Quantity Transacted', 0)))
+                    spot_price_str = row.get('Spot Price at Transaction', '').strip()
+                    price = float(spot_price_str.replace('$', '').replace(',', '')) if spot_price_str else 0
+
+                    acquisition_date = datetime.fromisoformat(date_str.replace('Z', '+00:00'))
+
+                elif exchange.lower() == 'kraken':
+                    # Kraken format: txid, time, type, asset, amount, fee, balance
+                    tx_type = row.get('type', '').strip().lower()
+                    if tx_type not in ['buy', 'deposit']:
+                        continue  # Skip non-acquisitions
+
+                    date_str = row.get('time', '').strip()
+                    token = row.get('asset', '').strip().upper()
+                    amount = abs(float(row.get('amount', 0)))
+                    # Kraken doesn't include price in basic export - use 0 as placeholder
+                    price = 0.0  # User will need to manually update
+
+                    acquisition_date = datetime.fromisoformat(date_str.replace('Z', '+00:00'))
+
+                else:
+                    raise HTTPException(status_code=400, detail=f"Unsupported exchange: {exchange}")
+
+                # Validate
+                if not token or amount <= 0:
+                    continue
+
+                # Determine chain (simplified - major tokens only)
+                chain_map = {
+                    'BTC': 'bitcoin', 'ETH': 'ethereum', 'SOL': 'solana',
+                    'USDT': 'ethereum', 'USDC': 'ethereum', 'BNB': 'bsc'
+                }
+                chain = chain_map.get(token, 'ethereum')  # Default to ethereum
+
+                # Create lot
+                lot = CostBasisLot(
+                    user_id=current_user.id,
+                    token=token,
+                    chain=chain,
+                    acquisition_date=acquisition_date,
+                    acquisition_method=AcquisitionMethod.PURCHASE,
+                    acquisition_price_usd=price,
+                    original_amount=amount,
+                    remaining_amount=amount,
+                    disposed_amount=0.0,
+                    notes=f"Imported from {exchange.upper()} CSV",
+                    manually_added=True,
+                    verified=False
+                )
+
+                db.add(lot)
+                db.flush()
+
+                # Enrich with local currency
+                await enrich_lot_with_local_currency(lot, current_user.id, db)
+
+                imported_count += 1
+
+                # Warn if price is $0 (Kraken issue)
+                if price == 0:
+                    warnings.append(f"Row {row_num}: {token} imported with $0 price - please update manually")
+
+            except Exception as e:
+                errors.append(f"Row {row_num}: {str(e)}")
+
+        db.commit()
+
+        return {
+            "message": f"Successfully imported {imported_count} acquisitions from {exchange.upper()}",
+            "exchange": exchange,
+            "imported_count": imported_count,
+            "total_rows": row_num - 1 if 'row_num' in locals() else 0,
+            "errors": errors if errors else None,
+            "warnings": warnings if warnings else None,
+            "note": "Only BUY transactions imported. SELL transactions ignored."
+        }
+
+    except Exception as e:
+        logger.error(f"Failed to import exchange CSV: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to import CSV: {str(e)}")
+
+
 @router.post("/import-csv")
 async def import_cost_basis_csv(
     file: UploadFile = File(...),
@@ -789,6 +945,83 @@ async def update_cost_basis_settings(
     return {"message": "Settings updated successfully"}
 
 
+@router.get("/export/irs-8949/validate")
+async def validate_export_data(
+    year: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Validate cost basis data before export
+
+    Checks for:
+    - Missing cost basis ($0 values)
+    - Disposals without acquisition data
+    - Unrealistic gains (>1000% which may indicate $0 cost basis)
+
+    Args:
+        year: Tax year to validate
+
+    Returns:
+        Validation result with warnings
+    """
+    from app.models.cost_basis import CostBasisDisposal
+
+    start_date = datetime(year, 1, 1)
+    end_date = datetime(year, 12, 31, 23, 59, 59)
+
+    disposals = db.query(CostBasisDisposal).filter(
+        CostBasisDisposal.user_id == current_user.id,
+        CostBasisDisposal.disposal_date >= start_date,
+        CostBasisDisposal.disposal_date <= end_date
+    ).order_by(CostBasisDisposal.disposal_date).all()
+
+    if not disposals:
+        return {
+            "valid": False,
+            "error": f"No disposals found for tax year {year}",
+            "warnings": [],
+            "missing_cost_basis_count": 0
+        }
+
+    warnings = []
+    missing_cost_basis = []
+
+    for disposal in disposals:
+        # Check for $0 or very low cost basis (< $0.01)
+        if disposal.cost_basis_usd is None or disposal.cost_basis_usd < 0.01:
+            missing_cost_basis.append({
+                "token": disposal.token,
+                "amount": float(disposal.amount_disposed),
+                "disposal_date": disposal.disposal_date.isoformat(),
+                "proceeds_usd": float(disposal.disposal_price_usd * disposal.amount_disposed),
+                "cost_basis_usd": float(disposal.cost_basis_usd) if disposal.cost_basis_usd else 0.0,
+                "inflated_gain": float(disposal.gain_loss_usd)
+            })
+
+        # Check for unrealistic gains (>1000% may indicate missing cost basis)
+        if disposal.cost_basis_usd and disposal.cost_basis_usd > 0:
+            gain_percent = (disposal.gain_loss_usd / (disposal.cost_basis_usd * disposal.amount_disposed)) * 100
+            if gain_percent > 1000:
+                warnings.append({
+                    "type": "unrealistic_gain",
+                    "message": f"{disposal.token}: {gain_percent:.0f}% gain may indicate missing cost basis",
+                    "token": disposal.token,
+                    "disposal_date": disposal.disposal_date.isoformat()
+                })
+
+    has_errors = len(missing_cost_basis) > 0
+
+    return {
+        "valid": not has_errors,
+        "total_disposals": len(disposals),
+        "missing_cost_basis_count": len(missing_cost_basis),
+        "missing_cost_basis_transactions": missing_cost_basis,
+        "warnings": warnings,
+        "error_message": f"⚠️ {len(missing_cost_basis)} transactions have $0 cost basis, which will massively overstate your capital gains. Please add purchase prices before exporting." if has_errors else None
+    }
+
+
 @router.get("/export/irs-8949")
 async def export_irs_form_8949(
     year: int,
@@ -797,7 +1030,9 @@ async def export_irs_form_8949(
 ):
     """
     Export IRS Form 8949 - Sales and Other Dispositions of Capital Assets
-    
+
+    ⚠️ IMPORTANT: Call /export/irs-8949/validate first to check for missing cost basis
+
     CSV format compatible with IRS Form 8949:
     - Description of property
     - Date acquired
@@ -806,27 +1041,27 @@ async def export_irs_form_8949(
     - Cost or other basis
     - Gain or (loss)
     - Term (Short-term / Long-term)
-    
+
     Args:
         year: Tax year to export (e.g., 2024)
-    
+
     Returns:
         CSV file ready for IRS Form 8949
     """
     from app.models.cost_basis import CostBasisDisposal
     from fastapi.responses import StreamingResponse
     import io
-    
+
     # Get all disposals for the year
     start_date = datetime(year, 1, 1)
     end_date = datetime(year, 12, 31, 23, 59, 59)
-    
+
     disposals = db.query(CostBasisDisposal).filter(
         CostBasisDisposal.user_id == current_user.id,
         CostBasisDisposal.disposal_date >= start_date,
         CostBasisDisposal.disposal_date <= end_date
     ).order_by(CostBasisDisposal.disposal_date).all()
-    
+
     if not disposals:
         raise HTTPException(
             status_code=404,
