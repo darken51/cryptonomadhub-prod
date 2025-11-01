@@ -22,8 +22,8 @@ export default function AIChatFeaturePage() {
     },
     {
       icon: Globe,
-      title: 'Multi-Country Expertise',
-      description: 'Ask about tax regulations in any of 167 countries. Get instant comparisons between jurisdictions tailored to your situation.'
+      title: 'Multi-Country & Multilingual',
+      description: 'Ask about tax regulations in any of 167 countries in 100+ languages (English, French, Spanish, German, Chinese, Japanese, Arabic, Portuguese, and more). Get instant comparisons between jurisdictions tailored to your situation.'
     },
     {
       icon: Calculator,
@@ -85,7 +85,7 @@ export default function AIChatFeaturePage() {
             "name": "CryptoNomadHub AI Chat Assistant",
             "applicationCategory": "FinanceApplication",
             "operatingSystem": "Web",
-            "description": "AI-powered crypto tax chat assistant that analyzes your portfolio data across 167 countries. Get personalized tax advice, country comparisons, and optimization strategies based on your actual holdings and transactions.",
+            "description": "AI-powered crypto tax chat assistant that analyzes your portfolio data across 167 countries in 100+ languages. Get personalized tax advice, country comparisons, and optimization strategies based on your actual holdings and transactions.",
             "url": "https://cryptonomadhub.io/features/ai-chat",
             "offers": {
               "@type": "Offer",
@@ -96,6 +96,7 @@ export default function AIChatFeaturePage() {
             "featureList": [
               "Portfolio data analysis",
               "Multi-country tax expertise (167 countries)",
+              "Multilingual support (100+ languages)",
               "Context-aware conversations",
               "Tax simulation recommendations",
               "Conversation history",
@@ -163,7 +164,7 @@ export default function AIChatFeaturePage() {
             </h1>
 
             <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto mb-8">
-              AI analyzes your portfolio data (wallets, transactions, holdings) to provide personalized tax recommendations across 167 countries. Get instant answers and optimization strategies based on YOUR actual data, not generic advice.
+              AI analyzes your portfolio data (wallets, transactions, holdings) to provide personalized tax recommendations across 167 countries in 100+ languages. Get instant answers and optimization strategies based on YOUR actual data, not generic advice.
             </p>
 
             <div className="flex flex-col sm:flex-row justify-center gap-4">
