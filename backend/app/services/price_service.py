@@ -76,8 +76,20 @@ class PriceService:
     }
 
     def __init__(self):
-        self.base_url = "https://api.coingecko.com/api/v3"
-        self.client = httpx.Client(timeout=10.0)
+        # ✅ CoinGecko Pro API support
+        self.coingecko_api_key = os.getenv("COINGECKO_API_KEY", "")
+
+        # Use Pro API if key exists and starts with CG-
+        if self.coingecko_api_key and self.coingecko_api_key.startswith("CG-"):
+            self.base_url = "https://pro-api.coingecko.com/api/v3"
+            self.headers = {"x-cg-pro-api-key": self.coingecko_api_key}
+            logger.info("✅ CoinGecko PRO API enabled (500 calls/min)")
+        else:
+            self.base_url = "https://api.coingecko.com/api/v3"
+            self.headers = {}
+            logger.info("ℹ️  Using CoinGecko Free API (10-30 calls/min)")
+
+        self.client = httpx.Client(timeout=10.0, headers=self.headers)
 
         # CoinMarketCap API (fallback)
         self.cmc_api_key = os.getenv("COINMARKETCAP_API_KEY", "")
