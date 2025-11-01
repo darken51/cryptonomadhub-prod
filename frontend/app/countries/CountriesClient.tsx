@@ -102,6 +102,17 @@ export default function CountriesClient({ initialCountries }: CountriesClientPro
         <CountryAutocomplete countries={initialCountries} />
       </div>
 
+      {/* Tax Advisory Disclaimer */}
+      <div className="bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-800 rounded-lg p-4 mb-6">
+        <div className="flex items-start gap-3">
+          <Info className="w-5 h-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+          <div className="text-sm text-amber-800 dark:text-amber-200">
+            <p className="font-semibold mb-1">⚠️ Not Financial or Tax Advice</p>
+            <p>The information provided on this site is for educational and informational purposes only. Tax laws are complex and vary by jurisdiction. This data should not be considered professional tax or legal advice. Always consult with a qualified tax professional or attorney before making any decisions about tax residency or cryptocurrency taxation.</p>
+          </div>
+        </div>
+      </div>
+
       {/* Info Banner */}
       <div className="bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800 rounded-lg p-4 mb-6">
         <div className="flex items-start gap-3">

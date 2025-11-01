@@ -59,12 +59,12 @@ export default function AboutClient() {
               {
                 icon: Database,
                 title: 'Official Sources Only',
-                description: 'All data sourced from government publications, OECD, PwC, KPMG, Tax Foundation, and official tax authorities. We never rely on unverified third-party data.'
+                description: 'All data sourced from government publications, OECD, PwC, KPMG, Tax Foundation, and official tax authorities. We primarily source data from official government publications and strive to verify all information.'
               },
               {
                 icon: Shield,
-                title: 'Quarterly Updates',
-                description: 'Tax laws change frequently. Our team updates country data quarterly, with AI scrapers monitoring official sources for real-time changes.'
+                title: 'Regular Updates',
+                description: 'Tax laws change frequently. Our team monitors official sources and updates country data when regulations change.'
               },
               {
                 icon: Sparkles,
@@ -84,7 +84,7 @@ export default function AboutClient() {
               {
                 icon: Users,
                 title: 'Community Verified',
-                description: '1,200+ digital nomads use our platform daily. User feedback helps us identify outdated information quickly.'
+                description: 'Growing community of digital nomads exploring tax optimization opportunities. User feedback helps us identify outdated information quickly.'
               }
             ].map((item, idx) => (
               <motion.div

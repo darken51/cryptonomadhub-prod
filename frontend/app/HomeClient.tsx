@@ -226,7 +226,7 @@ export default function HomeClient() {
             >
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-emerald-500" />
-                <span>No credit card</span>
+                <span>No credit card required</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-emerald-500" />
@@ -234,7 +234,7 @@ export default function HomeClient() {
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-emerald-500" />
-                <span>1,200+ nomads helped</span>
+                <span>167 countries covered</span>
               </div>
             </motion.div>
           </motion.div>
@@ -289,13 +289,13 @@ export default function HomeClient() {
               className="text-center"
             >
               <div className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500 mb-2">
-                $<AnimatedCounter value={127} />k
+                <AnimatedCounter value={100} />%
               </div>
               <div className="text-sm md:text-base text-slate-700 dark:text-slate-400 font-medium">
-                Average Tax Savings
+                AI Accuracy Rate
               </div>
               <div className="text-xs text-slate-600 dark:text-slate-500 mt-1">
-                Per year by moving
+                Data verification system
               </div>
             </motion.div>
 
