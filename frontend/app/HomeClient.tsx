@@ -172,23 +172,24 @@ export default function HomeClient() {
             {/* Real Country Examples */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto text-sm">
               {[
-                { flag: '🇦🇪', country: 'UAE', tax: '0% tax', detail: 'Golden visa, no winter' },
-                { flag: '🇸🇬', country: 'Singapore', tax: '0% tax', detail: '#1 quality of life' },
-                { flag: '🇭🇰', country: 'Hong Kong', tax: '0% tax', detail: 'Financial hub, low costs' },
-                { flag: '🇵🇦', country: 'Panama', tax: '0% tax', detail: '$1,200/mo, easy visa' }
+                { flag: '🇦🇪', country: 'UAE', code: 'ae', tax: '0% tax', detail: 'Golden visa, no winter' },
+                { flag: '🇸🇬', country: 'Singapore', code: 'sg', tax: '0% tax', detail: '#1 quality of life' },
+                { flag: '🇭🇰', country: 'Hong Kong', code: 'hk', tax: '0% tax', detail: 'Financial hub, low costs' },
+                { flag: '🇵🇦', country: 'Panama', code: 'pa', tax: '0% tax', detail: '$1,200/mo, easy visa' }
               ].map((country, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={heroInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ delay: 0.3 + idx * 0.1 }}
-                  className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/20 dark:to-teal-950/20 rounded-xl p-4 border-2 border-emerald-200 dark:border-emerald-800 hover:border-emerald-400 dark:hover:border-emerald-600 transition-all hover:shadow-lg"
-                >
-                  <div className="text-3xl mb-2">{country.flag}</div>
-                  <div className="font-bold text-slate-900 dark:text-white">{country.country}</div>
-                  <div className="text-emerald-600 dark:text-emerald-400 font-semibold">{country.tax}</div>
-                  <div className="text-xs text-slate-700 dark:text-slate-400 mt-1">{country.detail}</div>
-                </motion.div>
+                <Link key={idx} href={`/countries/${country.code}`}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={heroInView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ delay: 0.3 + idx * 0.1 }}
+                    className="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/20 dark:to-teal-950/20 rounded-xl p-4 border-2 border-emerald-200 dark:border-emerald-800 hover:border-emerald-400 dark:hover:border-emerald-600 transition-all hover:shadow-lg cursor-pointer transform hover:scale-105"
+                  >
+                    <div className="text-3xl mb-2">{country.flag}</div>
+                    <div className="font-bold text-slate-900 dark:text-white">{country.country}</div>
+                    <div className="text-emerald-600 dark:text-emerald-400 font-semibold">{country.tax}</div>
+                    <div className="text-xs text-slate-700 dark:text-slate-400 mt-1">{country.detail}</div>
+                  </motion.div>
+                </Link>
               ))}
             </div>
 
@@ -569,70 +570,77 @@ export default function HomeClient() {
                 gradient: 'from-violet-500 to-fuchsia-600',
                 title: 'Tax Simulations',
                 description: 'Compare current vs target country with AI-powered explanations, confidence scores, and PDF export.',
-                features: ['AI explanations', 'Confidence scores', 'PDF reports', 'Simulation history']
+                features: ['AI explanations', 'Confidence scores', 'PDF reports', 'Simulation history'],
+                href: '/tools'
               },
               {
                 icon: MessageCircle,
                 gradient: 'from-cyan-500 to-blue-600',
                 title: 'AI Chat Assistant',
-                description: 'Advanced conversational AI that analyzes your portfolio data directly. Context-aware recommendations based on your actual positions.',
-                features: ['Analyzes your data', 'Context-aware', 'Country suggestions', 'Portfolio insights']
+                description: 'Advanced conversational AI that analyzes your portfolio data directly. Supports 100+ languages including English, French, Spanish, German, Chinese, Japanese, Arabic, and more.',
+                features: ['Analyzes your data', 'Context-aware', '100+ languages', 'Portfolio insights'],
+                href: '/chat'
               },
               {
                 icon: Activity,
                 gradient: 'from-emerald-400 to-teal-500',
                 title: 'DeFi Audit',
                 description: 'Scan 50+ chains for DeFi activity. Uniswap, Aave, Compound, Jupiter, Raydium detection.',
-                features: ['50+ chains', 'Auto-detect protocols', 'CSV/PDF export', 'Transaction history']
+                features: ['50+ chains', 'Auto-detect protocols', 'CSV/PDF export', 'Transaction history'],
+                href: '/features/defi-audit'
               },
               {
                 icon: Calculator,
                 gradient: 'from-sky-500 to-cyan-600',
                 title: 'Cost Basis Tracking',
                 description: 'FIFO, LIFO, HIFO methods with wash sale detection and IRS Form 8949 export.',
-                features: ['FIFO/LIFO/HIFO', 'Wash sale alerts', 'Form 8949 export', 'CSV import']
+                features: ['FIFO/LIFO/HIFO', 'Wash sale alerts', 'Form 8949 export', 'CSV import'],
+                href: '/cost-basis'
               },
               {
                 icon: DollarSign,
                 gradient: 'from-amber-400 to-orange-500',
                 title: 'Tax Optimizer',
                 description: 'AI-powered tax-loss harvesting and timing optimization with potential savings calculator.',
-                features: ['Loss harvesting', 'LT timing', 'Deadline tracking', 'Multi-currency']
+                features: ['Loss harvesting', 'LT timing', 'Deadline tracking', 'Multi-currency'],
+                href: '/features/tax-optimizer'
               },
               {
                 icon: TrendingUp,
                 gradient: 'from-pink-400 to-rose-500',
                 title: 'Dashboard & Alerts',
                 description: 'Central hub with portfolio stats, critical alerts, opportunities, and activity timeline.',
-                features: ['Portfolio overview', 'Alert system', 'Tax opportunities', 'Activity feed']
+                features: ['Portfolio overview', 'Alert system', 'Tax opportunities', 'Activity feed'],
+                href: '/features/dashboard'
               }
             ].map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="group relative bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 hover:border-violet-300 dark:hover:border-fuchsia-700 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-1"
-              >
-                <div className={`inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br ${feature.gradient} mb-4 group-hover:scale-110 transition-transform`}>
-                  <feature.icon className="w-7 h-7 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4">
-                  {feature.description}
-                </p>
-                <ul className="space-y-1">
-                  {feature.features.map((item, idx) => (
-                    <li key={idx} className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
-                      <div className="w-1 h-1 bg-violet-500 rounded-full" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </motion.div>
+              <Link key={index} href={feature.href}>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className="group relative bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 hover:border-violet-300 dark:hover:border-fuchsia-700 shadow-lg hover:shadow-2xl transition-all transform hover:-translate-y-1 cursor-pointer h-full"
+                >
+                  <div className={`inline-flex items-center justify-center w-14 h-14 rounded-xl bg-gradient-to-br ${feature.gradient} mb-4 group-hover:scale-110 transition-transform`}>
+                    <feature.icon className="w-7 h-7 text-white" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+                    {feature.title}
+                  </h3>
+                  <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-4">
+                    {feature.description}
+                  </p>
+                  <ul className="space-y-1">
+                    {feature.features.map((item, idx) => (
+                      <li key={idx} className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400">
+                        <div className="w-1 h-1 bg-violet-500 rounded-full" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
+              </Link>
             ))}
           </div>
         </div>
