@@ -137,13 +137,15 @@ export default function RootLayout({
         />
 
         {/* Plausible Analytics - Privacy-friendly analytics */}
-        {process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN && (
-          <script
-            defer
-            data-domain={process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN}
-            src="https://plausible.io/js/script.js"
-          />
-        )}
+        <script
+          async
+          src="https://plausible.io/js/pa-6-YkoRqckGmDdp8BgueM_.js"
+        />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init()`
+          }}
+        />
       </head>
       <body className={inter.className}>
         {/* ✅ PHASE 2.4: Accessibility improvements */}
