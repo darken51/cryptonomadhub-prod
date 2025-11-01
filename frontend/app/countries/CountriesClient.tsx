@@ -87,20 +87,15 @@ export default function CountriesClient({ initialCountries }: CountriesClientPro
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      {/* Page Title */}
-      <motion.div
-        className="mb-6 sm:mb-8"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
+      {/* Page Title - No animation for faster LCP */}
+      <div className="mb-6 sm:mb-8">
         <h1 className="text-3xl sm:text-5xl font-bold bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent mb-4">
           Country Tax Regulations
         </h1>
         <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl">
           Browse crypto tax rates for {initialCountries.length}+ countries with verified data and real-time updates
         </p>
-      </motion.div>
+      </div>
 
       {/* Autocomplete Search */}
       <div className="mb-8">
@@ -117,18 +112,6 @@ export default function CountriesClient({ initialCountries }: CountriesClientPro
           </div>
         </div>
       </div>
-
-      {/* World Map */}
-      {initialCountries.length > 0 && (
-        <div className="mb-8">
-          <WorldTaxMap countries={initialCountries} />
-        </div>
-      )}
-
-      {/* Top Countries Podium */}
-      {initialCountries.length > 0 && (
-        <TopCountriesPodium countries={initialCountries} />
-      )}
 
     {/* SEO Content Section - Moved up for better UX */}
     <motion.div
@@ -210,20 +193,16 @@ export default function CountriesClient({ initialCountries }: CountriesClientPro
       </div>
     </motion.div>
 
-      {/* Podium Countries List */}
+      {/* Podium Countries List - Priority content for LCP */}
       <div className="space-y-6 mb-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
+        <div>
           <h2 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
             Top Destinations
           </h2>
           <p className="text-slate-600 dark:text-slate-400">
             Countries featured in our podiums - the best performers for crypto investors and digital nomads
           </p>
-        </motion.div>
+        </div>
 
         {podiumCountries.map((country, index) => (
           <CountryCardWithBadges key={country.country_code} country={country} index={index} />
@@ -233,9 +212,24 @@ export default function CountriesClient({ initialCountries }: CountriesClientPro
       {/* Can't find your country notice */}
       <div className="mt-8 mb-12 bg-slate-50 dark:bg-slate-900 rounded-lg p-6 text-center border border-slate-200 dark:border-slate-700">
         <p className="text-slate-700 dark:text-slate-300 text-lg">
-          Can't find your country? Use the <strong>search bar above</strong> or click on the <strong>interactive map</strong> to explore all {initialCountries.length} countries!
+          Can't find your country? Use the <strong>search bar above</strong> or click on the <strong>interactive map below</strong> to explore all {initialCountries.length} countries!
         </p>
       </div>
+
+      {/* World Map - Moved below fold for better LCP */}
+      {initialCountries.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
+            Interactive World Tax Map
+          </h2>
+          <WorldTaxMap countries={initialCountries} />
+        </div>
+      )}
+
+      {/* Top Countries Podium - Moved below fold */}
+      {initialCountries.length > 0 && (
+        <TopCountriesPodium countries={initialCountries} />
+      )}
 
     {/* Disclaimer */}
     <motion.div

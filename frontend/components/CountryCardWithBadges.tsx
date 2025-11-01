@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { motion } from 'framer-motion'
 import { CountryWithBadges, getPositionText, getCategoryLabel } from '@/lib/podiumHelpers'
 import CountryScoreCard from '@/components/CountryScoreCard'
 
@@ -26,11 +25,7 @@ export default function CountryCardWithBadges({ country, index }: CountryCardWit
   const longTermRate = country.crypto_long_rate ?? country.cgt_long_rate
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1, duration: 0.3 }}
-      className="bg-white dark:bg-slate-800 rounded-2xl p-6 border-2 border-slate-200 dark:border-slate-700 hover:border-violet-300 dark:hover:border-fuchsia-700 transition-all hover:shadow-xl"
+    <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 border-2 border-slate-200 dark:border-slate-700 hover:border-violet-300 dark:hover:border-fuchsia-700 transition-all hover:shadow-xl"
     >
       <Link href={`/countries/${country.country_code.toLowerCase()}`} className="block">
         {/* Header with Flag and Name */}
@@ -152,6 +147,6 @@ export default function CountryCardWithBadges({ country, index }: CountryCardWit
           </div>
         )}
       </Link>
-    </motion.div>
+    </div>
   )
 }
